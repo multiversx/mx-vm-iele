@@ -1,0 +1,225 @@
+
+Done. Passed: 98. Failed: 84.
+
+
+
+Starting test ../tests/iele/albe/ERC20/approve_Caller-Positive.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/approve_Caller-Zero.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/approve_Other-Positive.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/approve_Other-Zero.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/approve_SwitchCaller.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/create.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_AllDistinct-BalanceEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_AllDistinct-BalanceNEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_AllDistinct-EntireBalanceEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_AllDistinct-NoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_AllDistinct-StillNoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_AllEqual-EntireBalance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_CallerEqFrom-EntireBalance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_CallerEqTo-BalanceNEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_Exploratory-MultipleTransfersSucceed.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_Exploratory-MultipleTransfersThrow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_FromEqTo-BalanceEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_FromEqTo-BalanceNEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_FromEqTo-EntireBalanceEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transferFrom_FromEqTo-NoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Caller-AllowanceIrrelevant.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Caller-EntireBalance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Caller-NoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Caller-Positive.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Caller-StillNoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Caller-Zero.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Other-AllowanceIrrelevant.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Other-EntireBalance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Other-NoOverflow.iele.json ...  FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Other-Positive.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Other-StillNoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/ERC20/transfer_Other-Zero.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/auction/bid_first.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/auction/bid_higher.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/auction/create.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/auction/settle_success.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/forwarder/copycreate.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/forwarder/create.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/unit/blockhash.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/unit/collision.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/unit/exceptions.iele.json ...   FAIL!!!
+Starting test ../tests/iele/albe/unit/selfdestruct.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/approve_Caller-Positive.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/approve_Caller-Zero.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/approve_Other-Positive.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/approve_Other-Zero.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/approve_SwitchCaller.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/create.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_AllDistinct-BalanceEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_AllDistinct-BalanceNEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_AllDistinct-EntireBalanceEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_AllDistinct-NoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_AllDistinct-StillNoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_AllEqual-EntireBalance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_CallerEqFrom-EntireBalance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_CallerEqTo-BalanceNEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_Exploratory-MultipleTransfersSucceed.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_Exploratory-MultipleTransfersThrow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_FromEqTo-BalanceEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_FromEqTo-BalanceNEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_FromEqTo-EntireBalanceEqAllowance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transferFrom_FromEqTo-NoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Caller-AllowanceIrrelevant.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Caller-EntireBalance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Caller-NoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Caller-Positive.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Caller-StillNoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Caller-Zero.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Other-AllowanceIrrelevant.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Other-EntireBalance.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Other-NoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Other-Positive.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Other-StillNoOverflow.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/ERC20/transfer_Other-Zero.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/auction/bid_first.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/auction/bid_higher.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/auction/create.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/auction/settle_success.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/forwarder/copycreate.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/forwarder/create.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/unit/blockhash.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/unit/collision.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/unit/exceptions.iele.json ...   FAIL!!!
+Starting test ../tests/iele/danse/unit/selfdestruct.iele.json ...   FAIL!!!
+Done. Passed: 98. Failed: 84.
+PASS
+
+
+
+
+arg:#token("5", "Int") #token("0", "Int") #token("0", "Int") res:#token("0", "Int")
+
+
+./vmtest tests/VMTests/vmArithmeticTest/signextend_BigByteBigByte/signextend_BigByteBigByte.iele.json
+arg:115792089237316195423570985008687907853269984665640564039457584007913129639935 0 256 res:-1 Z.extract:115792089237316195423570985008687907853269984665640564039457584007913129639935
+
+./vmtest tests/VMTests/vmArithmeticTest/signextend_bitIsSet/signextend_bitIsSet.iele.json
+arg:1191924 0 8 res:-12 Z.extract:244
+
+./vmtest tests/VMTests/vmArithmeticTest/signextend_BitIsSetInHigherByte/signextend_BitIsSetInHigherByte.iele.json
+arg:1243892 0 16 res:-1292 Z.extract:64244
+
+./vmtest tests/VMTests/vmArithmeticTest/signextend_AlmostBiggestByte/signextend_AlmostBiggestByte.iele.json
+arg:115792089237316195423570985008687907853269984665640564039457584007913129639934 0 256 res:-2 Z.extract:115792089237316195423570985008687907853269984665640564039457584007913129639934
+
+./vmtest tests/VMTests/vmArithmeticTest/signextend_0_BigByte/signextend_0_BigByte.iele.json
+arg:115792089237316195423570985008687907853269984665640564039457584007913129639935 0 8 res:-1 Z.extract:255
+
+./blockchaintest tests/iele/danse/unit/bits2.iele.json
+arg:128 0 8 res:-128 Z.extract:128
+arg:128 0 8 res:-128 Z.extract:128
+arg:65407 0 16 res:-129 Z.extract:65407
+
+./blockchaintest tests/iele/albe/unit/bits2.iele.json
+arg:128 0 8 res:-128 Z.extract:128
+arg:128 0 8 res:-128 Z.extract:128
+arg:65407 0 16 res:-129 Z.extract:65407
+
+
+
+				if !hookRes.Equals(eval1608) {					
+					fmt.Println("signed ext bit range off!")
+					debugPrint(c1)
+					debugPrint(c2)
+					debugPrint(c3) 
+					debugPrint(hookRes) 
+					debugPrint(eval1608) 
+				}
+
+
+
+
+
+
+
+
+
+
+
+arg:#token("99", "Int") #token("0", "Int") #token("264", "Int") res:#token("99", "Int")
+arg:#token("4", "Int") #token("0", "Int") #token("264", "Int") res:#token("4", "Int")
+arg:#token("2", "Int") #token("0", "Int") #token("264", "Int") res:#token("2", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("5", "Int") #token("0", "Int") #token("264", "Int") res:#token("5", "Int")
+arg:#token("115792089237316195423570985008687907853269984665640564039457584007913129639935", "Int") #token("0", "Int") #token("256", "Int") res:#token("-1", "Int")
+arg:#token("1191924", "Int") #token("0", "Int") #token("8", "Int") res:#token("-12", "Int")
+arg:#token("1", "Int") #token("0", "Int") #token("264", "Int") res:#token("1", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("1191786", "Int") #token("0", "Int") #token("8", "Int") res:#token("106", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("1207028", "Int") #token("0", "Int") #token("16", "Int") res:#token("27380", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("3", "Int") #token("0", "Int") #token("264", "Int") res:#token("3", "Int")
+arg:#token("1243892", "Int") #token("0", "Int") #token("16", "Int") res:#token("-1292", "Int")
+arg:#token("2", "Int") #token("0", "Int") #token("264", "Int") res:#token("2", "Int")
+arg:#token("1", "Int") #token("0", "Int") #token("264", "Int") res:#token("1", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("256", "Int") res:#token("0", "Int")
+arg:#token("5", "Int") #token("0", "Int") #token("264", "Int") res:#token("5", "Int")
+arg:#token("255", "Int") #token("0", "Int") #token("256", "Int") res:#token("255", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("2", "Int") #token("0", "Int") #token("264", "Int") res:#token("2", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("8", "Int") res:#token("0", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("1", "Int") #token("0", "Int") #token("264", "Int") res:#token("1", "Int")
+arg:#token("115792089237316195423570985008687907853269984665640564039457584007913129639934", "Int") #token("0", "Int") #token("256", "Int") res:#token("-2", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("32768", "Int") #token("0", "Int") #token("256", "Int") res:#token("32768", "Int")
+arg:#token("2", "Int") #token("0", "Int") #token("264", "Int") res:#token("2", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("4", "Int") #token("0", "Int") #token("264", "Int") res:#token("4", "Int")
+arg:#token("2", "Int") #token("0", "Int") #token("264", "Int") res:#token("2", "Int")
+arg:#token("1", "Int") #token("0", "Int") #token("264", "Int") res:#token("1", "Int")
+arg:#token("5", "Int") #token("0", "Int") #token("264", "Int") res:#token("5", "Int")
+arg:#token("115792089237316195423570985008687907853269984665640564039457584007913129639935", "Int") #token("0", "Int") #token("8", "Int") res:#token("-1", "Int")
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+arg:#token("5", "Int") #token("0", "Int") #token("264", "Int") res:#token("5", "Int")
+arg:#token("1207028", "Int") #token("0", "Int") #token("256", "Int") res:#token("1207028", "Int")
+arg:#token("1", "Int") #token("0", "Int") #token("264", "Int") res:#token("1", "Int")
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf256Of256_8/expPowerOf256Of256_8.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/sub0/sub0.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/mulmod2_1/mulmod2_1.iele.json
+arg:#token("2", "Int") #token("0", "Int") #token("264", "Int") res:#token("2", "Int")
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf256_24/expPowerOf256_24.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf2_8/expPowerOf2_8.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf256_7/expPowerOf256_7.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf256Of256_20/expPowerOf256Of256_20.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf256Of256_32/expPowerOf256Of256_32.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf2_16/expPowerOf2_16.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/mulmoddivByZero3/mulmoddivByZero3.iele.json
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+./vmtest tests/VMTests/vmArithmeticTest/smod3/smod3.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/sdiv5/sdiv5.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/smod4/smod4.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf256_28/expPowerOf256_28.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf256_2/expPowerOf256_2.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/signextend_bigBytePlus1/signextend_bigBytePlus1.iele.json
+arg:#token("67553994410557441", "Int") #token("0", "Int") #token("256", "Int") res:#token("67553994410557441", "Int")
+./vmtest tests/VMTests/vmArithmeticTest/addmod2_0/addmod2_0.iele.json
+arg:#token("2", "Int") #token("0", "Int") #token("264", "Int") res:#token("2", "Int")
+./vmtest tests/VMTests/vmArithmeticTest/expPowerOf256Of256_24/expPowerOf256Of256_24.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/divByZero/divByZero.iele.json
+./vmtest tests/VMTests/vmArithmeticTest/addmodDivByZero2/addmodDivByZero2.iele.json
+arg:#token("0", "Int") #token("0", "Int") #token("264", "Int") res:#token("0", "Int")
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatacopy_DataIndexTooHigh2_return/calldatacopy_DataIndexTooHigh2_return.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/address1/address1.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldataload2/calldataload2.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatacopy_DataIndexTooHigh/calldatacopy_DataIndexTooHigh.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/balanceCaller3/balanceCaller3.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatacopy2_return/calldatacopy2_return.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatacopyZeroMemExpansion_return/calldatacopyZeroMemExpansion_return.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/callvalue/callvalue.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/balance01/balance01.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatacopyUnderFlow/calldatacopyUnderFlow.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatacopy_DataIndexTooHigh2/calldatacopy_DataIndexTooHigh2.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatacopy_DataIndexTooHigh_return/calldatacopy_DataIndexTooHigh_return.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatasize2/calldatasize2.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldatacopy2/calldatacopy2.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/calldataloadSizeTooHighPartial/calldataloadSizeTooHighPartial.iele.json
+./vmtest tests/VMTests/vmEnvironmentalInfo/caller/caller.iele.json

@@ -1,0 +1,36 @@
+{
+    "log4_logMemsizeTooHigh": {
+        "pre": {
+            "0x0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6": {
+                "nonce": "0x00", 
+                "balance": "0x152d02c7e14af6800000", 
+                "storage": {}, 
+                "code": "0x000000b363056900076465706f73697469000a69656c652e656372656369000769656c652e696469000a69656c652e656361646469000a69656c652e65636d756c6700000000680001000262a055440000000000000000000000000000000000000000000000000000000033230261800361200461800552020ca261800661800761800861800962010a61010b61800c50052d8d61010b5205316da40063a12b61800cf600010c660005660004660003660002660001fe"
+            }
+        }, 
+        "_info": {
+            "comment": "", 
+            "source": "src/VMTestsFiller/vmLogTest/log4_logMemsizeTooHighFiller.json", 
+            "filledwith": "cpp-1.3.0+commit.6e0ce939.Linux.g++", 
+            "lllcversion": "Version: 0.4.18-develop.2017.9.25+commit.a72237f2.Linux.g++", 
+            "sourceHash": "b3acd41f1bfa729371142b2e5442241ad7f7869587faab94d091699b3d4af32b"
+        }, 
+        "env": {
+            "currentDifficulty": "0x0100", 
+            "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba", 
+            "currentNumber": "0x00", 
+            "currentGasLimit": "0x0f4240", 
+            "currentTimestamp": "0x01"
+        }, 
+        "exec": {
+            "origin": "0xcd1722f3947def4cf144679da39c4c32bdc35681", 
+            "code": "0x000000b363056900076465706f73697469000a69656c652e656372656369000769656c652e696469000a69656c652e656361646469000a69656c652e65636d756c6700000000680001000262a055440000000000000000000000000000000000000000000000000000000033230261800361200461800552020ca261800661800761800861800962010a61010b61800c50052d8d61010b5205316da40063a12b61800cf600010c660005660004660003660002660001fe", 
+            "caller": "0xcd1722f3947def4cf144679da39c4c32bdc35681", 
+            "gas": "0x0186a0", 
+            "value": "0x0de0b6b3a7640000", 
+            "address": "0x0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6", 
+            "data": "0x", 
+            "gasPrice": "0x5af3107a4000"
+        }
+    }
+}
