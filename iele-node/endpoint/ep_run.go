@@ -131,13 +131,13 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	if !kLogsOk {
 		return nil, errors.New("invalid vmResult logs")
 	}
-	var logs []*LogEntry
-	for _, klog := range kLogs {
+	logs := make([]*LogEntry, len(kLogs))
+	for i, klog := range kLogs {
 		log, logErr := convertKToLog(klog)
 		if logErr != nil {
 			return nil, logErr
 		}
-		logs = append(logs, log)
+		logs[i] = log
 	}
 
 	// accounts
@@ -179,6 +179,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 		DeletedAccounts:  deletedAddr,
 		TouchedAccounts:  touchedAddr,
 		ModifiedAccounts: modAccounts,
+		Logs:             logs,
 	}
 
 	return result, nil
@@ -302,31 +303,35 @@ func convertKToLog(klog m.K) (*LogEntry, error) {
 	if !addrOk {
 		return nil, errors.New("invalid log address")
 	}
+	ktopics, ktopicsOk := m.ExtractListData(logArgs[1], m.SortList, m.KLabelForList)
+	if !ktopicsOk {
+		return nil, errors.New("invalid log topics")
+	}
+	topics := make([]*big.Int, len(ktopics))
+	for i, ktopic := range ktopics {
+		itopic, itopicOk := ktopic.(*m.Int)
+		if !itopicOk {
+			return nil, errors.New("invalid log topic")
+		}
+		topics[i] = itopic.Value
+	}
+
+	data := logArgs[2]
+	unparseResult, unparseErr := interpreter.Eval(
+		&m.KApply{Label: m.LblUnparseByteStack, List: []m.K{data}},
+		m.InternedBottom,
+	)
+	if unparseErr != nil {
+		return nil, unparseErr
+	}
+	strResult, isStr := unparseResult.(*m.String)
+	if !isStr {
+		return nil, errors.New("log data unparse error: result is not String")
+	}
 
 	return &LogEntry{
 		Address: iAddr.Value,
+		Topics:  topics,
+		Data:    []byte(strResult.Value),
 	}, nil
 }
-
-/*
-.build/vm/iele-vm 10000 127.0.0.1
-.build/vm/iele-test-vm tests/iele/danse/factorial/factorial_positive.iele.json 10000
-.build/vm/iele-test-vm tests/iele/albe/unit/blockhash.iele.json 10000
-
-runVM(
-	#token("false", "Bool"),
-	#token("91343852333181432387730302044767688728495783936", "Int"),
-	#token("966588469268559010541288244128342317224451555083", "Int"),
-	 #token("\"\"", "String"),
-	 `ListItem`(#token("100", "Int")),
-	 #token("0", "Int"),
-	 #token("1", "Int"),
-	 #token("1026692", "Int"),
-	 #token("244687034288125203496486448490407391986876152250", "Int"),
-	 #token("131072", "Int"),
-	 #token("1", "Int"),
-	 #token("100000000000", "Int"),
-	 #token("1000", "Int"),
-	 #token("\"factorial\"", "String"))
-
-*/

@@ -161,7 +161,25 @@ func runTest(testFilePath string, test *test) error {
 				return fmt.Errorf("result gas mismatch. Want: %d. Got: %d", blResult.gas, output.GasRemaining)
 			}
 
-			//spew.Dump(output)
+			// check empty logs, this seems to be the value
+			if blResult.logs == "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347" {
+				if len(output.Logs) != 0 {
+					return fmt.Errorf("empty logs expected. Found: %v", blResult.logs)
+				}
+			} else {
+				if len(output.Logs) == 0 {
+					return fmt.Errorf("non-empty logs expected")
+				}
+				for _, log := range output.Logs {
+					if log.Address != tx.to {
+						return fmt.Errorf("log address mismatch. Want: %d. Got: %d", tx.to, log.Address)
+					}
+				}
+				// ... we're not currently testing for the actual values (via the rlp hash)
+
+				//spew.Dump(output.Logs)
+			}
+
 		}
 	}
 

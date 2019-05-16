@@ -33,8 +33,8 @@ type VMInput struct {
 // LogEntry ... contract execution log
 type LogEntry struct {
 	Address *big.Int
-	topics  []*big.Int
-	data    []byte
+	Topics  []*big.Int
+	Data    []byte
 }
 
 // VMOutput ...
