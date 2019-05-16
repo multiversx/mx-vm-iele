@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/iele-node/main/main.go",
+            "program": "${workspaceFolder}/iele-standalone/main/main.go",
             "env": {},
             "args": []
         }
