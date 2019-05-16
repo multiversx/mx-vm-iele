@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	endpoint "github.com/ElrondNetwork/elrond-vm/iele-node/endpoint"
+	eptest "github.com/ElrondNetwork/elrond-vm/iele-node/endpointtest"
 )
 
 var excludedTests = []string{
@@ -47,7 +47,7 @@ func testAllInDirectory(t *testing.T, mainDirPath string) {
 				nrSkipped++
 				fmt.Print("  skip\n")
 			} else {
-				testErr := endpoint.RunJSONTest(testFilePath)
+				testErr := eptest.RunJSONTest(testFilePath)
 				if testErr == nil {
 					nrPassed++
 					fmt.Print("  ok\n")
