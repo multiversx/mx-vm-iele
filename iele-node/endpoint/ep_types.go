@@ -2,6 +2,8 @@ package endpoint
 
 import (
 	"math/big"
+
+	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 )
 
 // BlockHeader ...
@@ -15,6 +17,7 @@ type BlockHeader struct {
 
 // VMInput ... transaction!
 type VMInput struct {
+	IsCreate      bool
 	CallerAddr    *big.Int
 	RecipientAddr *big.Int
 	InputData     string
@@ -25,21 +28,6 @@ type VMInput struct {
 	GasProvided   *big.Int
 	BlockHeader   *BlockHeader
 	Schedule      Schedule
-}
-
-// StorageUpdate ... data pertaining changes in an account storage
-type StorageUpdate struct {
-	Offset *big.Int
-	Data   *big.Int
-}
-
-// ModifiedAccount ... data containing how an account is being modified by a contract call
-type ModifiedAccount struct {
-	Address        *big.Int
-	Nonce          *big.Int
-	Balance        *big.Int
-	StorageUpdates []*StorageUpdate
-	Code           string
 }
 
 // LogEntry ... contract execution log
@@ -56,8 +44,8 @@ type VMOutput struct {
 	GasRemaining     *big.Int
 	GasRefund        *big.Int
 	Error            bool
-	ModifiedAccounts []*ModifiedAccount
-	DeletedAccounts  []*big.Int
-	TouchedAccounts  []*big.Int
+	ModifiedAccounts []*world.ModifiedAccount
+	DeletedAccounts  [][]byte
+	TouchedAccounts  [][]byte
 	Logs             []*LogEntry
 }

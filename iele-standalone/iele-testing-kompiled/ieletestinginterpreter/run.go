@@ -2,11 +2,12 @@ package ieletestinginterpreter
 
 import (
 	"fmt"
-	koreparser "github.com/ElrondNetwork/elrond-vm/iele-standalone/iele-testing-kompiled/koreparser"
 	"log"
-	m "github.com/ElrondNetwork/elrond-vm/iele-standalone/iele-testing-kompiled/ieletestingmodel"
 	"math"
 	"os/exec"
+
+	m "github.com/ElrondNetwork/elrond-vm/iele-standalone/iele-testing-kompiled/ieletestingmodel"
+	koreparser "github.com/ElrondNetwork/elrond-vm/iele-standalone/iele-testing-kompiled/koreparser"
 )
 
 func callKast(kdir string, programPath string) []byte {
@@ -108,10 +109,18 @@ func TakeStepsNoThread(k m.K, maxSteps int) (finalState m.K, stepsMade int, err 
 	}
 
 	for stepsMade < maxSteps {
+		if stepsMade == 10000 {
+			// traceHandlers = append(traceHandlers, &tracePrettyDebug{})
+			// initializeTrace()
+			// defer closeTrace()
+		}
 		traceStepStart(stepsMade, finalState)
 		finalState, err = step(finalState)
 		if err != nil {
 			if _, t := err.(*noStepError); t {
+				traceHandlers = append(traceHandlers, &tracePrettyDebug{})
+				initializeTrace()
+				defer closeTrace()
 				traceNoStep(stepsMade, finalState)
 				err = nil
 			}

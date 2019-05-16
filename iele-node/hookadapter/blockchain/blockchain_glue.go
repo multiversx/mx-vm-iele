@@ -89,11 +89,11 @@ func GetCode(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 
 // GetBlockhash ... adapts between K model and elrond function
 func GetBlockhash(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	acct, isInt := c.(*m.Int)
+	offset, isInt := c.(*m.Int)
 	if !isInt {
 		return m.NoResult, &hookInvalidArgsError{}
 	}
-	result, err := blockchain.GetBlockhash(acct.Value)
+	result, err := blockchain.GetBlockhash(offset.Value)
 	if err != nil {
 		return m.NoResult, err
 	}

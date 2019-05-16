@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	interpreter "kgoieletesting/iele-testing-kompiled/ieletestinginterpreter"
 	"path"
+
+	interpreter "github.com/ElrondNetwork/elrond-vm/iele-standalone/iele-testing-kompiled/ieletestinginterpreter"
 )
 
 func main() {
@@ -13,11 +14,11 @@ func main() {
 
 	// debugTest("tests/iele/danse/ill-formed/illFormed2.iele.json")
 	// debugTest("tests/iele/danse/factorial/factorial_positive.iele.json")
-	// debugTest("tests/iele/danse/forwarder/create.iele.json")
-
-	debugTest("tests/iele/danse/ERC20/transferFrom_AllDistinct-BalanceEqAllowance.iele.json")
+	debugTest("tests/iele/albe/unit/exceptions.iele.json")
 
 }
+
+// .build/vm/iele-test-vm tests/iele/danse/forwarder/create.iele.json 10000
 
 func debugTest(testFile string) {
 	err := runTest(path.Join(ieleTestRoot, testFile), gasModeNormal, false, false)

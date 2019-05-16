@@ -16,13 +16,14 @@ const (
 	Default Schedule = iota
 
 	// Albe ... IELE "ALBE" gas model, this was their first version
-	Albe Schedule = iota
+	Albe
 
 	// Danse ... IELE "DANSE" gas model, this is the latest version
-	Danse Schedule = iota
+	Danse
 )
 
-func parseSchedule(scheduleName string) (Schedule, error) {
+// ParseSchedule ... yields a schedule type based on its string representation
+func ParseSchedule(scheduleName string) (Schedule, error) {
 	switch scheduleName {
 	case "Default":
 		return Default, nil
@@ -51,7 +52,8 @@ func scheduleToK(schedule Schedule) m.K {
 var emptyWordStack = &m.KApply{Label: m.ParseKLabel(".WordStack_IELE-DATA"), List: nil}
 var wordStackElemLabel = m.ParseKLabel("_:__IELE-DATA")
 
-func g0(schedule Schedule, txCreate bool, dataForGas string, args []*big.Int) (*big.Int, error) {
+// G0 ... computes the gas cost for starting a smart contract
+func G0(schedule Schedule, txCreate bool, dataForGas string, args []*big.Int) (*big.Int, error) {
 	kschedule := scheduleToK(schedule)
 	kargList := &m.KApply{Label: m.LblXdotListXlbracketXquoteoperandListXquoteXrbracket, List: []m.K{}}
 	for i := len(args) - 1; i >= 0; i-- {

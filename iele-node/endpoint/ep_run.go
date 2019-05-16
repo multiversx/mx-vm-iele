@@ -4,6 +4,7 @@ import (
 	"errors"
 	"math/big"
 
+	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele-node/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele-node/iele-testing-kompiled/ieletestingmodel"
 )
@@ -14,8 +15,6 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 		return nil, errors.New("block header required")
 	}
 
-	isCreate := input.RecipientAddr.Sign() == 0
-
 	kargs := make([]m.K, len(input.Arguments))
 	for i, arg := range input.Arguments {
 		kargs[i] = m.NewInt(arg)
@@ -23,7 +22,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	kargList := &m.List{Sort: m.SortList, Label: m.LblXuListXu, Data: kargs}
 
 	kapp := &m.KApply{Label: m.LblRunVM, List: []m.K{
-		m.ToBool(isCreate),
+		m.ToBool(input.IsCreate),
 		m.NewInt(input.RecipientAddr),
 		m.NewInt(input.CallerAddr),
 		m.NewString(input.InputData),
@@ -118,13 +117,13 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	if !kSelfDestructOk {
 		return nil, errors.New("invalid vmResult self destruct list")
 	}
-	var deletedAddr []*big.Int
+	var deletedAddr [][]byte
 	for _, ksd := range kSelfDestruct {
 		isd, isdOk := ksd.(*m.Int)
 		if !isdOk {
 			return nil, errors.New("self destruct address not of type Int")
 		}
-		deletedAddr = append(deletedAddr, isd.Value)
+		deletedAddr = append(deletedAddr, world.AccountAddress(isd.Value))
 	}
 
 	// logs
@@ -150,7 +149,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	if !kAccountsMapOk {
 		return nil, errors.New("invalid vmResult account map")
 	}
-	var modAccounts []*ModifiedAccount
+	var modAccounts []*world.ModifiedAccount
 	for _, kacc := range kAccountsMapData {
 		modAccount, modAccErr := convertKToModifiedAccount(kacc)
 		if modAccErr != nil {
@@ -163,13 +162,13 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	if !kTouchedOk {
 		return nil, errors.New("invalid vmResult touched accounts list")
 	}
-	var touchedAddr []*big.Int
+	var touchedAddr [][]byte
 	for _, kt := range kTouched {
 		it, itOk := kt.(*m.Int)
 		if !itOk {
 			return nil, errors.New("touched address not of type Int")
 		}
-		touchedAddr = append(touchedAddr, it.Value)
+		touchedAddr = append(touchedAddr, world.AccountAddress(it.Value))
 	}
 
 	result := &VMOutput{
@@ -185,7 +184,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	return result, nil
 }
 
-func convertKToModifiedAccount(kacc m.K) (*ModifiedAccount, error) {
+func convertKToModifiedAccount(kacc m.K) (*world.ModifiedAccount, error) {
 	kappAcc, kappAccOk5 := m.ExtractKApplyArgs(kacc, m.LblXltaccountXgt, 5)
 	if !kappAccOk5 {
 		var kappAccOk6 bool
@@ -234,7 +233,7 @@ func convertKToModifiedAccount(kacc m.K) (*ModifiedAccount, error) {
 	if !storageDataOk {
 		return nil, errors.New("invalid account storage")
 	}
-	var storageUpdates []*StorageUpdate
+	var storageUpdates []*world.StorageUpdate
 	for kmpkey, kvalue := range storageData {
 		kkey, kkeyErr := kmpkey.ToKItem()
 		if kkeyErr != nil {
@@ -248,7 +247,7 @@ func convertKToModifiedAccount(kacc m.K) (*ModifiedAccount, error) {
 		if !ivalueOk {
 			return nil, errors.New("invalid account storage value")
 		}
-		storageUpdates = append(storageUpdates, &StorageUpdate{
+		storageUpdates = append(storageUpdates, &world.StorageUpdate{
 			Offset: ikey.Value,
 			Data:   ivalue.Value,
 		})
@@ -266,8 +265,8 @@ func convertKToModifiedAccount(kacc m.K) (*ModifiedAccount, error) {
 		return nil, errors.New("invalid account nonce")
 	}
 
-	return &ModifiedAccount{
-		Address:        iaddr.Value,
+	return &world.ModifiedAccount{
+		Address:        world.AccountAddress(iaddr.Value),
 		Balance:        ibalance.Value,
 		Nonce:          inonce.Value,
 		StorageUpdates: storageUpdates,
@@ -312,6 +311,7 @@ func convertKToLog(klog m.K) (*LogEntry, error) {
 /*
 .build/vm/iele-vm 10000 127.0.0.1
 .build/vm/iele-test-vm tests/iele/danse/factorial/factorial_positive.iele.json 10000
+.build/vm/iele-test-vm tests/iele/albe/unit/blockhash.iele.json 10000
 
 runVM(
 	#token("false", "Bool"),

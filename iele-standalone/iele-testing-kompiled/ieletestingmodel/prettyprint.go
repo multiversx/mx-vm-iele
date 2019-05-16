@@ -92,7 +92,7 @@ func (k *Map) prettyPrint(sb *strings.Builder, indent int) {
 		for _, pair := range orderedKVPairs {
 			sb.WriteString("\n")
 			addIndent(sb, indent+1)
-			sb.WriteString(pair.KeyAsString)
+			pair.Key.prettyPrint(sb, indent+1)
 			sb.WriteString(" => ")
 			pair.Value.prettyPrint(sb, indent+1)
 		}
@@ -172,7 +172,7 @@ func (k *Array) prettyPrint(sb *strings.Builder, indent int) {
 }
 
 func (k *Int) prettyPrint(sb *strings.Builder, indent int) {
-	sb.WriteString(fmt.Sprintf("Int (%s)", k.Value.String()))
+	sb.WriteString(fmt.Sprintf("Int (0x%s | %s)", k.Value.Text(16), k.Value.String()))
 }
 
 func (k *MInt) prettyPrint(sb *strings.Builder, indent int) {

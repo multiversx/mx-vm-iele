@@ -2,11 +2,12 @@ package ieletestinginterpreter
 
 import (
 	"fmt"
-	koreparser "github.com/ElrondNetwork/elrond-vm/iele-node/iele-testing-kompiled/koreparser"
 	"log"
-	m "github.com/ElrondNetwork/elrond-vm/iele-node/iele-testing-kompiled/ieletestingmodel"
 	"math"
 	"os/exec"
+
+	m "github.com/ElrondNetwork/elrond-vm/iele-node/iele-testing-kompiled/ieletestingmodel"
+	koreparser "github.com/ElrondNetwork/elrond-vm/iele-node/iele-testing-kompiled/koreparser"
 )
 
 func callKast(kdir string, programPath string) []byte {
@@ -95,6 +96,10 @@ func Execute(kastMap map[string][]byte, options ExecuteOptions) (finalState m.K,
 
 // TakeStepsNoThread ... executes as many steps as possible given the starting configuration
 func TakeStepsNoThread(k m.K, maxSteps int) (finalState m.K, stepsMade int, err error) {
+	// traceHandlers = append(traceHandlers, &tracePrettyDebug{})
+	// initializeTrace()
+	// defer closeTrace()
+
 	stepsMade = 0
 	traceInitialState(k)
 
