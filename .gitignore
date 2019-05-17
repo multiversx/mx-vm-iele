@@ -1,6 +1,10 @@
 
+/iele-node/*-kompiled/
+/iele-node/kompile/kompile
 /iele-node/main/main
 /iele-node/main/trace_*/
 
+/iele-standalone/*-kompiled/
+/iele-standalone/kompile/kompile
 /iele-standalone/main/main
 /iele-standalone/main/trace_*/
