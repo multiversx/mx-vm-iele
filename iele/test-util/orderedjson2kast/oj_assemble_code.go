@@ -5,46 +5,43 @@ import (
 	"strings"
 
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
+	oj "github.com/ElrondNetwork/elrond-vm/iele/test-util/orderedjson"
 )
 
-func (j *OJsonMap) assembleIele(testPath string) {
-	isCreateTx := false
-	for _, keyValuePair := range j.orderedKV {
-		if keyValuePair.key == "to" {
-			if strVal, isStr := keyValuePair.value.(*OJsonString); isStr {
-				if string(*strVal) == "" {
-					isCreateTx = true
-					break
+func assembleIele(jobj oj.OJsonObject, testPath string) {
+	switch j := jobj.(type) {
+	case *oj.OJsonMap:
+		isCreateTx := false
+		for _, keyValuePair := range j.OrderedKV {
+			if keyValuePair.Key == "to" {
+				if strVal, isStr := keyValuePair.Value.(*oj.OJsonString); isStr {
+					if string(*strVal) == "" {
+						isCreateTx = true
+						break
+					}
 				}
 			}
 		}
-	}
 
-	for _, keyValuePair := range j.orderedKV {
-		if keyValuePair.key == "code" ||
-			(keyValuePair.key == "contractCode" && isCreateTx) {
-			if strVal, isStr := keyValuePair.value.(*OJsonString); isStr {
-				assembled := assembleIeleCode(testPath, string(*strVal))
-				asJObj := OJsonString(assembled)
-				keyValuePair.value = &asJObj
+		for _, keyValuePair := range j.OrderedKV {
+			if keyValuePair.Key == "code" ||
+				(keyValuePair.Key == "contractCode" && isCreateTx) {
+				if strVal, isStr := keyValuePair.Value.(*oj.OJsonString); isStr {
+					assembled := assembleIeleCode(testPath, string(*strVal))
+					asJObj := oj.OJsonString(assembled)
+					keyValuePair.Value = &asJObj
+				}
+			} else {
+				assembleIele(keyValuePair.Value, testPath)
 			}
-		} else {
-			keyValuePair.value.assembleIele(testPath)
 		}
+	case *oj.OJsonList:
+		collection := []oj.OJsonObject(*j)
+		for _, elem := range collection {
+			assembleIele(elem, testPath)
+		}
+	default:
 	}
-}
-
-func (j *OJsonList) assembleIele(testPath string) {
-	collection := []OJsonObject(*j)
-	for _, elem := range collection {
-		elem.assembleIele(testPath)
-	}
-}
-
-func (j *OJsonString) assembleIele(testPath string) {
-}
-
-func (j *OJsonBool) assembleIele(testPath string) {
 }
 
 func assembleIeleCode(testPath string, value string) string {

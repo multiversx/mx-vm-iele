@@ -3,57 +3,57 @@ package orderedjson2kast
 import (
 	"fmt"
 	"strings"
+
+	oj "github.com/ElrondNetwork/elrond-vm/iele/test-util/orderedjson"
 )
 
-func jsonToKastOrdered(j OJsonObject) string {
+func jsonToKastOrdered(j oj.OJsonObject) string {
 	var sb strings.Builder
-	j.writeKast(&sb)
+	writeKast(j, &sb)
 	return sb.String()
-}
-
-func (j *OJsonString) writeKast(sb *strings.Builder) {
-	value := string(*j)
-	writeStringKast(sb, value)
 }
 
 func writeStringKast(sb *strings.Builder, value string) {
 	sb.WriteString(fmt.Sprintf("#token(\"\\\"%s\\\"\",\"String\")", value))
 }
 
-func (j *OJsonBool) writeKast(sb *strings.Builder) {
-	value := bool(*j)
-	sb.WriteString(fmt.Sprintf("#token(\"%t\",\"Bool\")", value))
-}
-
-func (j *OJsonMap) writeKast(sb *strings.Builder) {
-
-	sb.WriteString("`{_}_IELE-DATA`(")
-	for _, keyValuePair := range j.orderedKV {
-		sb.WriteString("`_,__IELE-DATA`(`_:__IELE-DATA`(")
-		writeStringKast(sb, keyValuePair.key)
-		sb.WriteString(",")
-		keyValuePair.value.writeKast(sb)
-		sb.WriteString("),")
-	}
-	sb.WriteString("`.List{\"_,__IELE-DATA\"}`(.KList)")
-	for i := 0; i < j.size(); i++ {
+func writeKast(jobj oj.OJsonObject, sb *strings.Builder) {
+	switch j := jobj.(type) {
+	case *oj.OJsonMap:
+		sb.WriteString("`{_}_IELE-DATA`(")
+		for _, keyValuePair := range j.OrderedKV {
+			sb.WriteString("`_,__IELE-DATA`(`_:__IELE-DATA`(")
+			writeStringKast(sb, keyValuePair.Key)
+			sb.WriteString(",")
+			writeKast(keyValuePair.Value, sb)
+			sb.WriteString("),")
+		}
+		sb.WriteString("`.List{\"_,__IELE-DATA\"}`(.KList)")
+		for i := 0; i < j.Size(); i++ {
+			sb.WriteString(")")
+		}
 		sb.WriteString(")")
-	}
-	sb.WriteString(")")
-}
+	case *oj.OJsonList:
+		collection := []oj.OJsonObject(*j)
 
-func (j *OJsonList) writeKast(sb *strings.Builder) {
-	collection := []OJsonObject(*j)
-
-	sb.WriteString("`[_]_IELE-DATA`(")
-	for _, elem := range collection {
-		sb.WriteString("`_,__IELE-DATA`(")
-		elem.writeKast(sb)
-		sb.WriteString(",")
-	}
-	sb.WriteString("`.List{\"_,__IELE-DATA\"}`(.KList)")
-	for i := 0; i < len(collection); i++ {
+		sb.WriteString("`[_]_IELE-DATA`(")
+		for _, elem := range collection {
+			sb.WriteString("`_,__IELE-DATA`(")
+			writeKast(elem, sb)
+			sb.WriteString(",")
+		}
+		sb.WriteString("`.List{\"_,__IELE-DATA\"}`(.KList)")
+		for i := 0; i < len(collection); i++ {
+			sb.WriteString(")")
+		}
 		sb.WriteString(")")
+	case *oj.OJsonString:
+		value := string(*j)
+		writeStringKast(sb, value)
+	case *oj.OJsonBool:
+		value := bool(*j)
+		sb.WriteString(fmt.Sprintf("#token(\"%t\",\"Bool\")", value))
+	default:
+		panic("unknown OJsonObject type")
 	}
-	sb.WriteString(")")
 }

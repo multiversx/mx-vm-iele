@@ -1,4 +1,4 @@
-package orderedjson2kast
+package orderedjson
 
 import (
 	"fmt"
@@ -20,13 +20,13 @@ func addIndent(sb *strings.Builder, indent int) {
 
 func (j *OJsonMap) writeJSON(sb *strings.Builder, indent int) {
 	sb.WriteString("{")
-	for i, child := range j.orderedKV {
+	for i, child := range j.OrderedKV {
 		sb.WriteString("\n")
 		addIndent(sb, indent+1)
-		sb.WriteString(child.key)
+		sb.WriteString(child.Key)
 		sb.WriteString(": ")
-		child.value.writeJSON(sb, indent+1)
-		if i < len(j.orderedKV)-1 {
+		child.Value.writeJSON(sb, indent+1)
+		if i < len(j.OrderedKV)-1 {
 			sb.WriteString(",")
 		}
 	}

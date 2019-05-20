@@ -1,4 +1,4 @@
-package orderedjson2kast
+package orderedjson
 
 import (
 	"strings"
@@ -7,20 +7,18 @@ import (
 // OJsonObject ... ordered JSON tree object interface
 type OJsonObject interface {
 	writeJSON(sb *strings.Builder, indent int)
-	writeKast(sb *strings.Builder)
-	assembleIele(testPath string)
 }
 
 // OJsonKeyValuePair ... since this ir ordered JSON, maps are really ordered lists of key value pairs, this class
 type OJsonKeyValuePair struct {
-	key   string
-	value OJsonObject
+	Key   string
+	Value OJsonObject
 }
 
 // OJsonMap ... ordered map, actually a list of key value pairs
 type OJsonMap struct {
-	keySet    map[string]bool
-	orderedKV []*OJsonKeyValuePair
+	KeySet    map[string]bool
+	OrderedKV []*OJsonKeyValuePair
 }
 
 // OJsonList ... JSON list
@@ -33,18 +31,19 @@ type OJsonString string
 type OJsonBool bool
 
 func newMap() *OJsonMap {
-	keySet := make(map[string]bool)
-	return &OJsonMap{keySet: keySet, orderedKV: nil}
+	KeySet := make(map[string]bool)
+	return &OJsonMap{KeySet: KeySet, OrderedKV: nil}
 }
 
 func (j *OJsonMap) put(kvPair *OJsonKeyValuePair) {
-	_, alreadyInserted := j.keySet[kvPair.key]
+	_, alreadyInserted := j.KeySet[kvPair.Key]
 	if !alreadyInserted {
-		j.keySet[kvPair.key] = true
-		j.orderedKV = append(j.orderedKV, kvPair)
+		j.KeySet[kvPair.Key] = true
+		j.OrderedKV = append(j.OrderedKV, kvPair)
 	}
 }
 
-func (j *OJsonMap) size() int {
-	return len(j.orderedKV)
+// Size ... size of ordered map
+func (j *OJsonMap) Size() int {
+	return len(j.OrderedKV)
 }

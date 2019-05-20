@@ -1,4 +1,4 @@
-package orderedjson2kast
+package orderedjson
 
 import (
 	"bytes"
@@ -132,7 +132,7 @@ func ParseOrderedJSON(input []byte) (OJsonObject, error) {
 					stateStack.pop()
 				} else if c == ',' {
 					stateStack.push(&jsonStateMapKeyValue{})
-				} else if specificState.currentMap.size() == 0 {
+				} else if specificState.currentMap.Size() == 0 {
 					stateStack.push(&jsonStateMapKeyValue{})
 					done = false
 				} else {
@@ -175,7 +175,7 @@ func ParseOrderedJSON(input []byte) (OJsonObject, error) {
 						return nil, errors.New("map key should be a string enclosed in quotes")
 					}
 					key = key[1 : len(key)-1]
-					keyValuePair := &OJsonKeyValuePair{key: key, value: pendingResult}
+					keyValuePair := &OJsonKeyValuePair{Key: key, Value: pendingResult}
 					pendingResult = nil
 					stateStack.pop()
 					mapState, isMap := stateStack.peek().(*jsonParserStateMap)
