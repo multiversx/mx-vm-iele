@@ -1,7 +1,11 @@
 #!/bin/sh
 
-rm -rf $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/original/node/iele-testing-kompiled
-go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/original/node/kompile
+./kompile-clear
 
-rm -rf $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled
+go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/original/node/kompile
 go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/original/standalone/kompile
+
+go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/elrond/node/kompile
+go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/elrond/standalone/kompile
+
+go test ./...
