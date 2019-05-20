@@ -18,27 +18,28 @@ type jsonParserStateSingleValue struct {
 }
 
 type jsonParserStateMap struct {
-	currentMap *jsonMap
+	currentMap *OJsonMap
 }
 
 type jsonStateMapKeyValue struct {
 	keyBuffer bytes.Buffer
 	state     int // 0=key, 1=':', 2=value
-	currentKV jsonKeyValuePair
+	currentKV OJsonKeyValuePair
 }
 
 type jsonParserStateList struct {
-	list jsonList
+	list OJsonList
 }
 
 func isWhitespace(c byte) bool {
 	return c == ' ' || c == '\n' || c == '\t'
 }
 
-func parseOrderedJSON(input []byte) (jsonObject, error) {
+// ParseOrderedJSON ... parses JSON preserving order in maps
+func ParseOrderedJSON(input []byte) (OJsonObject, error) {
 	stateStack := &jsonParserStateStack{}
 	stateStack.push(&jsonParserStateAnyObjPlaceholder{})
-	var pendingResult jsonObject
+	var pendingResult OJsonObject
 
 	for i, c := range input {
 		done := false
@@ -174,7 +175,7 @@ func parseOrderedJSON(input []byte) (jsonObject, error) {
 						return nil, errors.New("map key should be a string enclosed in quotes")
 					}
 					key = key[1 : len(key)-1]
-					keyValuePair := &jsonKeyValuePair{key: key, value: pendingResult}
+					keyValuePair := &OJsonKeyValuePair{key: key, value: pendingResult}
 					pendingResult = nil
 					stateStack.pop()
 					mapState, isMap := stateStack.peek().(*jsonParserStateMap)
@@ -199,19 +200,19 @@ func parseOrderedJSON(input []byte) (jsonObject, error) {
 	return pendingResult, nil
 }
 
-func (s *jsonParserStateSingleValue) finalize() (jsonObject, error) {
+func (s *jsonParserStateSingleValue) finalize() (OJsonObject, error) {
 	str := s.buffer.String()
 	if strings.HasPrefix(str, "\"") && strings.HasSuffix(str, "\"") {
-		result := jsonString(str)
+		result := OJsonString(str)
 		result = result[1 : len(result)-1]
 		return &result, nil
 	}
 	if str == "true" {
-		result := jsonBool(true)
+		result := OJsonBool(true)
 		return &result, nil
 	}
 	if str == "false" {
-		result := jsonBool(false)
+		result := OJsonBool(false)
 		return &result, nil
 	}
 	return nil, errors.New("Invalid value: " + str)

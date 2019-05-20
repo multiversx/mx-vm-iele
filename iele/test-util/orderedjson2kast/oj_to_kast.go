@@ -5,13 +5,13 @@ import (
 	"strings"
 )
 
-func jsonToKastOrdered(j jsonObject) string {
+func jsonToKastOrdered(j OJsonObject) string {
 	var sb strings.Builder
 	j.writeKast(&sb)
 	return sb.String()
 }
 
-func (j *jsonString) writeKast(sb *strings.Builder) {
+func (j *OJsonString) writeKast(sb *strings.Builder) {
 	value := string(*j)
 	writeStringKast(sb, value)
 }
@@ -20,12 +20,12 @@ func writeStringKast(sb *strings.Builder, value string) {
 	sb.WriteString(fmt.Sprintf("#token(\"\\\"%s\\\"\",\"String\")", value))
 }
 
-func (j *jsonBool) writeKast(sb *strings.Builder) {
+func (j *OJsonBool) writeKast(sb *strings.Builder) {
 	value := bool(*j)
 	sb.WriteString(fmt.Sprintf("#token(\"%t\",\"Bool\")", value))
 }
 
-func (j *jsonMap) writeKast(sb *strings.Builder) {
+func (j *OJsonMap) writeKast(sb *strings.Builder) {
 
 	sb.WriteString("`{_}_IELE-DATA`(")
 	for _, keyValuePair := range j.orderedKV {
@@ -42,8 +42,8 @@ func (j *jsonMap) writeKast(sb *strings.Builder) {
 	sb.WriteString(")")
 }
 
-func (j *jsonList) writeKast(sb *strings.Builder) {
-	collection := []jsonObject(*j)
+func (j *OJsonList) writeKast(sb *strings.Builder) {
+	collection := []OJsonObject(*j)
 
 	sb.WriteString("`[_]_IELE-DATA`(")
 	for _, elem := range collection {

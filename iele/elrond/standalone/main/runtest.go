@@ -10,7 +10,7 @@ import (
 
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/standalone/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/standalone/iele-testing-kompiled/ieletestingmodel"
-	oj2k "github.com/ElrondNetwork/elrond-vm/iele/elrond/standalone/orderedjson2kast"
+	oj2k "github.com/ElrondNetwork/elrond-vm/iele/test-util/orderedjson2kast"
 )
 
 type gasMode string

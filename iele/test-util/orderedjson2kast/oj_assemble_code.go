@@ -7,11 +7,11 @@ import (
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 )
 
-func (j *jsonMap) assembleIele(testPath string) {
+func (j *OJsonMap) assembleIele(testPath string) {
 	isCreateTx := false
 	for _, keyValuePair := range j.orderedKV {
 		if keyValuePair.key == "to" {
-			if strVal, isStr := keyValuePair.value.(*jsonString); isStr {
+			if strVal, isStr := keyValuePair.value.(*OJsonString); isStr {
 				if string(*strVal) == "" {
 					isCreateTx = true
 					break
@@ -23,9 +23,9 @@ func (j *jsonMap) assembleIele(testPath string) {
 	for _, keyValuePair := range j.orderedKV {
 		if keyValuePair.key == "code" ||
 			(keyValuePair.key == "contractCode" && isCreateTx) {
-			if strVal, isStr := keyValuePair.value.(*jsonString); isStr {
+			if strVal, isStr := keyValuePair.value.(*OJsonString); isStr {
 				assembled := assembleIeleCode(testPath, string(*strVal))
-				asJObj := jsonString(assembled)
+				asJObj := OJsonString(assembled)
 				keyValuePair.value = &asJObj
 			}
 		} else {
@@ -34,17 +34,17 @@ func (j *jsonMap) assembleIele(testPath string) {
 	}
 }
 
-func (j *jsonList) assembleIele(testPath string) {
-	collection := []jsonObject(*j)
+func (j *OJsonList) assembleIele(testPath string) {
+	collection := []OJsonObject(*j)
 	for _, elem := range collection {
 		elem.assembleIele(testPath)
 	}
 }
 
-func (j *jsonString) assembleIele(testPath string) {
+func (j *OJsonString) assembleIele(testPath string) {
 }
 
-func (j *jsonBool) assembleIele(testPath string) {
+func (j *OJsonBool) assembleIele(testPath string) {
 }
 
 func assembleIeleCode(testPath string, value string) string {

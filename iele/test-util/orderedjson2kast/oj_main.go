@@ -8,7 +8,7 @@ import (
 // assembles code if necessary
 // and converts to KAST format, readable by K
 func ConvertOrderedJSONToKast(data []byte, testFilePath string) (string, error) {
-	jsonObj, err := parseOrderedJSON(data)
+	jsonObj, err := ParseOrderedJSON(data)
 	if err != nil {
 		return "", err
 	}
