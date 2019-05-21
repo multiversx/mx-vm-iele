@@ -19,24 +19,31 @@ func addIndent(sb *strings.Builder, indent int) {
 }
 
 func (j *OJsonMap) writeJSON(sb *strings.Builder, indent int) {
+	if j.Size() == 0 {
+		sb.WriteString("{}")
+		return
+	}
+
 	sb.WriteString("{")
 	for i, child := range j.OrderedKV {
 		sb.WriteString("\n")
 		addIndent(sb, indent+1)
+		sb.WriteString("\"")
 		sb.WriteString(child.Key)
-		sb.WriteString(": ")
+		sb.WriteString("\": ")
 		child.Value.writeJSON(sb, indent+1)
 		if i < len(j.OrderedKV)-1 {
 			sb.WriteString(",")
 		}
 	}
+	sb.WriteString("\n")
 	addIndent(sb, indent)
-	sb.WriteString("\n}")
+	sb.WriteString("}")
 }
 
 func (j *OJsonList) writeJSON(sb *strings.Builder, indent int) {
 	collection := []OJsonObject(*j)
-	sb.WriteString("[\n")
+	sb.WriteString("[")
 	for i, child := range collection {
 		sb.WriteString("\n")
 		addIndent(sb, indent+1)
@@ -45,11 +52,13 @@ func (j *OJsonList) writeJSON(sb *strings.Builder, indent int) {
 			sb.WriteString(",")
 		}
 	}
-	sb.WriteString("\n]")
+	sb.WriteString("\n")
+	addIndent(sb, indent)
+	sb.WriteString("]")
 }
 
 func (j *OJsonString) writeJSON(sb *strings.Builder, indent int) {
-	sb.WriteString(string(*j))
+	sb.WriteString(fmt.Sprintf("\"%s\"", string(*j)))
 }
 
 func (j *OJsonBool) writeJSON(sb *strings.Builder, indent int) {

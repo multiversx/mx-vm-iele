@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/iele/original/node/main/main.go",
+            "program": "${workspaceFolder}/iele/elrond/tests/original-to-elrond/main.go",
             "env": {},
             "args": []
         }

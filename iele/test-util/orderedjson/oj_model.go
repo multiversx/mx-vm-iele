@@ -47,3 +47,11 @@ func (j *OJsonMap) put(kvPair *OJsonKeyValuePair) {
 func (j *OJsonMap) Size() int {
 	return len(j.OrderedKV)
 }
+
+// RefreshKeySet ... recreate the key set from the key value pairs
+func (j *OJsonMap) RefreshKeySet() {
+	j.KeySet = make(map[string]bool)
+	for _, kv := range j.OrderedKV {
+		j.KeySet[kv.Key] = true
+	}
+}
