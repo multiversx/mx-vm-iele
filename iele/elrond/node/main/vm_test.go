@@ -33,7 +33,7 @@ func isExcluded(testPath string) bool {
 }
 
 func TestIeleTests(t *testing.T) {
-	dirPath := path.Join(ieleTestRoot, "tests/iele")
+	dirPath := path.Join(ieleTestRoot, "tests/iele-v1")
 	testAllInDirectory(t, dirPath)
 }
 
