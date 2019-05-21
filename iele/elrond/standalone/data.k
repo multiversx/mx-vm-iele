@@ -379,7 +379,7 @@ module IELE-DATA
 
     syntax Int ::= #addr ( Int ) [function]
  // ---------------------------------------
-    rule #addr(W) => W modInt pow160
+    rule #addr(W) => W modInt pow256
 
 
 

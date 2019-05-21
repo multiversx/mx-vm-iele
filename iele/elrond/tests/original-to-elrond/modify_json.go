@@ -18,6 +18,41 @@ func modifyJSON(jobj oj.OJsonObject) error {
 				}
 				acctMap.RefreshKeySet()
 			}
+			if testComponent.Key == "blocks" {
+				blocks, _ := testComponent.Value.(*oj.OJsonList)
+				for _, block := range blocks.AsList() {
+					blockCmps, _ := block.(*oj.OJsonMap)
+					for _, blockCmp := range blockCmps.OrderedKV {
+						if blockCmp.Key == "transactions" {
+							txs, _ := blockCmp.Value.(*oj.OJsonList)
+							for _, txRaw := range txs.AsList() {
+								tx, _ := txRaw.(*oj.OJsonMap)
+								for _, txCmp := range tx.OrderedKV {
+									if txCmp.Key == "from" {
+										from, _ := txCmp.Value.(*oj.OJsonString)
+										from.Value = expandAddress(from.Value)
+									}
+									if txCmp.Key == "to" {
+										to, _ := txCmp.Value.(*oj.OJsonString)
+										if len(to.Value) == 42 {
+											to.Value = expandAddress(to.Value)
+										}
+									}
+									if txCmp.Key == "arguments" {
+										args, _ := txCmp.Value.(*oj.OJsonList)
+										for _, arg := range args.AsList() {
+											argStr, _ := arg.(*oj.OJsonString)
+											if len(argStr.Value) == 42 {
+												argStr.Value = expandAddress(argStr.Value)
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 

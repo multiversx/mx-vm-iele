@@ -40,28 +40,28 @@
                         "function": "test_blockhash",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                             "0x00",
                             "0x00"
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "test_blockhash",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                             "0x0200",
                             "0x01"
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     }
                 ],
                 "blockHeader": {

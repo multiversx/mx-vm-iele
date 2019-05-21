@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"go/build"
 	"io"
 	"io/ioutil"
@@ -24,7 +23,6 @@ func main() {
 
 func processIeleTests(origPath string) {
 	err := filepath.Walk(origPath, func(testFilePath string, info os.FileInfo, err error) error {
-		fmt.Println(origPath)
 		if strings.HasSuffix(testFilePath, ".iele.json") {
 			toPath := correspondingDestination(testFilePath)
 			return readModifySave(testFilePath, toPath)

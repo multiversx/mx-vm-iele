@@ -15,7 +15,7 @@ func assembleIele(jobj oj.OJsonObject, testPath string) {
 		for _, keyValuePair := range j.OrderedKV {
 			if keyValuePair.Key == "to" {
 				if strVal, isStr := keyValuePair.Value.(*oj.OJsonString); isStr {
-					if string(*strVal) == "" {
+					if strVal.Value == "" {
 						isCreateTx = true
 						break
 					}
@@ -27,9 +27,7 @@ func assembleIele(jobj oj.OJsonObject, testPath string) {
 			if keyValuePair.Key == "code" ||
 				(keyValuePair.Key == "contractCode" && isCreateTx) {
 				if strVal, isStr := keyValuePair.Value.(*oj.OJsonString); isStr {
-					assembled := assembleIeleCode(testPath, string(*strVal))
-					asJObj := oj.OJsonString(assembled)
-					keyValuePair.Value = &asJObj
+					strVal.Value = assembleIeleCode(testPath, strVal.Value)
 				}
 			} else {
 				assembleIele(keyValuePair.Value, testPath)

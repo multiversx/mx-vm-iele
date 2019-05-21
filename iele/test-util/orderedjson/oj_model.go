@@ -25,7 +25,9 @@ type OJsonMap struct {
 type OJsonList []OJsonObject
 
 // OJsonString ... JSON string value
-type OJsonString string
+type OJsonString struct {
+	Value string
+}
 
 // OJsonBool ... JSON bool value
 type OJsonBool bool
@@ -54,4 +56,9 @@ func (j *OJsonMap) RefreshKeySet() {
 	for _, kv := range j.OrderedKV {
 		j.KeySet[kv.Key] = true
 	}
+}
+
+// AsList ... returns it represented as a slice of objects
+func (j *OJsonList) AsList() []OJsonObject {
+	return []OJsonObject(*j)
 }

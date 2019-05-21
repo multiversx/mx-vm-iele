@@ -203,9 +203,8 @@ func ParseOrderedJSON(input []byte) (OJsonObject, error) {
 func (s *jsonParserStateSingleValue) finalize() (OJsonObject, error) {
 	str := s.buffer.String()
 	if strings.HasPrefix(str, "\"") && strings.HasSuffix(str, "\"") {
-		result := OJsonString(str)
-		result = result[1 : len(result)-1]
-		return &result, nil
+		str = str[1 : len(str)-1]
+		return &OJsonString{Value: str}, nil
 	}
 	if str == "true" {
 		result := OJsonBool(true)

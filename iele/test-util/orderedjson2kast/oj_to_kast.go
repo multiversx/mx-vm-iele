@@ -48,8 +48,7 @@ func writeKast(jobj oj.OJsonObject, sb *strings.Builder) {
 		}
 		sb.WriteString(")")
 	case *oj.OJsonString:
-		value := string(*j)
-		writeStringKast(sb, value)
+		writeStringKast(sb, j.Value)
 	case *oj.OJsonBool:
 		value := bool(*j)
 		sb.WriteString(fmt.Sprintf("#token(\"%t\",\"Bool\")", value))

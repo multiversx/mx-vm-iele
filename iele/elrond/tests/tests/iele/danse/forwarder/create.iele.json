@@ -46,35 +46,35 @@
                         "value": "0x00",
                         "to": "",
                         "arguments": [
-                            "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                            "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                         ],
                         "contractCode": "../../../../iele-examples/forwardingWallet.iele",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "newForwarder",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x6295ee1b4f6dd65047762f924ecd367c17eabf8f",
+                        "to": "0x6295ee1b4f6dd65047762f924ecd367c17eabf8f000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "deposit",
                         "gasLimit": "0x100000",
                         "value": "0x0100",
-                        "to": "0x64e2ebd6405af8cb348aec519084d3fff42ebba6",
+                        "to": "0x64e2ebd6405af8cb348aec519084d3fff42ebba6000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     }
                 ],
                 "blockHeader": {

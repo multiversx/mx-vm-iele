@@ -42,7 +42,7 @@ func (j *OJsonMap) writeJSON(sb *strings.Builder, indent int) {
 }
 
 func (j *OJsonList) writeJSON(sb *strings.Builder, indent int) {
-	collection := []OJsonObject(*j)
+	collection := j.AsList()
 	sb.WriteString("[")
 	for i, child := range collection {
 		sb.WriteString("\n")
@@ -58,7 +58,7 @@ func (j *OJsonList) writeJSON(sb *strings.Builder, indent int) {
 }
 
 func (j *OJsonString) writeJSON(sb *strings.Builder, indent int) {
-	sb.WriteString(fmt.Sprintf("\"%s\"", string(*j)))
+	sb.WriteString(fmt.Sprintf("\"%s\"", j.Value))
 }
 
 func (j *OJsonBool) writeJSON(sb *strings.Builder, indent int) {

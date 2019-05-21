@@ -90,84 +90,84 @@
                         "function": "test_ecrec",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "test_sha256",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "test_rip160",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "test_id",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "test_ecadd",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "test_ecmul",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     },
                     {
                         "nonce": "0x00",
                         "function": "test_ecpairing",
                         "gasLimit": "0x100000",
                         "value": "0x00",
-                        "to": "0x1000000000000000000000000000000000000000",
+                        "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
                         ],
                         "contractCode": "",
                         "gasPrice": "0x01",
-                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b"
+                        "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000"
                     }
                 ],
                 "blockHeader": {
