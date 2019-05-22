@@ -47,7 +47,7 @@ func testAllInDirectory(t *testing.T, mainDirPath string) {
 				nrSkipped++
 				fmt.Print("  skip\n")
 			} else {
-				testErr := eptest.RunJSONTest(testFilePath)
+				testErr := eptest.RunJSONTest(testFilePath, false)
 				if testErr == nil {
 					nrPassed++
 					fmt.Print("  ok\n")

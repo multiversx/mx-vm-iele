@@ -15,12 +15,12 @@ func main() {
 	//debugTest("tests/iele/albe/unit/blockhash.iele.json")
 	//debugTest("tests/iele/albe/unit/exceptions.iele.json")
 	//debugTest("tests/iele-v1/albe/forwarder/create.iele.json")
-	debugTest("/tests/iele-v1/albe/forwarder/create.iele.json")
+	debugTest("tests/iele-v1/albe/unit/blockhash.iele.json", true)
 
 }
 
-func debugTest(testFile string) {
-	err := eptest.RunJSONTest(path.Join(ieleTestRoot, testFile))
+func debugTest(testFile string, tracePretty bool) {
+	err := eptest.RunJSONTest(path.Join(ieleTestRoot, testFile), tracePretty)
 	if err == nil {
 		fmt.Println("SUCCESS")
 	} else {

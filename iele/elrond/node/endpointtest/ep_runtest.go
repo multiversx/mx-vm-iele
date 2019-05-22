@@ -15,10 +15,11 @@ import (
 	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 	endpoint "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
+	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestinginterpreter"
 )
 
 // RunJSONTest ... only playing around for now
-func RunJSONTest(testFilePath string) error {
+func RunJSONTest(testFilePath string, tracePretty bool) error {
 	var err error
 	testFilePath, err = filepath.Abs(testFilePath)
 	if err != nil {
@@ -47,7 +48,7 @@ func RunJSONTest(testFilePath string) error {
 	}
 
 	for _, test := range top.tests {
-		testErr := runTest(testFilePath, test)
+		testErr := runTest(testFilePath, test, tracePretty)
 		if testErr != nil {
 			return testErr
 		}
@@ -56,7 +57,17 @@ func RunJSONTest(testFilePath string) error {
 	return nil
 }
 
-func runTest(testFilePath string, test *test) error {
+func runTest(testFilePath string, test *test, tracePretty bool) error {
+	if tracePretty {
+		// for debugging only
+		endpoint.InterpreterOptions = &interpreter.ExecuteOptions{
+			TracePretty: true,
+			TraceKPrint: false,
+			Verbose:     false,
+			MaxSteps:    0,
+		}
+	}
+
 	ws := world.MakeInMemoryWorldState()
 	ws.Blockhashes = test.blockHashes
 	world.HookWorldState = ws

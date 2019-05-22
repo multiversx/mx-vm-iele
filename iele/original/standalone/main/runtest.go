@@ -59,7 +59,7 @@ func runTest(testFilePath string, testGasMode gasMode, tracePretty bool, verbose
 	kastInitMap["PGM"] = []byte(kast)
 	kastInitMap["SCHEDULE"] = []byte("`DEFAULT_IELE-GAS`(.KList)")
 	kastInitMap["MODE"] = []byte(string(testGasMode))
-	options := interpreter.ExecuteOptions{TracePretty: tracePretty, TraceKPrint: false, Verbose: verbose}
+	options := &interpreter.ExecuteOptions{TracePretty: tracePretty, TraceKPrint: false, Verbose: verbose}
 
 	// execution itself
 	finalState, nrSteps, execErr := interpreter.Execute(kastInitMap, options)

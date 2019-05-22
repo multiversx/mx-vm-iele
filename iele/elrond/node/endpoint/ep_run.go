@@ -9,6 +9,14 @@ import (
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 )
 
+// InterpreterOptions ... options used by the interpreter, shouldn't need to change other than for debugging
+var InterpreterOptions = &interpreter.ExecuteOptions{
+	TracePretty: false,
+	TraceKPrint: false,
+	Verbose:     false,
+	MaxSteps:    0,
+}
+
 // RunTransaction ... executes transaction contract code in VM
 func RunTransaction(input *VMInput) (*VMOutput, error) {
 	if input.BlockHeader == nil {
@@ -57,7 +65,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	}
 
 	// execute
-	finalState, _, execErr := interpreter.TakeStepsNoThread(initConfig, 0)
+	finalState, _, execErr := interpreter.TakeStepsNoThread(initConfig, InterpreterOptions)
 	if execErr != nil {
 		return nil, execErr
 	}
