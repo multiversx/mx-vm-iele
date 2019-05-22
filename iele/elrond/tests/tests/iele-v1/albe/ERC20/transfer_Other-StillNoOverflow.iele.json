@@ -11,11 +11,11 @@
                 "nonce": "0x00",
                 "balance": "0x00",
                 "storage": {
-                    "0x01a94f5374fce5edbc8e2a8697c15331677e6ebf0b": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-                    "0x010000000000000000000000000000000000000002": "0x0a",
+                    "0x1a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                    "0x010000000000000000000000000000000000000000000000000000000000000002": "0x0a",
                     "0x00": "0x010000000000000000000000000000000000000000000000000000000000000009"
                 },
-                "code": "../../../../iele-examples/erc20.iele"
+                "code": "../../../../iele-examples/erc20_elrond.iele"
             }
         },
         "blocks": [
@@ -39,7 +39,7 @@
                         "value": "0x00",
                         "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
-                            "0x0000000000000000000000000000000000000002000000000000000000000000",
+                            "0x0000000000000000000000000000000000000000000000000000000000000002",
                             "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
                         ],
                         "contractCode": "",
@@ -72,11 +72,11 @@
                 "nonce": "0x00",
                 "balance": "0x00",
                 "storage": {
-                    "0x01a94f5374fce5edbc8e2a8697c15331677e6ebf0b": "0x0a",
-                    "0x010000000000000000000000000000000000000002": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                    "0x1a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0x0a",
+                    "0x010000000000000000000000000000000000000000000000000000000000000002": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                     "0x00": "0x010000000000000000000000000000000000000000000000000000000000000009"
                 },
-                "code": "../../../../iele-examples/erc20.iele"
+                "code": "../../../../iele-examples/erc20_elrond.iele"
             }
         }
     }

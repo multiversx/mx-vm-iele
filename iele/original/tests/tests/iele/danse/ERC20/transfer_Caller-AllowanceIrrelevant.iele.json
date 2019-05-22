@@ -88,7 +88,7 @@
                 "balance": "0x00", 
                 "storage": {
                     "0x01a94f5374fce5edbc8e2a8697c15331677e6ebf0b": "0x2710",
-                    "0x02a94f5374fce5edbc8e2a8697c15331677e6ebf0ba94f5374fce5edbc8e2a8697c15331677e6ebf0b": "0x14",
+                    "0x02a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0x14",
                     "0x00": "0x2710"
                 }, 
                 "code": "../../../../iele-examples/erc20.iele"

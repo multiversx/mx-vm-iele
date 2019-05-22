@@ -140,16 +140,18 @@ func runTest(testFilePath string, test *test) error {
 
 			// check return code
 			if blResult.status.Cmp(output.ReturnCode) != 0 {
-				return fmt.Errorf("result code mismatch. Want: %d. Have: %d", blResult.status, output.ReturnCode)
+				return fmt.Errorf("result code mismatch. Want: 0x%x. Have: 0x%x", blResult.status, output.ReturnCode)
 			}
 
 			// check result
 			if len(output.ReturnData) != len(blResult.out) {
-				return fmt.Errorf("result length mismatch. Want: %v. Have: %v", blResult.out, output.ReturnData)
+				return fmt.Errorf("result length mismatch. Want: %s. Have: %s",
+					resultAsString(blResult.out), resultAsString(output.ReturnData))
 			}
 			for i, expected := range blResult.out {
 				if expected.Cmp(output.ReturnData[i]) != 0 {
-					return fmt.Errorf("result mismatch. Want: %v. Have: %v", blResult.out, output.ReturnData)
+					return fmt.Errorf("result mismatch. Want: %s. Have: %s",
+						resultAsString(blResult.out), resultAsString(output.ReturnData))
 				}
 			}
 
@@ -194,8 +196,9 @@ func runTest(testFilePath string, test *test) error {
 
 	for _, postAcct := range test.postState {
 		matchingAcct, isMatch := ws.AcctMap[string(postAcct.Address)]
+		printableAcctAddr := hex.EncodeToString(postAcct.Address)
 		if !isMatch {
-			return fmt.Errorf("account %s expected but not found after running test", hex.EncodeToString(postAcct.Address))
+			return fmt.Errorf("account %s expected but not found after running test", printableAcctAddr)
 		}
 
 		if !bytes.Equal(matchingAcct.Address, postAcct.Address) {
@@ -222,17 +225,34 @@ func runTest(testFilePath string, test *test) error {
 		for k := range matchingAcct.Storage {
 			allKeys[k] = true
 		}
+		storageError := ""
 		for k := range allKeys {
 			want := postAcct.StorageValue(k)
 			have := matchingAcct.StorageValue(k)
 			if have.Cmp(want) != 0 {
-				return fmt.Errorf("wrong account storage entry for key %s. Want: 0x%x. Have: 0x%x",
+				storageError += fmt.Sprintf(
+					"\n  for key %s: Want: 0x%x. Have: 0x%x",
 					k, want, have)
 			}
+		}
+		if len(storageError) > 0 {
+			return fmt.Errorf("wrong account storage for account 0x%s:%s", printableAcctAddr, storageError)
 		}
 	}
 
 	return nil
+}
+
+// for nicer error messages
+func resultAsString(result []*big.Int) string {
+	str := "["
+	for i, res := range result {
+		str += fmt.Sprintf("0x%x", res)
+		if i < len(result)-1 {
+			str += ", "
+		}
+	}
+	return str + "]"
 }
 
 // make the tests run faster, by not repeating code assembly over and over again

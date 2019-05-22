@@ -11,11 +11,11 @@ func main() {
 
 	//debugTest("tests/iele/danse/factorial/factorial_positive.iele.json")
 	//debugTest("tests/iele/albe/factorial/factorial_positive.iele.json")
-	debugTest("tests/iele/albe/ERC20/approve_Caller-Positive.iele.json")
+	//debugTest("tests/iele/albe/ERC20/approve_Caller-Positive.iele.json")
 	//debugTest("tests/iele/albe/unit/blockhash.iele.json")
 	//debugTest("tests/iele/albe/unit/exceptions.iele.json")
-	//debugTest("tests/iele/albe/forwarder/create.iele.json")
-	//debugTest("tests/iele/danse/unit/selfdestruct.iele.json")
+	//debugTest("tests/iele-v1/albe/forwarder/create.iele.json")
+	debugTest("/tests/iele-v1/albe/forwarder/create.iele.json")
 
 }
 
