@@ -15,7 +15,7 @@ func main() {
 	//debugTest("tests/iele/albe/unit/blockhash.iele.json")
 	//debugTest("tests/iele/albe/unit/exceptions.iele.json")
 	//debugTest("tests/iele-v1/albe/forwarder/create.iele.json")
-	debugTest("tests/iele-v1/albe/unit/blockhash.iele.json", true)
+	debugTest("tests/iele-v1/albe/unit/blockhash.iele.json", false)
 
 }
 

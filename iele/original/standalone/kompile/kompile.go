@@ -17,7 +17,7 @@ func main() {
 	hookPackages := "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/hookadapter/krypto"
 	goSrcPath := path.Join(build.Default.GOPATH, "src")
 
-	fmt.Println("Starting to generate iele-standalone go sources ...")
+	fmt.Println("Starting to generate original iele-standalone go sources ...")
 	cmd := exec.Command("kompile", "iele-testing.k",
 		"--backend", "go",
 		"--main-module", "IELE-TESTING",

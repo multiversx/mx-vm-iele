@@ -18,7 +18,7 @@ func main() {
 		"github.com/ElrondNetwork/elrond-vm/iele/original/node/hookadapter/blockchain"
 	goSrcPath := path.Join(build.Default.GOPATH, "src")
 
-	fmt.Println("Starting to generate iele-node go sources ...")
+	fmt.Println("Starting to generate original iele-node go sources ...")
 	cmd := exec.Command("kompile", "iele-testing.k",
 		"--backend", "go",
 		"--main-module", "IELE-TESTING",
