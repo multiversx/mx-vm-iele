@@ -14,8 +14,7 @@ func main() {
 
 	// debugTest("tests/iele/danse/ill-formed/illFormed2.iele.json")
 	// debugTest("tests/iele/danse/factorial/factorial_positive.iele.json")
-	debugTest("tests/iele/albe/unit/exceptions.iele.json")
-
+	debugTest("tests/iele-v1/danse/ERC20/transfer_Caller-Zero.iele.json")
 }
 
 // .build/vm/iele-test-vm tests/iele/danse/forwarder/create.iele.json 10000

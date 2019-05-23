@@ -43,6 +43,11 @@ func (j *OJsonMap) writeJSON(sb *strings.Builder, indent int) {
 
 func (j *OJsonList) writeJSON(sb *strings.Builder, indent int) {
 	collection := j.AsList()
+	if len(collection) == 0 {
+		sb.WriteString("[]")
+		return
+	}
+
 	sb.WriteString("[")
 	for i, child := range collection {
 		sb.WriteString("\n")

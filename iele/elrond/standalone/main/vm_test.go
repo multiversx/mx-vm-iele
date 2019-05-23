@@ -11,9 +11,9 @@ import (
 
 var excludedTests = []string{
 	"tests/VMTests/vmPerformance/*/*",
-	"tests/iele/*/unit/precompiled.iele.json",
-	"tests/iele/*/ill-formed/illFormed.iele.json",
-	"tests/iele/*/ill-formed/illFormed2.iele.json",
+	"tests/iele-v1/*/unit/precompiled.iele.json",
+	"tests/iele-v1/*/ill-formed/illFormed.iele.json",
+	"tests/iele-v1/*/ill-formed/illFormed2.iele.json",
 }
 
 func isExcluded(testPath string) bool {

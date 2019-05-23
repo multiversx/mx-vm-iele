@@ -32,16 +32,19 @@ type OJsonString struct {
 // OJsonBool ... JSON bool value
 type OJsonBool bool
 
-func newMap() *OJsonMap {
+// NewMap ... create new ordered "map" instance
+func NewMap() *OJsonMap {
 	KeySet := make(map[string]bool)
 	return &OJsonMap{KeySet: KeySet, OrderedKV: nil}
 }
 
-func (j *OJsonMap) put(kvPair *OJsonKeyValuePair) {
-	_, alreadyInserted := j.KeySet[kvPair.Key]
+// Put ... put into map. Nothing if key exists in map
+func (j *OJsonMap) Put(key string, value OJsonObject) {
+	_, alreadyInserted := j.KeySet[key]
 	if !alreadyInserted {
-		j.KeySet[kvPair.Key] = true
-		j.OrderedKV = append(j.OrderedKV, kvPair)
+		j.KeySet[key] = true
+		keyValuePair := &OJsonKeyValuePair{Key: key, Value: value}
+		j.OrderedKV = append(j.OrderedKV, keyValuePair)
 	}
 }
 

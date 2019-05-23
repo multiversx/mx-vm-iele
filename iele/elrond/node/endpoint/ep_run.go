@@ -31,8 +31,8 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 
 	kapp := &m.KApply{Label: m.LblRunVM, List: []m.K{
 		m.ToBool(input.IsCreate),
-		m.NewInt(input.RecipientAddr),
-		m.NewInt(input.CallerAddr),
+		m.NewIntFromBytes(input.RecipientAddr),
+		m.NewIntFromBytes(input.CallerAddr),
 		m.NewString(input.InputData),
 		kargList,
 		m.NewInt(input.CallValue),
@@ -338,7 +338,7 @@ func convertKToLog(klog m.K) (*LogEntry, error) {
 	}
 
 	return &LogEntry{
-		Address: iAddr.Value,
+		Address: iAddr.Value.Bytes(),
 		Topics:  topics,
 		Data:    []byte(strResult.Value),
 	}, nil

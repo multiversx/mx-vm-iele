@@ -64,7 +64,7 @@ func ParseOrderedJSON(input []byte) (OJsonObject, error) {
 					// leading whitespace, ignore
 				} else if c == '{' {
 					// replace with map state
-					stateStack.replaceTop(&jsonParserStateMap{currentMap: newMap()})
+					stateStack.replaceTop(&jsonParserStateMap{currentMap: NewMap()})
 				} else if c == '[' {
 					// replace with list state
 					stateStack.replaceTop(&jsonParserStateList{})
@@ -175,14 +175,13 @@ func ParseOrderedJSON(input []byte) (OJsonObject, error) {
 						return nil, errors.New("map key should be a string enclosed in quotes")
 					}
 					key = key[1 : len(key)-1]
-					keyValuePair := &OJsonKeyValuePair{Key: key, Value: pendingResult}
-					pendingResult = nil
 					stateStack.pop()
 					mapState, isMap := stateStack.peek().(*jsonParserStateMap)
 					if !isMap {
 						return nil, errors.New("map key value state, but no map state underneath")
 					}
-					mapState.currentMap.put(keyValuePair)
+					mapState.currentMap.Put(key, pendingResult)
+					pendingResult = nil
 					done = false
 				default:
 					return nil, errors.New("unknown jsonStateMapKeyValue state")

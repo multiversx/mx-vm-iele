@@ -16,6 +16,8 @@ import (
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 	endpoint "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestinginterpreter"
+
+	ij "github.com/ElrondNetwork/elrond-vm/iele/test-util/ielejson"
 )
 
 // RunJSONTest ... only playing around for now
@@ -42,12 +44,12 @@ func RunJSONTest(testFilePath string, tracePretty bool) error {
 		return err
 	}
 
-	top, parseErr := parseTopLevel(byteValue)
+	top, parseErr := ij.ParseTopLevel(byteValue)
 	if parseErr != nil {
 		return parseErr
 	}
 
-	for _, test := range top.tests {
+	for _, test := range top {
 		testErr := runTest(testFilePath, test, tracePretty)
 		if testErr != nil {
 			return testErr
@@ -57,7 +59,7 @@ func RunJSONTest(testFilePath string, tracePretty bool) error {
 	return nil
 }
 
-func runTest(testFilePath string, test *test, tracePretty bool) error {
+func runTest(testFilePath string, test *ij.Test, tracePretty bool) error {
 	if tracePretty {
 		// for debugging only
 		endpoint.InterpreterOptions = &interpreter.ExecuteOptions{
@@ -69,25 +71,25 @@ func runTest(testFilePath string, test *test, tracePretty bool) error {
 	}
 
 	ws := world.MakeInMemoryWorldState()
-	ws.Blockhashes = test.blockHashes
+	ws.Blockhashes = test.BlockHashes
 	world.HookWorldState = ws
 
 	testDirPath := filepath.Dir(testFilePath)
 
-	schedule, schErr := endpoint.ParseSchedule(test.network)
+	schedule, schErr := endpoint.ParseSchedule(test.Network)
 	if schErr != nil {
 		return schErr
 	}
 
 	var assErr error
-	for _, acct := range test.pre {
+	for _, acct := range test.Pre {
 		acct.Code, assErr = assembleIeleCode(testDirPath, acct.Code)
 		if assErr != nil {
 			return assErr
 		}
-		ws.AcctMap.PutAccount(acct)
+		ws.AcctMap.PutAccount(convertAccount(acct))
 	}
-	for _, acct := range test.postState {
+	for _, acct := range test.PostState {
 		acct.Code, assErr = assembleIeleCode(testDirPath, acct.Code)
 		if assErr != nil {
 			return assErr
@@ -96,11 +98,11 @@ func runTest(testFilePath string, test *test, tracePretty bool) error {
 
 	//spew.Dump(ws.AcctMap)
 
-	for _, block := range test.blocks {
-		for txIndex, tx := range block.transactions {
+	for _, block := range test.Blocks {
+		for txIndex, tx := range block.Transactions {
 			var data, function, dataForGas string
-			if tx.isCreate {
-				data, assErr = assembleIeleCode(testDirPath, tx.contractCode)
+			if tx.IsCreate {
+				data, assErr = assembleIeleCode(testDirPath, tx.ContractCode)
 				if assErr != nil {
 					return assErr
 				}
@@ -108,32 +110,32 @@ func runTest(testFilePath string, test *test, tracePretty bool) error {
 				dataForGas = data
 			} else {
 				data = ""
-				function = tx.function
+				function = tx.Function
 				dataForGas = function
 			}
 
-			beforeErr := endpoint.UpdateWorldStateBefore(ws, tx.from.Bytes(), tx.gasLimit, tx.gasPrice)
+			beforeErr := endpoint.UpdateWorldStateBefore(ws, tx.From, tx.GasLimit, tx.GasPrice)
 			if beforeErr != nil {
 				return beforeErr
 			}
 
-			g0, g0Err := endpoint.G0(schedule, tx.isCreate, dataForGas, tx.arguments)
+			g0, g0Err := endpoint.G0(schedule, tx.IsCreate, dataForGas, tx.Arguments)
 			if g0Err != nil {
 				return g0Err
 			}
-			gasLimit := big.NewInt(0).Sub(tx.gasLimit, g0)
+			gasLimit := big.NewInt(0).Sub(tx.GasLimit, g0)
 
 			input := &endpoint.VMInput{
-				IsCreate:      tx.isCreate,
-				CallerAddr:    tx.from,
-				RecipientAddr: tx.to,
+				IsCreate:      tx.IsCreate,
+				CallerAddr:    tx.From,
+				RecipientAddr: tx.To,
 				InputData:     data,
 				Function:      function,
-				Arguments:     tx.arguments,
-				CallValue:     tx.value,
-				GasPrice:      tx.gasPrice,
+				Arguments:     tx.Arguments,
+				CallValue:     tx.Value,
+				GasPrice:      tx.GasPrice,
 				GasProvided:   gasLimit,
-				BlockHeader:   block.blockHeader,
+				BlockHeader:   convertBlockHeader(block.BlockHeader),
 				Schedule:      schedule,
 			}
 
@@ -147,47 +149,48 @@ func runTest(testFilePath string, test *test, tracePretty bool) error {
 				return updErr
 			}
 
-			blResult := block.results[txIndex]
+			blResult := block.Results[txIndex]
 
 			// check return code
-			if blResult.status.Cmp(output.ReturnCode) != 0 {
-				return fmt.Errorf("result code mismatch. Want: 0x%x. Have: 0x%x", blResult.status, output.ReturnCode)
+			if blResult.Status.Cmp(output.ReturnCode) != 0 {
+				return fmt.Errorf("result code mismatch. Want: 0x%x. Have: 0x%x", blResult.Status, output.ReturnCode)
 			}
 
 			// check result
-			if len(output.ReturnData) != len(blResult.out) {
+			if len(output.ReturnData) != len(blResult.Out) {
 				return fmt.Errorf("result length mismatch. Want: %s. Have: %s",
-					resultAsString(blResult.out), resultAsString(output.ReturnData))
+					resultAsString(blResult.Out), resultAsString(output.ReturnData))
 			}
-			for i, expected := range blResult.out {
+			for i, expected := range blResult.Out {
 				if expected.Cmp(output.ReturnData[i]) != 0 {
 					return fmt.Errorf("result mismatch. Want: %s. Have: %s",
-						resultAsString(blResult.out), resultAsString(output.ReturnData))
+						resultAsString(blResult.Out), resultAsString(output.ReturnData))
 				}
 			}
 
 			// check refund
-			if blResult.refund.Cmp(output.GasRefund) != 0 {
+			if blResult.Refund.Cmp(output.GasRefund) != 0 {
 				return errors.New("result gas refund mismatch")
 			}
 
 			// check gas
-			if blResult.gas.Cmp(output.GasRemaining) != 0 {
-				//return fmt.Errorf("result gas mismatch. Want: %d. Got: %d", blResult.gas, output.GasRemaining)
+			if blResult.Gas.Cmp(output.GasRemaining) != 0 {
+				//return fmt.Errorf("result gas mismatch. Want: %d. Got: %d", blResult.Gas, output.GasRemaining)
 			}
 
 			// check empty logs, this seems to be the value
-			if blResult.logs == "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347" {
+			if blResult.Logs == "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347" {
 				if len(output.Logs) != 0 {
-					return fmt.Errorf("empty logs expected. Found: %v", blResult.logs)
+					return fmt.Errorf("empty logs expected. Found: %v", blResult.Logs)
 				}
 			} else {
 				if len(output.Logs) == 0 {
 					return fmt.Errorf("non-empty logs expected")
 				}
 				for _, log := range output.Logs {
-					if log.Address != tx.to {
-						return fmt.Errorf("log address mismatch. Want: %d. Got: %d", tx.to, log.Address)
+					if !bytes.Equal(log.Address, tx.To) {
+						return fmt.Errorf("log address mismatch. Want: %s. Got: %s",
+							hex.EncodeToString(tx.To), hex.EncodeToString(log.Address))
 					}
 				}
 				// ... we're not currently testing for the actual values (via the rlp hash)
@@ -199,17 +202,18 @@ func runTest(testFilePath string, test *test, tracePretty bool) error {
 	}
 
 	for worldAcctAddr := range ws.AcctMap {
-		_, postAcctMatches := test.postState[worldAcctAddr]
-		if !postAcctMatches {
+		postAcctMatch := ij.FindAccount(test.PostState, []byte(worldAcctAddr))
+		if postAcctMatch == nil {
 			return fmt.Errorf("unexpected account address: %s", hex.EncodeToString([]byte(worldAcctAddr)))
 		}
 	}
 
-	for _, postAcct := range test.postState {
+	for _, postAcctFromTest := range test.PostState {
+		postAcct := convertAccount(postAcctFromTest)
 		matchingAcct, isMatch := ws.AcctMap[string(postAcct.Address)]
-		printableAcctAddr := hex.EncodeToString(postAcct.Address)
 		if !isMatch {
-			return fmt.Errorf("account %s expected but not found after running test", printableAcctAddr)
+			return fmt.Errorf("account %s expected but not found after running test",
+				hex.EncodeToString(postAcct.Address))
 		}
 
 		if !bytes.Equal(matchingAcct.Address, postAcct.Address) {
@@ -247,7 +251,8 @@ func runTest(testFilePath string, test *test, tracePretty bool) error {
 			}
 		}
 		if len(storageError) > 0 {
-			return fmt.Errorf("wrong account storage for account 0x%s:%s", printableAcctAddr, storageError)
+			return fmt.Errorf("wrong account storage for account 0x%s:%s",
+				hex.EncodeToString(postAcct.Address), storageError)
 		}
 	}
 
@@ -264,6 +269,32 @@ func resultAsString(result []*big.Int) string {
 		}
 	}
 	return str + "]"
+}
+
+func convertAccount(testAcct *ij.Account) *world.Account {
+	storage := make(map[string]*big.Int)
+	for _, stkvp := range testAcct.Storage {
+		key := stkvp.Key.Text(16)
+		storage[key] = stkvp.Value
+	}
+
+	return &world.Account{
+		Address: testAcct.Address,
+		Nonce:   testAcct.Nonce,
+		Balance: testAcct.Balance,
+		Storage: storage,
+		Code:    testAcct.Code,
+	}
+}
+
+func convertBlockHeader(testBlh *ij.BlockHeader) *endpoint.BlockHeader {
+	return &endpoint.BlockHeader{
+		Beneficiary:   testBlh.Beneficiary,
+		Difficulty:    testBlh.Difficulty,
+		Number:        testBlh.Number,
+		GasLimit:      testBlh.GasLimit,
+		UnixTimestamp: testBlh.UnixTimestamp,
+	}
 }
 
 // make the tests run faster, by not repeating code assembly over and over again

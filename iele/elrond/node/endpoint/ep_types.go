@@ -18,8 +18,8 @@ type BlockHeader struct {
 // VMInput ... transaction!
 type VMInput struct {
 	IsCreate      bool
-	CallerAddr    *big.Int
-	RecipientAddr *big.Int
+	CallerAddr    []byte
+	RecipientAddr []byte
 	InputData     string
 	Function      string
 	Arguments     []*big.Int
@@ -32,7 +32,7 @@ type VMInput struct {
 
 // LogEntry ... contract execution log
 type LogEntry struct {
-	Address *big.Int
+	Address []byte
 	Topics  []*big.Int
 	Data    []byte
 }
