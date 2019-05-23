@@ -17,11 +17,12 @@ type Test struct {
 
 // Account ...
 type Account struct {
-	Address []byte
-	Nonce   *big.Int
-	Balance *big.Int
-	Storage []*StorageKeyValuePair
-	Code    string
+	Address      []byte
+	Nonce        *big.Int
+	Balance      *big.Int
+	Storage      []*StorageKeyValuePair
+	Code         string
+	OriginalCode string
 }
 
 // StorageKeyValuePair ...

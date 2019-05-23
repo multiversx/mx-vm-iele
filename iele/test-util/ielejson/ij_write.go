@@ -16,12 +16,12 @@ func ToJSONString(testTopLevel []*Test) string {
 // ToOrderedJSON ...
 func ToOrderedJSON(testTopLevel []*Test) oj.OJsonObject {
 
-	result := oj.OJsonMap{}
+	result := oj.NewMap()
 	for _, test := range testTopLevel {
 		result.Put(test.TestName, testToOJ(test))
 	}
 
-	return &result
+	return result
 }
 
 func testToOJ(test *Test) oj.OJsonObject {
@@ -59,7 +59,7 @@ func accountsToOJ(accounts []*Account) oj.OJsonObject {
 			storageOJ.Put(intToString(st.Key), intToOJ(st.Value))
 		}
 		acctOJ.Put("storage", storageOJ)
-		acctOJ.Put("code", stringToOJ(account.Code))
+		acctOJ.Put("code", stringToOJ(account.OriginalCode))
 
 		acctsOJ.Put(accountAddressToString(account.Address), acctOJ)
 	}
@@ -140,11 +140,30 @@ func accountAddressToString(address []byte) string {
 }
 
 func accountAddressToOJ(address []byte) oj.OJsonObject {
+	if len(address) == 0 {
+		return stringToOJ("")
+	}
 	return stringToOJ(accountAddressToString(address))
 }
 
 func intToString(i *big.Int) string {
-	return "0x" + i.Text(16)
+	if i == nil {
+		return ""
+	}
+
+	isNegative := i.Sign() == -1
+	str := i.Text(16)
+	if isNegative {
+		str = str[1:] // drop the minus in front
+	}
+	if len(str)%2 != 0 {
+		str = "0" + str
+	}
+	str = "0x" + str
+	if isNegative {
+		str = "-" + str
+	}
+	return str
 }
 
 func intToOJ(i *big.Int) oj.OJsonObject {

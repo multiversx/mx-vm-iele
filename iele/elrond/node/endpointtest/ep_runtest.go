@@ -56,6 +56,10 @@ func RunJSONTest(testFilePath string, tracePretty bool) error {
 		}
 	}
 
+	// toPath := strings.Replace(testFilePath, "iele-v1", "iele-v2", 1)
+	// fmt.Println(toPath)
+	// saveModifiedTest(toPath, top)
+
 	return nil
 }
 
@@ -152,8 +156,9 @@ func runTest(testFilePath string, test *ij.Test, tracePretty bool) error {
 			blResult := block.Results[txIndex]
 
 			// check return code
-			if blResult.Status.Cmp(output.ReturnCode) != 0 {
-				return fmt.Errorf("result code mismatch. Want: 0x%x. Have: 0x%x", blResult.Status, output.ReturnCode)
+			expectedStatus := zeroIfNil(blResult.Status)
+			if expectedStatus.Cmp(output.ReturnCode) != 0 {
+				return fmt.Errorf("result code mismatch. Want: 0x%x. Have: 0x%x", expectedStatus, output.ReturnCode)
 			}
 
 			// check result
@@ -169,13 +174,16 @@ func runTest(testFilePath string, test *ij.Test, tracePretty bool) error {
 			}
 
 			// check refund
-			if blResult.Refund.Cmp(output.GasRefund) != 0 {
+			expectedRefund := zeroIfNil(blResult.Refund)
+			if expectedRefund.Cmp(output.GasRefund) != 0 {
 				return errors.New("result gas refund mismatch")
 			}
 
 			// check gas
-			if blResult.Gas.Cmp(output.GasRemaining) != 0 {
-				//return fmt.Errorf("result gas mismatch. Want: %d. Got: %d", blResult.Gas, output.GasRemaining)
+			expectedGas := zeroIfNil(blResult.Gas)
+			if expectedGas.Cmp(output.GasRemaining) != 0 {
+				return fmt.Errorf("result gas mismatch. Want: %d. Got: %d", expectedGas, output.GasRemaining)
+				//blResult.Gas = output.GasRemaining
 			}
 
 			// check empty logs, this seems to be the value
@@ -280,8 +288,8 @@ func convertAccount(testAcct *ij.Account) *world.Account {
 
 	return &world.Account{
 		Address: testAcct.Address,
-		Nonce:   testAcct.Nonce,
-		Balance: testAcct.Balance,
+		Nonce:   big.NewInt(0).Set(testAcct.Nonce),
+		Balance: big.NewInt(0).Set(testAcct.Balance),
 		Storage: storage,
 		Code:    testAcct.Code,
 	}
@@ -295,6 +303,15 @@ func convertBlockHeader(testBlh *ij.BlockHeader) *endpoint.BlockHeader {
 		GasLimit:      testBlh.GasLimit,
 		UnixTimestamp: testBlh.UnixTimestamp,
 	}
+}
+
+var zero = big.NewInt(0)
+
+func zeroIfNil(i *big.Int) *big.Int {
+	if i == nil {
+		return zero
+	}
+	return i
 }
 
 // make the tests run faster, by not repeating code assembly over and over again
@@ -324,4 +341,19 @@ func assembleIeleCode(testPath string, value string) (string, error) {
 	result := string(decoded)
 	assembledCodeCache[contractPathFilePath] = result
 	return result, nil
+}
+
+// tool to modify tests
+// use with caution
+func saveModifiedTest(toPath string, top []*ij.Test) {
+	resultJSON := ij.ToJSONString(top)
+
+	err := os.MkdirAll(filepath.Dir(toPath), os.ModePerm)
+	if err != nil {
+		panic(err)
+	}
+	err = ioutil.WriteFile(toPath, []byte(resultJSON), 0644)
+	if err != nil {
+		panic(err)
+	}
 }

@@ -165,6 +165,7 @@ func processAccount(acctRaw oj.OJsonObject) (*Account, error) {
 			if !codeOk {
 				return nil, errors.New("invalid account code")
 			}
+			acct.OriginalCode = acct.Code
 		}
 	}
 
@@ -314,14 +315,17 @@ func processBlockTransaction(blrRaw oj.OJsonObject) (*Transaction, error) {
 			if !toOk {
 				return nil, errors.New("invalid block transaction to")
 			}
-			var toErr error
-			blt.To, toErr = processAccountAddress(toStr)
-			if toErr != nil {
-				return nil, toErr
-			}
 
 			// note "to": "0x00" has to yield isCreate=false, even though it parses to 0, just like the 2 cases below
 			blt.IsCreate = toStr == "" || toStr == "0x"
+
+			if !blt.IsCreate {
+				var toErr error
+				blt.To, toErr = processAccountAddress(toStr)
+				if toErr != nil {
+					return nil, toErr
+				}
+			}
 
 		}
 
@@ -466,13 +470,15 @@ func parseBigInt(obj oj.OJsonObject) (*big.Int, bool) {
 	if !isStr {
 		return nil, false
 	}
+	if len(str.Value) == 0 {
+		return nil, true // interpret "" as nil, so we can restore to empty string instead of 0
+	}
+
 	result := new(big.Int)
 	var parseOk bool
-	if len(str.Value) > 0 { // interpret "" as 0
-		result, parseOk = result.SetString(str.Value, 0)
-		if !parseOk {
-			return nil, false
-		}
+	result, parseOk = result.SetString(str.Value, 0)
+	if !parseOk {
+		return nil, false
 	}
 
 	return result, true
