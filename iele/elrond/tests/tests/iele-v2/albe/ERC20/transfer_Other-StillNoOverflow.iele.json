@@ -11,7 +11,7 @@
                 "nonce": "0x00",
                 "balance": "0x00",
                 "storage": {
-                    "0x1a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+                    "0x01a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                     "0x010000000000000000000000000000000000000000000000000000000000000002": "0x0a",
                     "0x00": "0x010000000000000000000000000000000000000000000000000000000000000009"
                 },
@@ -26,7 +26,7 @@
                             "0x01"
                         ],
                         "status": "",
-                        "gas": "0x0f58c3",
+                        "gas": "0x0f4f19",
                         "logs": "0x1e8377cdb3f4277477a27de5eb63b1d3b8d332f1f55fa60414701f04a37b5f07",
                         "refund": "0x1d4c"
                     }
@@ -39,7 +39,7 @@
                         "value": "0x00",
                         "to": "0x1000000000000000000000000000000000000000000000000000000000000000",
                         "arguments": [
-                            "0x0000000000000000000000000000000000000000000000000000000000000002",
+                            "0x02",
                             "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
                         ],
                         "contractCode": "",
@@ -72,7 +72,7 @@
                 "nonce": "0x00",
                 "balance": "0x00",
                 "storage": {
-                    "0x1a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0x0a",
+                    "0x01a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0x0a",
                     "0x010000000000000000000000000000000000000000000000000000000000000002": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
                     "0x00": "0x010000000000000000000000000000000000000000000000000000000000000009"
                 },

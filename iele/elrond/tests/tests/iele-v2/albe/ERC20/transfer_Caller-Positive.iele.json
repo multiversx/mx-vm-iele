@@ -11,7 +11,7 @@
                 "nonce": "0x00",
                 "balance": "0x00",
                 "storage": {
-                    "0x1a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0x2710",
+                    "0x01a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0x2710",
                     "0x00": "0x2710"
                 },
                 "code": "../../../../iele-examples/erc20_elrond.iele"
@@ -25,7 +25,7 @@
                             "0x01"
                         ],
                         "status": "",
-                        "gas": "0x0f8221",
+                        "gas": "0x0f7829",
                         "logs": "0x4e747bc1a4f7cd13e29b8bfe4c6402acefd319e39a19334c67bab963410436e7",
                         "refund": ""
                     }
@@ -71,7 +71,7 @@
                 "nonce": "0x00",
                 "balance": "0x00",
                 "storage": {
-                    "0x1a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0x2710",
+                    "0x01a94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000": "0x2710",
                     "0x00": "0x2710"
                 },
                 "code": "../../../../iele-examples/erc20_elrond.iele"
