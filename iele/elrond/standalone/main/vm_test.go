@@ -11,9 +11,9 @@ import (
 
 var excludedTests = []string{
 	"tests/VMTests/vmPerformance/*/*",
-	"tests/iele-v1/*/unit/precompiled.iele.json",
-	"tests/iele-v1/*/ill-formed/illFormed.iele.json",
-	"tests/iele-v1/*/ill-formed/illFormed2.iele.json",
+	"tests/*/*/unit/precompiled.iele.json",
+	"tests/*/*/ill-formed/illFormed.iele.json",
+	"tests/*/*/ill-formed/illFormed2.iele.json",
 }
 
 func isExcluded(testPath string) bool {
@@ -36,7 +36,7 @@ func TestVmTests(t *testing.T) {
 }
 
 func TestIeleTests(t *testing.T) {
-	dirPath := path.Join(ieleTestRoot, "tests/iele-v1")
+	dirPath := path.Join(ieleTestRoot, "tests/iele-v2")
 	testAllInDirectory(t, dirPath, gasModeNormal)
 }
 
