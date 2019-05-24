@@ -1,8 +1,11 @@
 
+
+/iele/vmdebug/vmdebug
+/iele/vmdebug/trace_*/
+
+
 /iele/original/node/*-kompiled/
 /iele/original/node/kompile/kompile
-/iele/original/node/main/main
-/iele/original/node/main/trace_*/
 
 /iele/original/standalone/*-kompiled/
 /iele/original/standalone/kompile/kompile
@@ -12,8 +15,6 @@
 
 /iele/elrond/node/*-kompiled/
 /iele/elrond/node/kompile/kompile
-/iele/elrond/node/main/main
-/iele/elrond/node/main/trace_*/
 
 /iele/elrond/standalone/*-kompiled/
 /iele/elrond/standalone/kompile/kompile

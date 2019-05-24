@@ -7,6 +7,8 @@ import (
 	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
+
+	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
 )
 
 // InterpreterOptions ... options used by the interpreter, shouldn't need to change other than for debugging
@@ -17,8 +19,14 @@ var InterpreterOptions = &interpreter.ExecuteOptions{
 	MaxSteps:    0,
 }
 
+// ElrondIeleVMType ... endpoint container type
+type ElrondIeleVMType int
+
+// ElrondIeleVM ... singleton endpoint for the Elrond version of the IELE VM, 32-byte addresses, etc.
+var ElrondIeleVM ElrondIeleVMType
+
 // RunTransaction ... executes transaction contract code in VM
-func RunTransaction(input *VMInput) (*VMOutput, error) {
+func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error) {
 	if input.BlockHeader == nil {
 		return nil, errors.New("block header required")
 	}
@@ -139,7 +147,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	if !kLogsOk {
 		return nil, errors.New("invalid vmResult logs")
 	}
-	logs := make([]*LogEntry, len(kLogs))
+	logs := make([]*vmi.LogEntry, len(kLogs))
 	for i, klog := range kLogs {
 		log, logErr := convertKToLog(klog)
 		if logErr != nil {
@@ -179,7 +187,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 		touchedAddr = append(touchedAddr, world.AccountAddress(it.Value))
 	}
 
-	result := &VMOutput{
+	result := &vmi.VMOutput{
 		ReturnData:       returnData,
 		GasRemaining:     kresGas.Value,
 		GasRefund:        kresRefund.Value,
@@ -302,7 +310,7 @@ func getCodeBytes(kcode m.K) (string, error) {
 	return strResult.Value, nil
 }
 
-func convertKToLog(klog m.K) (*LogEntry, error) {
+func convertKToLog(klog m.K) (*vmi.LogEntry, error) {
 	logArgs, logKappOk := m.ExtractKApplyArgs(klog, m.LblLogEntry, 3)
 	if !logKappOk {
 		return nil, errors.New("invalid log entry")
@@ -337,7 +345,7 @@ func convertKToLog(klog m.K) (*LogEntry, error) {
 		return nil, errors.New("log data unparse error: result is not String")
 	}
 
-	return &LogEntry{
+	return &vmi.LogEntry{
 		Address: iAddr.Value.Bytes(),
 		Topics:  topics,
 		Data:    []byte(strResult.Value),

@@ -1,9 +1,23 @@
-package endpoint
+package vminterface
 
 import (
 	"math/big"
 
 	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
+)
+
+// Schedule ... IELE gas model type
+type Schedule int
+
+const (
+	// Default ... IELE default gas model
+	Default Schedule = iota
+
+	// Albe ... IELE "ALBE" gas model, this was their first version
+	Albe
+
+	// Danse ... IELE "DANSE" gas model, this is the latest version
+	Danse
 )
 
 // BlockHeader ...
@@ -18,8 +32,8 @@ type BlockHeader struct {
 // VMInput ... transaction!
 type VMInput struct {
 	IsCreate      bool
-	CallerAddr    *big.Int
-	RecipientAddr *big.Int
+	CallerAddr    []byte
+	RecipientAddr []byte
 	InputData     string
 	Function      string
 	Arguments     []*big.Int
@@ -32,7 +46,7 @@ type VMInput struct {
 
 // LogEntry ... contract execution log
 type LogEntry struct {
-	Address *big.Int
+	Address []byte
 	Topics  []*big.Int
 	Data    []byte
 }

@@ -1,4 +1,4 @@
-package endpoint
+package endpointtest
 
 import (
 	"bytes"
@@ -15,13 +15,13 @@ import (
 	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 	endpoint "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
-	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestinginterpreter"
 
 	ij "github.com/ElrondNetwork/elrond-vm/iele/test-util/ielejson"
+	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
 )
 
 // RunJSONTest ... only playing around for now
-func RunJSONTest(testFilePath string, tracePretty bool) error {
+func RunJSONTest(testFilePath string, vm vmi.IeleVM) error {
 	var err error
 	testFilePath, err = filepath.Abs(testFilePath)
 	if err != nil {
@@ -50,7 +50,7 @@ func RunJSONTest(testFilePath string, tracePretty bool) error {
 	}
 
 	for _, test := range top {
-		testErr := runTest(testFilePath, test, tracePretty)
+		testErr := runTest(testFilePath, test, vm)
 		if testErr != nil {
 			return testErr
 		}
@@ -63,24 +63,14 @@ func RunJSONTest(testFilePath string, tracePretty bool) error {
 	return nil
 }
 
-func runTest(testFilePath string, test *ij.Test, tracePretty bool) error {
-	if tracePretty {
-		// for debugging only
-		endpoint.InterpreterOptions = &interpreter.ExecuteOptions{
-			TracePretty: true,
-			TraceKPrint: false,
-			Verbose:     false,
-			MaxSteps:    0,
-		}
-	}
-
+func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
 	ws := world.MakeInMemoryWorldState()
 	ws.Blockhashes = test.BlockHashes
 	world.HookWorldState = ws
 
 	testDirPath := filepath.Dir(testFilePath)
 
-	schedule, schErr := endpoint.ParseSchedule(test.Network)
+	schedule, schErr := vm.ParseSchedule(test.Network)
 	if schErr != nil {
 		return schErr
 	}
@@ -123,13 +113,13 @@ func runTest(testFilePath string, test *ij.Test, tracePretty bool) error {
 				return beforeErr
 			}
 
-			g0, g0Err := endpoint.G0(schedule, tx.IsCreate, dataForGas, tx.Arguments)
+			g0, g0Err := vm.G0(schedule, tx.IsCreate, dataForGas, tx.Arguments)
 			if g0Err != nil {
 				return g0Err
 			}
 			gasLimit := big.NewInt(0).Sub(tx.GasLimit, g0)
 
-			input := &endpoint.VMInput{
+			input := &vmi.VMInput{
 				IsCreate:      tx.IsCreate,
 				CallerAddr:    tx.From,
 				RecipientAddr: tx.To,
@@ -143,7 +133,7 @@ func runTest(testFilePath string, test *ij.Test, tracePretty bool) error {
 				Schedule:      schedule,
 			}
 
-			output, err := endpoint.RunTransaction(input)
+			output, err := vm.RunTransaction(input)
 			if err != nil {
 				return err
 			}
@@ -183,7 +173,6 @@ func runTest(testFilePath string, test *ij.Test, tracePretty bool) error {
 			expectedGas := zeroIfNil(blResult.Gas)
 			if expectedGas.Cmp(output.GasRemaining) != 0 {
 				return fmt.Errorf("result gas mismatch. Want: %d. Got: %d", expectedGas, output.GasRemaining)
-				//blResult.Gas = output.GasRemaining
 			}
 
 			// check empty logs, this seems to be the value
@@ -295,8 +284,8 @@ func convertAccount(testAcct *ij.Account) *world.Account {
 	}
 }
 
-func convertBlockHeader(testBlh *ij.BlockHeader) *endpoint.BlockHeader {
-	return &endpoint.BlockHeader{
+func convertBlockHeader(testBlh *ij.BlockHeader) *vmi.BlockHeader {
+	return &vmi.BlockHeader{
 		Beneficiary:   testBlh.Beneficiary,
 		Difficulty:    testBlh.Difficulty,
 		Number:        testBlh.Number,

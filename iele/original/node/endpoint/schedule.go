@@ -6,43 +6,30 @@ import (
 
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/original/node/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele/original/node/iele-testing-kompiled/ieletestingmodel"
-)
-
-// Schedule ... IELE gas model type
-type Schedule int
-
-const (
-	// Default ... IELE default gas model
-	Default Schedule = iota
-
-	// Albe ... IELE "ALBE" gas model, this was their first version
-	Albe
-
-	// Danse ... IELE "DANSE" gas model, this is the latest version
-	Danse
+	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
 )
 
 // ParseSchedule ... yields a schedule type based on its string representation
-func ParseSchedule(scheduleName string) (Schedule, error) {
+func (OriginalIeleVMType) ParseSchedule(scheduleName string) (vmi.Schedule, error) {
 	switch scheduleName {
 	case "Default":
-		return Default, nil
+		return vmi.Default, nil
 	case "Albe":
-		return Albe, nil
+		return vmi.Albe, nil
 	case "Danse":
-		return Danse, nil
+		return vmi.Danse, nil
 	default:
-		return Default, errors.New("unknown IELE schedule name")
+		return vmi.Default, errors.New("unknown IELE schedule name")
 	}
 }
 
-func scheduleToK(schedule Schedule) m.K {
+func scheduleToK(schedule vmi.Schedule) m.K {
 	switch schedule {
-	case Default:
+	case vmi.Default:
 		return &m.KApply{Label: m.ParseKLabel("DEFAULT_IELE-GAS")}
-	case Albe:
+	case vmi.Albe:
 		return &m.KApply{Label: m.ParseKLabel("ALBE_IELE-CONSTANTS")}
-	case Danse:
+	case vmi.Danse:
 		return &m.KApply{Label: m.ParseKLabel("DANSE_IELE-CONSTANTS")}
 	default:
 		panic("unknown IELE schedule")
@@ -53,7 +40,7 @@ var emptyWordStack = &m.KApply{Label: m.ParseKLabel(".WordStack_IELE-DATA"), Lis
 var wordStackElemLabel = m.ParseKLabel("_:__IELE-DATA")
 
 // G0 ... computes the gas cost for starting a smart contract
-func G0(schedule Schedule, txCreate bool, dataForGas string, args []*big.Int) (*big.Int, error) {
+func (OriginalIeleVMType) G0(schedule vmi.Schedule, txCreate bool, dataForGas string, args []*big.Int) (*big.Int, error) {
 	kschedule := scheduleToK(schedule)
 	kargList := &m.KApply{Label: m.LblXdotListXlbracketXquoteoperandListXquoteXrbracket, List: []m.K{}}
 	for i := len(args) - 1; i >= 0; i-- {

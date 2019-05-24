@@ -7,6 +7,8 @@ import (
 	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/original/node/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele/original/node/iele-testing-kompiled/ieletestingmodel"
+
+	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
 )
 
 // InterpreterOptions ... options used by the interpreter, shouldn't need to change other than for debugging
@@ -17,8 +19,14 @@ var InterpreterOptions = &interpreter.ExecuteOptions{
 	MaxSteps:    0,
 }
 
+// OriginalIeleVMType ... endpoint container type
+type OriginalIeleVMType int
+
+// OriginalIeleVM ... singleton endpoint for the original version of the IELE VM
+var OriginalIeleVM OriginalIeleVMType
+
 // RunTransaction ... executes transaction contract code in VM
-func RunTransaction(input *VMInput) (*VMOutput, error) {
+func (OriginalIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error) {
 	if input.BlockHeader == nil {
 		return nil, errors.New("block header required")
 	}
@@ -31,8 +39,8 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 
 	kapp := &m.KApply{Label: m.LblRunVM, List: []m.K{
 		m.ToBool(input.IsCreate),
-		m.NewInt(input.RecipientAddr),
-		m.NewInt(input.CallerAddr),
+		m.NewIntFromBytes(input.RecipientAddr),
+		m.NewIntFromBytes(input.CallerAddr),
 		m.NewString(input.InputData),
 		kargList,
 		m.NewInt(input.CallValue),
@@ -139,7 +147,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 	if !kLogsOk {
 		return nil, errors.New("invalid vmResult logs")
 	}
-	logs := make([]*LogEntry, len(kLogs))
+	logs := make([]*vmi.LogEntry, len(kLogs))
 	for i, klog := range kLogs {
 		log, logErr := convertKToLog(klog)
 		if logErr != nil {
@@ -179,7 +187,7 @@ func RunTransaction(input *VMInput) (*VMOutput, error) {
 		touchedAddr = append(touchedAddr, world.AccountAddress(it.Value))
 	}
 
-	result := &VMOutput{
+	result := &vmi.VMOutput{
 		ReturnData:       returnData,
 		GasRemaining:     kresGas.Value,
 		GasRefund:        kresRefund.Value,
@@ -302,7 +310,7 @@ func getCodeBytes(kcode m.K) (string, error) {
 	return strResult.Value, nil
 }
 
-func convertKToLog(klog m.K) (*LogEntry, error) {
+func convertKToLog(klog m.K) (*vmi.LogEntry, error) {
 	logArgs, logKappOk := m.ExtractKApplyArgs(klog, m.LblLogEntry, 3)
 	if !logKappOk {
 		return nil, errors.New("invalid log entry")
@@ -337,8 +345,8 @@ func convertKToLog(klog m.K) (*LogEntry, error) {
 		return nil, errors.New("log data unparse error: result is not String")
 	}
 
-	return &LogEntry{
-		Address: iAddr.Value,
+	return &vmi.LogEntry{
+		Address: iAddr.Value.Bytes(),
 		Topics:  topics,
 		Data:    []byte(strResult.Value),
 	}, nil

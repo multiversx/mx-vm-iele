@@ -5,6 +5,7 @@ import (
 	"math/big"
 
 	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
+	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
 )
 
 // UpdateWorldStateBefore ... performs gas payment, before transaction
@@ -25,6 +26,6 @@ func UpdateWorldStateBefore(w world.WorldState, fromAddr []byte, gasLimit *big.I
 }
 
 // UpdateWorldStateAfter ... updates accounts, after transaction
-func UpdateWorldStateAfter(w world.WorldState, trOut *VMOutput) error {
+func UpdateWorldStateAfter(w world.WorldState, trOut *vmi.VMOutput) error {
 	return w.UpdateAccounts(trOut.ModifiedAccounts, trOut.DeletedAccounts)
 }
