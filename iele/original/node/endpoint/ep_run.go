@@ -25,10 +25,13 @@ type OriginalIeleVMType int
 // OriginalIeleVM ... singleton endpoint for the original version of the IELE VM
 var OriginalIeleVM OriginalIeleVMType
 
+const addressLength = 20
+
 // RunTransaction ... executes transaction contract code in VM
 func (OriginalIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error) {
-	if input.BlockHeader == nil {
-		return nil, errors.New("block header required")
+	validationErr := validateInput(input)
+	if validationErr != nil {
+		return nil, validationErr
 	}
 
 	kargs := make([]m.K, len(input.Arguments))

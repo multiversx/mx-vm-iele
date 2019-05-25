@@ -25,10 +25,13 @@ type ElrondIeleVMType int
 // ElrondIeleVM ... singleton endpoint for the Elrond version of the IELE VM, 32-byte addresses, etc.
 var ElrondIeleVM ElrondIeleVMType
 
+const addressLength = 32
+
 // RunTransaction ... executes transaction contract code in VM
 func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error) {
-	if input.BlockHeader == nil {
-		return nil, errors.New("block header required")
+	validationErr := validateInput(input)
+	if validationErr != nil {
+		return nil, validationErr
 	}
 
 	kargs := make([]m.K, len(input.Arguments))
