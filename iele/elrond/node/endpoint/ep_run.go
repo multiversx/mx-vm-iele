@@ -201,6 +201,8 @@ func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error
 		Logs:             logs,
 	}
 
+	m.ClearModel()
+
 	return result, nil
 }
 

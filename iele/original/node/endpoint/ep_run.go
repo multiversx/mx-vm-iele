@@ -201,6 +201,8 @@ func (OriginalIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, err
 		Logs:             logs,
 	}
 
+	m.ClearModel()
+
 	return result, nil
 }
 
