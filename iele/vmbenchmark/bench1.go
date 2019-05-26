@@ -13,6 +13,8 @@ import (
 	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
 )
 
+var lastReturnCode *big.Int
+
 func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 
 	contractPathFilePath := path.Join(elrondTestRoot, "iele-examples/erc20_elrond.iele")
@@ -68,7 +70,7 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		blHeader := &vmi.BlockHeader{
 			Beneficiary:   big.NewInt(0),
 			Difficulty:    big.NewInt(0),
-			Number:        big.NewInt(1),
+			Number:        big.NewInt(int64(benchMarkRepeat)),
 			GasLimit:      hexToBigInt("174876e800"),
 			UnixTimestamp: big.NewInt(0),
 		}
@@ -100,6 +102,8 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 			if output.ReturnCode.Sign() != 0 {
 				panic(fmt.Sprintf("returned non-zero code: %d", output.ReturnCode))
 			}
+
+			lastReturnCode = output.ReturnCode
 		}
 	}
 }

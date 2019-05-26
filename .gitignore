@@ -3,6 +3,10 @@
 /iele/vmdebug/vmdebug
 /iele/vmdebug/trace_*/
 
+/iele/vmbenchmark/vmbenchmark
+/iele/vmbenchmark/vmbenchmark.test
+/iele/vmbenchmark/trace_*/
+/iele/vmbenchmark/*.prof/
 
 /iele/original/node/*-kompiled/
 /iele/original/node/kompile/kompile

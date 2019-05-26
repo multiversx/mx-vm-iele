@@ -9,7 +9,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}/iele/vmdebug/debug_node.go",
+            "program": "${workspaceFolder}/iele/vmbenchmark/debug_benchmark.go",
             "env": {},
             "args": []
         }
