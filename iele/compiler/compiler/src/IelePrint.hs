@@ -6,7 +6,7 @@ module IelePrint
   , prettyContractsD
   , PrettyNames(prettyName)
   ) where
-import Prelude hiding (LT,EQ,GT)
+import Prelude hiding (LT,EQ,GT,(<>))
 
 import Text.PrettyPrint
 import Data.List(intersperse)
