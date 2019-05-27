@@ -32,7 +32,7 @@ type jsonParserStateList struct {
 }
 
 func isWhitespace(c byte) bool {
-	return c == ' ' || c == '\n' || c == '\t'
+	return c == ' ' || c == '\n' || c == '\r' || c == '\t'
 }
 
 // ParseOrderedJSON ... parses JSON preserving order in maps
