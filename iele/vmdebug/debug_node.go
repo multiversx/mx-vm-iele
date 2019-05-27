@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"path"
+	"path/filepath"
 
 	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
 	oiele "github.com/ElrondNetwork/elrond-vm/iele/original/node/endpoint"
@@ -50,7 +51,7 @@ func debugOriginalTest(testFile string, tracePretty bool) {
 			MaxSteps:    0,
 		}
 	}
-	err := eptest.RunJSONTest(path.Join(originalTestRoot, testFile), oiele.OriginalIeleVM)
+	err := eptest.RunJSONTest(filepath.Join(originalTestRoot, testFile), oiele.OriginalIeleVM)
 	if err == nil {
 		fmt.Println("SUCCESS")
 	} else {

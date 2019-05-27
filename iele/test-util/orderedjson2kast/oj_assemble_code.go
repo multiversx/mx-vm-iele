@@ -1,7 +1,7 @@
 package orderedjson2kast
 
 import (
-	"path"
+	"path/filepath"
 	"strings"
 
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
@@ -50,6 +50,6 @@ func assembleIeleCode(testPath string, value string) string {
 		return value
 	}
 
-	contractPathFilePath := path.Join(testPath, value)
+	contractPathFilePath := filepath.Join(testPath, value)
 	return compiler.AssembleIeleCode(contractPathFilePath)
 }

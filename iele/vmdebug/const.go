@@ -2,9 +2,9 @@ package main
 
 import (
 	"go/build"
-	"path"
+	"path/filepath"
 )
 
 // where to find the tests to run
-var elrondTestRoot = path.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork/elrond-vm/iele/elrond/tests/")
-var originalTestRoot = path.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork/elrond-vm/iele/original/tests/")
+var elrondTestRoot = filepath.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork/elrond-vm/iele/elrond/tests/")
+var originalTestRoot = filepath.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork/elrond-vm/iele/original/tests/")

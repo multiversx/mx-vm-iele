@@ -4,7 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"math/big"
-	"path"
+	"path/filepath"
 	"testing"
 
 	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
@@ -17,7 +17,7 @@ var lastReturnCode *big.Int
 
 func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 
-	contractPathFilePath := path.Join(elrondTestRoot, "iele-examples/erc20_elrond.iele")
+	contractPathFilePath := filepath.Join(elrondTestRoot, "iele-examples/erc20_elrond.iele")
 
 	compiledBytes := compiler.AssembleIeleCode(contractPathFilePath)
 	decoded, err := hex.DecodeString(string(compiledBytes))
@@ -64,7 +64,9 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		Code:    "",
 	})
 
-	b.ResetTimer()
+	if b != nil { // nil when debugging
+		b.ResetTimer()
+	}
 
 	for benchMarkRepeat := 0; benchMarkRepeat < 1; benchMarkRepeat++ {
 		blHeader := &vmi.BlockHeader{

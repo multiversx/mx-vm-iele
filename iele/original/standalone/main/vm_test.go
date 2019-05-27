@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -18,7 +17,7 @@ var excludedTests = []string{
 
 func isExcluded(testPath string) bool {
 	for _, et := range excludedTests {
-		excludedFullPath := path.Join(ieleTestRoot, et)
+		excludedFullPath := filepath.Join(ieleTestRoot, et)
 		match, err := filepath.Match(excludedFullPath, testPath)
 		if err != nil {
 			panic(err)
@@ -31,12 +30,12 @@ func isExcluded(testPath string) bool {
 }
 
 func TestVmTests(t *testing.T) {
-	dirPath := path.Join(ieleTestRoot, "tests/VMTests")
+	dirPath := filepath.Join(ieleTestRoot, "tests/VMTests")
 	testAllInDirectory(t, dirPath, gasModeVMTests)
 }
 
 func TestIeleTests(t *testing.T) {
-	dirPath := path.Join(ieleTestRoot, "tests/iele")
+	dirPath := filepath.Join(ieleTestRoot, "tests/iele")
 	testAllInDirectory(t, dirPath, gasModeNormal)
 }
 

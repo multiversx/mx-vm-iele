@@ -8,7 +8,6 @@ import (
 	"io/ioutil"
 	"math/big"
 	"os"
-	"path"
 	"path/filepath"
 	"strings"
 
@@ -314,7 +313,7 @@ func assembleIeleCode(testPath string, value string) (string, error) {
 		return value, nil
 	}
 
-	contractPathFilePath := path.Join(testPath, value)
+	contractPathFilePath := filepath.Join(testPath, value)
 
 	cached, foundInCache := assembledCodeCache[contractPathFilePath]
 	if foundInCache {
