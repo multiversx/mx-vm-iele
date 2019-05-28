@@ -30,16 +30,6 @@ func isExcluded(testPath string) bool {
 	return false
 }
 
-func TestVmTests(t *testing.T) {
-	dirPath := path.Join(ieleTestRoot, "tests/VMTests")
-	testAllInDirectory(t, dirPath, gasModeVMTests)
-}
-
-func TestIeleTests(t *testing.T) {
-	dirPath := path.Join(ieleTestRoot, "tests/iele-v2")
-	testAllInDirectory(t, dirPath, gasModeNormal)
-}
-
 func testAllInDirectory(t *testing.T, mainDirPath string, testGasMode gasMode) {
 	var nrPassed, nrFailed, nrSkipped int
 
