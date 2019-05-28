@@ -10,7 +10,7 @@ import (
 	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
-	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
+	vmi "github.com/ElrondNetwork/elrond-vm-common"
 )
 
 var lastReturnCode *big.Int

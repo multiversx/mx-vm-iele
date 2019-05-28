@@ -39,7 +39,7 @@ func testToOJ(test *Test) oj.OJsonObject {
 
 	var blockhashesList []oj.OJsonObject
 	for _, blh := range test.BlockHashes {
-		blockhashesList = append(blockhashesList, intToOJ(blh))
+		blockhashesList = append(blockhashesList, stringToOJ(byteArrayToString(blh)))
 	}
 	blockHashesOJ := oj.OJsonList(blockhashesList)
 	testOJ.Put("blockhashes", &blockHashesOJ)
@@ -61,7 +61,7 @@ func accountsToOJ(accounts []*Account) oj.OJsonObject {
 		acctOJ.Put("storage", storageOJ)
 		acctOJ.Put("code", stringToOJ(account.OriginalCode))
 
-		acctsOJ.Put(accountAddressToString(account.Address), acctOJ)
+		acctsOJ.Put(byteArrayToString(account.Address), acctOJ)
 	}
 
 	return acctsOJ
@@ -135,7 +135,7 @@ func resultToOJ(res *TransactionResult) oj.OJsonObject {
 	return resultOJ
 }
 
-func accountAddressToString(address []byte) string {
+func byteArrayToString(address []byte) string {
 	return "0x" + hex.EncodeToString(address)
 }
 
@@ -143,7 +143,7 @@ func accountAddressToOJ(address []byte) oj.OJsonObject {
 	if len(address) == 0 {
 		return stringToOJ("")
 	}
-	return stringToOJ(accountAddressToString(address))
+	return stringToOJ(byteArrayToString(address))
 }
 
 func intToString(i *big.Int) string {

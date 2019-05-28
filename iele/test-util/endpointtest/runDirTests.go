@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
+	worldhook "github.com/ElrondNetwork/elrond-vm/mock-hook-blockchain"
 )
 
 var excludedTests = []string{
@@ -34,7 +34,7 @@ func isExcluded(testPath string, generalTestPath string) bool {
 }
 
 // TestAllInDirectory ... walk directory and run all .iele.json tests
-func TestAllInDirectory(t *testing.T, generalTestPath string, specificTestPath string, vm vmi.IeleVM) {
+func TestAllInDirectory(t *testing.T, generalTestPath string, specificTestPath string, vmp VMProvider, world *worldhook.BlockchainHookMock) {
 	mainDirPath := path.Join(generalTestPath, specificTestPath)
 	var nrPassed, nrFailed, nrSkipped int
 
@@ -45,7 +45,7 @@ func TestAllInDirectory(t *testing.T, generalTestPath string, specificTestPath s
 				nrSkipped++
 				fmt.Print("  skip\n")
 			} else {
-				testErr := RunJSONTest(testFilePath, vm)
+				testErr := RunJSONTest(testFilePath, vmp, world)
 				if testErr == nil {
 					nrPassed++
 					fmt.Print("  ok\n")

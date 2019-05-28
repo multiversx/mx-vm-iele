@@ -86,7 +86,7 @@ func processTest(testObj oj.OJsonObject) (*Test, error) {
 
 		if kvp.Key == "blockhashes" {
 			var bhsOk bool
-			test.BlockHashes, bhsOk = processBigIntList(kvp.Value)
+			test.BlockHashes, bhsOk = processByteArrayList(kvp.Value)
 			if !bhsOk {
 				return nil, errors.New("unmarshalled blockHashes object is not a list")
 			}
@@ -461,6 +461,29 @@ func processBigIntList(obj interface{}) ([]*big.Int, bool) {
 			return nil, false
 		}
 		result = append(result, i)
+	}
+	return result, true
+}
+
+func processByteArrayList(obj interface{}) ([][]byte, bool) {
+	listRaw, listOk := obj.(*oj.OJsonList)
+	if !listOk {
+		return nil, false
+	}
+	var result [][]byte
+	for _, elemRaw := range listRaw.AsList() {
+		i, iOk := parseBigInt(elemRaw)
+		if !iOk {
+			return nil, false
+		}
+		switch i.Sign() {
+		case 0:
+			result = append(result, []byte{})
+		case 1:
+			result = append(result, i.Bytes())
+		default:
+			return nil, false
+		}
 	}
 	return result, true
 }

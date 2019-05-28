@@ -1,17 +1,24 @@
 package blockchainadapter
 
 import (
-	blockchain "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
+	"errors"
+
+	vmi "github.com/ElrondNetwork/elrond-vm-common"
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 )
 
+// Blockchain is an adapter between K and the outside world
+type Blockchain struct {
+	Upstream vmi.BlockchainHook
+}
+
 // GetBalance ... adapts between K model and elrond function
-func GetBalance(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
+func (b *Blockchain) GetBalance(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 	acct, isInt := c.(*m.Int)
 	if !isInt {
-		return m.NoResult, &hookInvalidArgsError{}
+		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := blockchain.GetBalance(acct.Value)
+	result, err := b.Upstream.GetBalance(acct.Value.Bytes())
 	if err != nil {
 		return m.NoResult, err
 	}
@@ -19,12 +26,12 @@ func GetBalance(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 }
 
 // GetNonce ... adapts between K model and elrond function
-func GetNonce(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
+func (b *Blockchain) GetNonce(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 	acct, isInt := c.(*m.Int)
 	if !isInt {
-		return m.NoResult, &hookInvalidArgsError{}
+		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := blockchain.GetNonce(acct.Value)
+	result, err := b.Upstream.GetNonce(acct.Value.Bytes())
 	if err != nil {
 		return m.NoResult, err
 	}
@@ -32,12 +39,12 @@ func GetNonce(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 }
 
 // IsCodeEmpty ... adapts between K model and elrond function
-func IsCodeEmpty(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
+func (b *Blockchain) IsCodeEmpty(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 	acct, isInt := c.(*m.Int)
 	if !isInt {
-		return m.NoResult, &hookInvalidArgsError{}
+		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := blockchain.IsCodeEmpty(acct.Value)
+	result, err := b.Upstream.IsCodeEmpty(acct.Value.Bytes())
 	if err != nil {
 		return m.NoResult, err
 	}
@@ -45,12 +52,12 @@ func IsCodeEmpty(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 }
 
 // AccountExists ... adapts between K model and elrond function
-func AccountExists(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
+func (b *Blockchain) AccountExists(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 	acct, isInt := c.(*m.Int)
 	if !isInt {
-		return m.NoResult, &hookInvalidArgsError{}
+		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := blockchain.AccountExists(acct.Value)
+	result, err := b.Upstream.AccountExists(acct.Value.Bytes())
 	if err != nil {
 		return m.NoResult, err
 	}
@@ -58,51 +65,44 @@ func AccountExists(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 }
 
 // GetStorageData ... adapts between K model and elrond function
-func GetStorageData(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
+func (b *Blockchain) GetStorageData(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 	acct, isInt1 := c1.(*m.Int)
 	if !isInt1 {
-		return m.NoResult, &hookInvalidArgsError{}
+		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
 	index, isInt2 := c2.(*m.Int)
 	if !isInt2 {
-		return m.NoResult, &hookInvalidArgsError{}
+		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := blockchain.GetStorageData(acct.Value, index.Value)
+	result, err := b.Upstream.GetStorageData(acct.Value.Bytes(), index.Value.Bytes())
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.NewInt(result), nil
+	return m.NewIntFromBytes(result), nil
 }
 
 // GetCode ... adapts between K model and elrond function
-func GetCode(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
+func (b *Blockchain) GetCode(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 	acct, isInt := c.(*m.Int)
 	if !isInt {
-		return m.NoResult, &hookInvalidArgsError{}
+		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := blockchain.GetCode(acct.Value)
+	result, err := b.Upstream.GetCode(acct.Value.Bytes())
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.NewString(result), nil
+	return m.NewString(string(result)), nil
 }
 
 // GetBlockhash ... adapts between K model and elrond function
-func GetBlockhash(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
+func (b *Blockchain) GetBlockhash(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
 	offset, isInt := c.(*m.Int)
 	if !isInt {
-		return m.NoResult, &hookInvalidArgsError{}
+		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := blockchain.GetBlockhash(offset.Value)
+	result, err := b.Upstream.GetBlockhash(offset.Value)
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.NewInt(result), nil
-}
-
-type hookInvalidArgsError struct {
-}
-
-func (e *hookInvalidArgsError) Error() string {
-	return "Invalid argument(s) provided to blockchain hook."
+	return m.NewIntFromBytes(result), nil
 }

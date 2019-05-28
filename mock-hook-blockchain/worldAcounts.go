@@ -10,14 +10,14 @@ type Account struct {
 	Address []byte
 	Nonce   *big.Int
 	Balance *big.Int
-	Storage map[string]*big.Int
-	Code    string
+	Storage map[string][]byte
+	Code    []byte
 }
 
-var storageDefaultValue = big.NewInt(0)
+var storageDefaultValue = []byte{}
 
-// MakeAccountMap ... new AccountMap instance
-func MakeAccountMap() AccountMap {
+// NewAccountMap creates a new AccountMap instance
+func NewAccountMap() AccountMap {
 	return AccountMap(make(map[string]*Account))
 }
 
@@ -40,7 +40,7 @@ func (am AccountMap) DeleteAccount(address []byte) {
 }
 
 // StorageValue ... storage value for key, default 0
-func (a *Account) StorageValue(key string) *big.Int {
+func (a *Account) StorageValue(key string) []byte {
 	value, found := a.Storage[key]
 	if !found {
 		return storageDefaultValue

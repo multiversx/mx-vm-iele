@@ -11,16 +11,15 @@ import (
 	"path/filepath"
 	"strings"
 
-	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
-	endpoint "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
+	worldhook "github.com/ElrondNetwork/elrond-vm/mock-hook-blockchain"
 
+	vmi "github.com/ElrondNetwork/elrond-vm-common"
 	ij "github.com/ElrondNetwork/elrond-vm/iele/test-util/ielejson"
-	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
 )
 
 // RunJSONTest ... only playing around for now
-func RunJSONTest(testFilePath string, vm vmi.IeleVM) error {
+func RunJSONTest(testFilePath string, vmp VMProvider, world *worldhook.BlockchainHookMock) error {
 	var err error
 	testFilePath, err = filepath.Abs(testFilePath)
 	if err != nil {
@@ -49,7 +48,7 @@ func RunJSONTest(testFilePath string, vm vmi.IeleVM) error {
 	}
 
 	for _, test := range top {
-		testErr := runTest(testFilePath, test, vm)
+		testErr := runTest(testFilePath, test, vmp, world)
 		if testErr != nil {
 			return testErr
 		}
@@ -62,16 +61,17 @@ func RunJSONTest(testFilePath string, vm vmi.IeleVM) error {
 	return nil
 }
 
-func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
-	ws := world.MakeInMemoryWorldState()
-	ws.Blockhashes = test.BlockHashes
-	world.HookWorldState = ws
+func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhook.BlockchainHookMock) error {
+	// reset world
+	world.Clear()
+	world.Blockhashes = test.BlockHashes
 
 	testDirPath := filepath.Dir(testFilePath)
 
-	schedule, schErr := vm.ParseSchedule(test.Network)
-	if schErr != nil {
-		return schErr
+	scheduleName := test.Network
+	vm, initErr := vmp.GetVM(scheduleName)
+	if initErr != nil {
+		return initErr
 	}
 
 	var assErr error
@@ -80,7 +80,7 @@ func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
 		if assErr != nil {
 			return assErr
 		}
-		ws.AcctMap.PutAccount(convertAccount(acct))
+		world.AcctMap.PutAccount(convertAccount(acct))
 	}
 	for _, acct := range test.PostState {
 		acct.Code, assErr = assembleIeleCode(testDirPath, acct.Code)
@@ -89,55 +89,74 @@ func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
 		}
 	}
 
-	//spew.Dump(ws.AcctMap)
+	//spew.Dump(world.AcctMap)
 
 	for _, block := range test.Blocks {
 		for txIndex, tx := range block.Transactions {
-			var data, function, dataForGas string
-			if tx.IsCreate {
-				data, assErr = assembleIeleCode(testDirPath, tx.ContractCode)
-				if assErr != nil {
-					return assErr
-				}
-				function = ""
-				dataForGas = data
-			} else {
-				data = ""
-				function = tx.Function
-				dataForGas = function
-			}
-
-			beforeErr := endpoint.UpdateWorldStateBefore(ws, tx.From, tx.GasLimit, tx.GasPrice)
+			beforeErr := world.UpdateWorldStateBefore(tx.From, tx.GasLimit, tx.GasPrice)
 			if beforeErr != nil {
 				return beforeErr
 			}
 
-			g0, g0Err := vm.G0(schedule, tx.IsCreate, dataForGas, tx.Arguments)
-			if g0Err != nil {
-				return g0Err
-			}
-			gasLimit := big.NewInt(0).Sub(tx.GasLimit, g0)
+			var output *vmi.VMOutput
 
-			input := &vmi.VMInput{
-				IsCreate:      tx.IsCreate,
-				CallerAddr:    tx.From,
-				RecipientAddr: tx.To,
-				InputData:     data,
-				Function:      function,
-				Arguments:     tx.Arguments,
-				CallValue:     tx.Value,
-				GasPrice:      tx.GasPrice,
-				GasProvided:   gasLimit,
-				BlockHeader:   convertBlockHeader(block.BlockHeader),
-				Schedule:      schedule,
+			if tx.IsCreate {
+				assembledCode, assErr := assembleIeleCode(testDirPath, tx.ContractCode)
+				if assErr != nil {
+					return assErr
+				}
+
+				input := &vmi.ContractCreateInput{
+					ContractCode: []byte(assembledCode),
+					VMInput: vmi.VMInput{
+						CallerAddr:  tx.From,
+						Arguments:   tx.Arguments,
+						CallValue:   tx.Value,
+						GasPrice:    tx.GasPrice,
+						GasProvided: nil,
+						Header:      convertBlockHeader(block.BlockHeader),
+					},
+				}
+
+				g0, g0Err := vm.G0Create(input)
+				if g0Err != nil {
+					return g0Err
+				}
+				input.GasProvided = big.NewInt(0).Sub(tx.GasLimit, g0)
+
+				var err error
+				output, err = vm.RunSmartContractCreate(input)
+				if err != nil {
+					return err
+				}
+			} else {
+				input := &vmi.ContractCallInput{
+					RecipientAddr: tx.To,
+					Function:      tx.Function,
+					VMInput: vmi.VMInput{
+						CallerAddr:  tx.From,
+						Arguments:   tx.Arguments,
+						CallValue:   tx.Value,
+						GasPrice:    tx.GasPrice,
+						GasProvided: nil,
+						Header:      convertBlockHeader(block.BlockHeader),
+					},
+				}
+
+				g0, g0Err := vm.G0Call(input)
+				if g0Err != nil {
+					return g0Err
+				}
+				input.GasProvided = big.NewInt(0).Sub(tx.GasLimit, g0)
+
+				var err error
+				output, err = vm.RunSmartContractCall(input)
+				if err != nil {
+					return err
+				}
 			}
 
-			output, err := vm.RunTransaction(input)
-			if err != nil {
-				return err
-			}
-
-			updErr := endpoint.UpdateWorldStateAfter(ws, output)
+			updErr := world.UpdateAccounts(output.OutputAccounts, output.DeletedAccounts)
 			if updErr != nil {
 				return updErr
 			}
@@ -145,9 +164,12 @@ func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
 			blResult := block.Results[txIndex]
 
 			// check return code
-			expectedStatus := zeroIfNil(blResult.Status)
-			if expectedStatus.Cmp(output.ReturnCode) != 0 {
-				return fmt.Errorf("result code mismatch. Want: 0x%x. Have: 0x%x", expectedStatus, output.ReturnCode)
+			expectedStatus := 0
+			if blResult.Status != nil {
+				expectedStatus = int(blResult.Status.Int64())
+			}
+			if expectedStatus != int(output.ReturnCode) {
+				return fmt.Errorf("result code mismatch. Want: %d. Have: %d", expectedStatus, int(output.ReturnCode))
 			}
 
 			// check result
@@ -197,7 +219,7 @@ func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
 		}
 	}
 
-	for worldAcctAddr := range ws.AcctMap {
+	for worldAcctAddr := range world.AcctMap {
 		postAcctMatch := ij.FindAccount(test.PostState, []byte(worldAcctAddr))
 		if postAcctMatch == nil {
 			return fmt.Errorf("unexpected account address: %s", hex.EncodeToString([]byte(worldAcctAddr)))
@@ -206,7 +228,7 @@ func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
 
 	for _, postAcctFromTest := range test.PostState {
 		postAcct := convertAccount(postAcctFromTest)
-		matchingAcct, isMatch := ws.AcctMap[string(postAcct.Address)]
+		matchingAcct, isMatch := world.AcctMap[string(postAcct.Address)]
 		if !isMatch {
 			return fmt.Errorf("account %s expected but not found after running test",
 				hex.EncodeToString(postAcct.Address))
@@ -224,8 +246,8 @@ func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
 			return fmt.Errorf("bad account balance. Want: %d. Have: %d", postAcct.Balance, matchingAcct.Balance)
 		}
 
-		if matchingAcct.Code != postAcct.Code {
-			return fmt.Errorf("bad account code. Want: %s. Have: %s", postAcct.Code, matchingAcct.Code)
+		if !bytes.Equal(matchingAcct.Code, postAcct.Code) {
+			return fmt.Errorf("bad account code. Want: [%s]. Have: [%s]", postAcct.Code, matchingAcct.Code)
 		}
 
 		// compare storages
@@ -240,10 +262,10 @@ func runTest(testFilePath string, test *ij.Test, vm vmi.IeleVM) error {
 		for k := range allKeys {
 			want := postAcct.StorageValue(k)
 			have := matchingAcct.StorageValue(k)
-			if have.Cmp(want) != 0 {
+			if !bytes.Equal(want, have) {
 				storageError += fmt.Sprintf(
-					"\n  for key %s: Want: 0x%x. Have: 0x%x",
-					k, want, have)
+					"\n  for key %s: Want: 0x%s. Have: 0x%s",
+					k, hex.EncodeToString(want), hex.EncodeToString(have))
 			}
 		}
 		if len(storageError) > 0 {
@@ -267,29 +289,28 @@ func resultAsString(result []*big.Int) string {
 	return str + "]"
 }
 
-func convertAccount(testAcct *ij.Account) *world.Account {
-	storage := make(map[string]*big.Int)
+func convertAccount(testAcct *ij.Account) *worldhook.Account {
+	storage := make(map[string][]byte)
 	for _, stkvp := range testAcct.Storage {
-		key := stkvp.Key.Text(16)
-		storage[key] = stkvp.Value
+		key := string(stkvp.Key.Bytes())
+		storage[key] = stkvp.Value.Bytes()
 	}
 
-	return &world.Account{
+	return &worldhook.Account{
 		Address: testAcct.Address,
 		Nonce:   big.NewInt(0).Set(testAcct.Nonce),
 		Balance: big.NewInt(0).Set(testAcct.Balance),
 		Storage: storage,
-		Code:    testAcct.Code,
+		Code:    []byte(testAcct.Code),
 	}
 }
 
-func convertBlockHeader(testBlh *ij.BlockHeader) *vmi.BlockHeader {
-	return &vmi.BlockHeader{
-		Beneficiary:   testBlh.Beneficiary,
-		Difficulty:    testBlh.Difficulty,
-		Number:        testBlh.Number,
-		GasLimit:      testBlh.GasLimit,
-		UnixTimestamp: testBlh.UnixTimestamp,
+func convertBlockHeader(testBlh *ij.BlockHeader) *vmi.SCCallHeader {
+	return &vmi.SCCallHeader{
+		Beneficiary: testBlh.Beneficiary,
+		Number:      testBlh.Number,
+		GasLimit:    testBlh.GasLimit,
+		Timestamp:   testBlh.UnixTimestamp,
 	}
 }
 

@@ -2,70 +2,100 @@ package endpoint
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 
-	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 
-	vmi "github.com/ElrondNetwork/elrond-vm/iele/vm-interface"
+	vmi "github.com/ElrondNetwork/elrond-vm-common"
 )
 
-// InterpreterOptions ... options used by the interpreter, shouldn't need to change other than for debugging
-var InterpreterOptions = &interpreter.ExecuteOptions{
-	TracePretty: false,
-	TraceKPrint: false,
-	Verbose:     false,
-	MaxSteps:    0,
-}
-
-// ElrondIeleVMType ... endpoint container type
-type ElrondIeleVMType int
-
-// ElrondIeleVM ... singleton endpoint for the Elrond version of the IELE VM, 32-byte addresses, etc.
-var ElrondIeleVM ElrondIeleVMType
-
-const addressLength = 32
-
-// RunTransaction ... executes transaction contract code in VM
-func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error) {
-	validationErr := validateInput(input)
-	if validationErr != nil {
-		return nil, validationErr
+// RunSmartContractCreate computes how a smart contract creation should be performed
+func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (*vmi.VMOutput, error) {
+	// validate input
+	if input.Header == nil {
+		return nil, errors.New("block header required")
+	}
+	if len(input.CallerAddr) != AddressLength {
+		return nil, fmt.Errorf("caller address is not %d bytes in length", AddressLength)
 	}
 
-	kargs := make([]m.K, len(input.Arguments))
-	for i, arg := range input.Arguments {
-		kargs[i] = m.NewInt(arg)
-	}
-	kargList := &m.List{Sort: m.SortList, Label: m.LblXuListXu, Data: kargs}
-
+	// convert input
 	kapp := &m.KApply{Label: m.LblRunVM, List: []m.K{
-		m.ToBool(input.IsCreate),
-		m.NewIntFromBytes(input.RecipientAddr),
+		m.BoolTrue,
+		m.IntZero,
 		m.NewIntFromBytes(input.CallerAddr),
-		m.NewString(input.InputData),
-		kargList,
+		m.NewString(string(input.ContractCode)),
+		convertArgs(input.Arguments),
 		m.NewInt(input.CallValue),
 		m.NewInt(input.GasPrice),
 		m.NewInt(input.GasProvided),
-		m.NewInt(input.BlockHeader.Beneficiary),
-		m.NewInt(input.BlockHeader.Difficulty),
-		m.NewInt(input.BlockHeader.Number),
-		m.NewInt(input.BlockHeader.GasLimit),
-		m.NewInt(input.BlockHeader.UnixTimestamp),
+		m.NewInt(input.Header.Beneficiary),
+		m.IntZero, // difficulty
+		m.NewInt(input.Header.Number),
+		m.NewInt(input.Header.GasLimit),
+		m.NewInt(input.Header.Timestamp),
+		m.StringEmpty,
+	}}
+
+	return vm.runTransaction(kapp)
+}
+
+// RunSmartContractCall computes the result of a smart contract call and how the system must change after the execution
+func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi.VMOutput, error) {
+	// validate input
+	if input.Header == nil {
+		return nil, errors.New("block header required")
+	}
+	if len(input.CallerAddr) != AddressLength {
+		return nil, fmt.Errorf("caller address is not %d bytes in length", AddressLength)
+	}
+	if len(input.RecipientAddr) != AddressLength {
+		return nil, fmt.Errorf("recipient address is not %d bytes in length", AddressLength)
+	}
+
+	kapp := &m.KApply{Label: m.LblRunVM, List: []m.K{
+		m.BoolFalse,
+		m.NewIntFromBytes(input.RecipientAddr),
+		m.NewIntFromBytes(input.CallerAddr),
+		m.StringEmpty,
+		convertArgs(input.Arguments),
+		m.NewInt(input.CallValue),
+		m.NewInt(input.GasPrice),
+		m.NewInt(input.GasProvided),
+		m.NewInt(input.Header.Beneficiary),
+		m.IntZero, // difficulty
+		m.NewInt(input.Header.Number),
+		m.NewInt(input.Header.GasLimit),
+		m.NewInt(input.Header.Timestamp),
 		m.NewString(input.Function),
 	}}
+
+	return vm.runTransaction(kapp)
+}
+
+func convertArgs(args []*big.Int) m.K {
+	kargs := make([]m.K, len(args))
+	for i, arg := range args {
+		kargs[i] = m.NewInt(arg)
+	}
+	kargList := &m.List{Sort: m.SortList, Label: m.LblXuListXu, Data: kargs}
+	return kargList
+}
+
+// RunTransaction ... executes transaction contract code in VM
+func (vm *ElrondIeleVM) runTransaction(kinput m.K) (*vmi.VMOutput, error) {
 
 	mode := &m.KApply{Label: m.LblNORMAL}
 
 	kConfigMap := make(map[m.KMapKey]m.K)
-	kConfigMap[m.KToken{Sort: m.SortKConfigVar, Value: "$PGM"}] = kapp
+	kConfigMap[m.KToken{Sort: m.SortKConfigVar, Value: "$PGM"}] = kinput
 	kConfigMap[m.KToken{Sort: m.SortKConfigVar, Value: "$MODE"}] = mode
-	kConfigMap[m.KToken{Sort: m.SortKConfigVar, Value: "$SCHEDULE"}] = scheduleToK(input.Schedule)
+	kConfigMap[m.KToken{Sort: m.SortKConfigVar, Value: "$SCHEDULE"}] = scheduleToK(vm.schedule)
 
 	// init
-	initConfig, initErr := interpreter.Eval(
+	initConfig, initErr := vm.kinterpreter.Eval(
 		&m.KApply{
 			Label: interpreter.TopCellInitializer,
 			List:  []m.K{&m.Map{Sort: m.SortMap, Label: m.LblXuMapXu, Data: kConfigMap}}},
@@ -76,13 +106,13 @@ func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error
 	}
 
 	// execute
-	finalState, _, execErr := interpreter.TakeStepsNoThread(initConfig, InterpreterOptions)
+	finalState, _, execErr := vm.kinterpreter.TakeStepsNoThread(initConfig)
 	if execErr != nil {
 		return nil, execErr
 	}
 
 	// extract result
-	extracted, extractErr := interpreter.Eval(
+	extracted, extractErr := vm.kinterpreter.Eval(
 		&m.KApply{
 			Label: m.LblExtractConfig,
 			List:  []m.K{finalState}},
@@ -142,7 +172,7 @@ func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error
 		if !isdOk {
 			return nil, errors.New("self destruct address not of type Int")
 		}
-		deletedAddr = append(deletedAddr, world.AccountAddress(isd.Value))
+		deletedAddr = append(deletedAddr, isd.Value.Bytes())
 	}
 
 	// logs
@@ -152,7 +182,7 @@ func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error
 	}
 	logs := make([]*vmi.LogEntry, len(kLogs))
 	for i, klog := range kLogs {
-		log, logErr := convertKToLog(klog)
+		log, logErr := vm.convertKToLog(klog)
 		if logErr != nil {
 			return nil, logErr
 		}
@@ -168,9 +198,9 @@ func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error
 	if !kAccountsMapOk {
 		return nil, errors.New("invalid vmResult account map")
 	}
-	var modAccounts []*world.ModifiedAccount
+	var modAccounts []*vmi.OutputAccount
 	for _, kacc := range kAccountsMapData {
-		modAccount, modAccErr := convertKToModifiedAccount(kacc)
+		modAccount, modAccErr := vm.convertKToModifiedAccount(kacc)
 		if modAccErr != nil {
 			return nil, modAccErr
 		}
@@ -187,26 +217,24 @@ func (ElrondIeleVMType) RunTransaction(input *vmi.VMInput) (*vmi.VMOutput, error
 		if !itOk {
 			return nil, errors.New("touched address not of type Int")
 		}
-		touchedAddr = append(touchedAddr, world.AccountAddress(it.Value))
+		touchedAddr = append(touchedAddr, it.Value.Bytes())
 	}
 
 	result := &vmi.VMOutput{
-		ReturnData:       returnData,
-		GasRemaining:     kresGas.Value,
-		GasRefund:        kresRefund.Value,
-		ReturnCode:       kresStatus.Value,
-		DeletedAccounts:  deletedAddr,
-		TouchedAccounts:  touchedAddr,
-		ModifiedAccounts: modAccounts,
-		Logs:             logs,
+		ReturnData:      returnData,
+		GasRemaining:    kresGas.Value,
+		GasRefund:       kresRefund.Value,
+		ReturnCode:      vmi.ReturnCode(int(kresStatus.Value.Int64())),
+		DeletedAccounts: deletedAddr,
+		TouchedAccounts: touchedAddr,
+		OutputAccounts:  modAccounts,
+		Logs:            logs,
 	}
-
-	m.ClearModel()
 
 	return result, nil
 }
 
-func convertKToModifiedAccount(kacc m.K) (*world.ModifiedAccount, error) {
+func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.K) (*vmi.OutputAccount, error) {
 	kappAcc, kappAccOk5 := m.ExtractKApplyArgs(kacc, m.LblXltaccountXgt, 5)
 	if !kappAccOk5 {
 		var kappAccOk6 bool
@@ -241,7 +269,7 @@ func convertKToModifiedAccount(kacc m.K) (*world.ModifiedAccount, error) {
 	if !kappCodeOk {
 		return nil, errors.New("invalid account code")
 	}
-	codeStr, codeErr := getCodeBytes(kappCode[0])
+	codeStr, codeErr := vm.getCodeBytes(kappCode[0])
 	if codeErr != nil {
 		return nil, codeErr
 	}
@@ -255,7 +283,7 @@ func convertKToModifiedAccount(kacc m.K) (*world.ModifiedAccount, error) {
 	if !storageDataOk {
 		return nil, errors.New("invalid account storage")
 	}
-	var storageUpdates []*world.StorageUpdate
+	var storageUpdates []*vmi.StorageUpdate
 	for kmpkey, kvalue := range storageData {
 		kkey, kkeyErr := kmpkey.ToKItem()
 		if kkeyErr != nil {
@@ -269,9 +297,9 @@ func convertKToModifiedAccount(kacc m.K) (*world.ModifiedAccount, error) {
 		if !ivalueOk {
 			return nil, errors.New("invalid account storage value")
 		}
-		storageUpdates = append(storageUpdates, &world.StorageUpdate{
-			Offset: ikey.Value,
-			Data:   ivalue.Value,
+		storageUpdates = append(storageUpdates, &vmi.StorageUpdate{
+			Offset: ikey.Value.Bytes(),
+			Data:   ivalue.Value.Bytes(),
 		})
 	}
 
@@ -287,18 +315,18 @@ func convertKToModifiedAccount(kacc m.K) (*world.ModifiedAccount, error) {
 		return nil, errors.New("invalid account nonce")
 	}
 
-	return &world.ModifiedAccount{
-		Address:        world.AccountAddress(iaddr.Value),
+	return &vmi.OutputAccount{
+		Address:        iaddr.Value.Bytes(),
 		Balance:        ibalance.Value,
 		Nonce:          inonce.Value,
 		StorageUpdates: storageUpdates,
-		Code:           codeStr,
+		Code:           []byte(codeStr),
 	}, nil
 }
 
 // this one calls the interpreter evaluate function to extract the bytes
-func getCodeBytes(kcode m.K) (string, error) {
-	result, err := interpreter.Eval(
+func (vm *ElrondIeleVM) getCodeBytes(kcode m.K) (string, error) {
+	result, err := vm.kinterpreter.Eval(
 		&m.KApply{
 			Label: m.LblContractBytes,
 			List:  []m.K{kcode},
@@ -315,7 +343,7 @@ func getCodeBytes(kcode m.K) (string, error) {
 	return strResult.Value, nil
 }
 
-func convertKToLog(klog m.K) (*vmi.LogEntry, error) {
+func (vm *ElrondIeleVM) convertKToLog(klog m.K) (*vmi.LogEntry, error) {
 	logArgs, logKappOk := m.ExtractKApplyArgs(klog, m.LblLogEntry, 3)
 	if !logKappOk {
 		return nil, errors.New("invalid log entry")
@@ -338,7 +366,7 @@ func convertKToLog(klog m.K) (*vmi.LogEntry, error) {
 	}
 
 	data := logArgs[2]
-	unparseResult, unparseErr := interpreter.Eval(
+	unparseResult, unparseErr := vm.kinterpreter.Eval(
 		&m.KApply{Label: m.LblUnparseByteStack, List: []m.K{data}},
 		m.InternedBottom,
 	)
