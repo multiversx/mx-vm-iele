@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -10,14 +11,14 @@ import (
 
 var excludedTests = []string{
 	"tests/VMTests/vmPerformance/*/*",
-	"tests/iele/*/unit/precompiled.iele.json",
-	"tests/iele/*/ill-formed/illFormed.iele.json",
-	"tests/iele/*/ill-formed/illFormed2.iele.json",
+	"tests/*/*/unit/precompiled.iele.json",
+	"tests/*/*/ill-formed/illFormed.iele.json",
+	"tests/*/*/ill-formed/illFormed2.iele.json",
 }
 
 func isExcluded(testPath string) bool {
 	for _, et := range excludedTests {
-		excludedFullPath := filepath.Join(ieleTestRoot, et)
+		excludedFullPath := path.Join(ieleTestRoot, et)
 		match, err := filepath.Match(excludedFullPath, testPath)
 		if err != nil {
 			panic(err)
@@ -27,16 +28,6 @@ func isExcluded(testPath string) bool {
 		}
 	}
 	return false
-}
-
-func TestVmTests(t *testing.T) {
-	dirPath := filepath.Join(ieleTestRoot, "tests/VMTests")
-	testAllInDirectory(t, dirPath, gasModeVMTests)
-}
-
-func TestIeleTests(t *testing.T) {
-	dirPath := filepath.Join(ieleTestRoot, "tests/iele")
-	testAllInDirectory(t, dirPath, gasModeNormal)
 }
 
 func testAllInDirectory(t *testing.T, mainDirPath string, testGasMode gasMode) {

@@ -8,9 +8,11 @@ import (
 	"path"
 	"path/filepath"
 
+	krypto "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/hookadapter/krypto"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestingmodel"
 	oj2k "github.com/ElrondNetwork/elrond-vm/iele/test-util/orderedjson2kast"
+	cryptohook "github.com/ElrondNetwork/elrond-vm/mock-hook-crypto"
 )
 
 type gasMode string
@@ -22,6 +24,8 @@ const (
 
 // where to find the tests to run
 var ieleTestRoot = path.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork/elrond-vm/iele/original/tests/")
+
+var kryptoAdapter = &krypto.Krypto{Upstream: cryptohook.KryptoHookMockInstance}
 
 // runTest ... runs one individual *.iele.json test
 func runTest(testFilePath string, testGasMode gasMode, tracePretty bool, verbose bool) error {
@@ -59,34 +63,36 @@ func runTest(testFilePath string, testGasMode gasMode, tracePretty bool, verbose
 	kastInitMap["PGM"] = []byte(kast)
 	kastInitMap["SCHEDULE"] = []byte("`DEFAULT_IELE-GAS`(.KList)")
 	kastInitMap["MODE"] = []byte(string(testGasMode))
-	options := &interpreter.ExecuteOptions{TracePretty: tracePretty, TraceKPrint: false, Verbose: verbose}
+
+	//options := &interpreter.ExecuteOptions{TracePretty: tracePretty, TraceKPrint: false, Verbose: verbose}
+	kinterpreter := interpreter.NewInterpreter(kryptoAdapter)
 
 	// execution itself
-	finalState, nrSteps, execErr := interpreter.Execute(kastInitMap, options)
+	finalState, nrSteps, execErr := kinterpreter.Execute(kastInitMap)
 
 	if execErr != nil {
 		return execErr
 	}
 
-	if !isExitCodeZero(finalState) {
+	if !isExitCodeZero(finalState, kinterpreter) {
 		return fmt.Errorf(
 			"test failed, excution returned non-zero exit code.\nNr. steps performed: %d\nFinal state:\n%s\nTest path:%s",
-			nrSteps, m.PrettyPrint(finalState), testFilePath)
+			nrSteps, kinterpreter.Model.PrettyPrint(finalState), testFilePath)
 	}
 
-	if !isKCellEmpty(finalState) {
+	if !isKCellEmpty(finalState, kinterpreter) {
 		return fmt.Errorf(
 			"test failed, K cell not empty in the end.\nNr. steps performed: %d\nFinal state:\n%s\nTest path:%s",
-			nrSteps, m.PrettyPrint(finalState), testFilePath)
+			nrSteps, kinterpreter.Model.PrettyPrint(finalState), testFilePath)
 	}
 
 	return nil
 }
 
-func isExitCodeZero(c m.K) bool {
+func isExitCodeZero(c m.K, kinterpreter *interpreter.Interpreter) bool {
 	if generatedTop, t := c.(*m.KApply); t && generatedTop.Label == m.ParseKLabel("<generatedTop>") { // `<generatedTop>`(`<k>`(...
 		if exitCodeCell, t := generatedTop.List[2].(*m.KApply); t && exitCodeCell.Label == m.ParseKLabel("<exit-code>") && len(exitCodeCell.List) == 1 { // `<exit-code>`(...
-			return exitCodeCell.List[0].Equals(m.IntZero)
+			return kinterpreter.Model.Equals(exitCodeCell.List[0], m.IntZero)
 		}
 
 	}
@@ -94,11 +100,11 @@ func isExitCodeZero(c m.K) bool {
 	return false
 }
 
-func isKCellEmpty(c m.K) bool {
+func isKCellEmpty(c m.K, kinterpreter *interpreter.Interpreter) bool {
 	if generatedTop, t := c.(*m.KApply); t && generatedTop.Label == m.ParseKLabel("<generatedTop>") { // `<generatedTop>`(`<k>`(...
 		if kcell, t := generatedTop.List[0].(*m.KApply); t && kcell.Label == m.ParseKLabel("<k>") && len(kcell.List) == 1 { // `<k>`(...
-			if kseq, isKseq := kcell.List[0].(*m.KSequence); isKseq {
-				return kseq.IsEmpty()
+			if kseq, isKseq := kcell.List[0].(m.KSequence); isKseq {
+				return kinterpreter.Model.KSequenceIsEmpty(kseq)
 			}
 		}
 
