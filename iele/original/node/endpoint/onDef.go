@@ -31,5 +31,5 @@ func NewOriginalIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoH
 
 // SetTracePretty turns on pretty trace creation, use for debugging only
 func (vm *OriginalIeleVM) SetTracePretty() {
-	vm.kinterpreter.TracePretty = true
+	vm.kinterpreter.SetTracePretty()
 }

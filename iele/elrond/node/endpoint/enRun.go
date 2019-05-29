@@ -106,10 +106,11 @@ func (vm *ElrondIeleVM) runTransaction(kinput m.K) (*vmi.VMOutput, error) {
 	}
 
 	// execute
-	finalState, _, execErr := vm.kinterpreter.TakeStepsNoThread(initConfig)
+	execErr := vm.kinterpreter.TakeStepsNoThread(initConfig)
 	if execErr != nil {
 		return nil, execErr
 	}
+	finalState := vm.kinterpreter.GetState()
 
 	// extract result
 	extracted, extractErr := vm.kinterpreter.Eval(

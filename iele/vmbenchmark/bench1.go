@@ -7,13 +7,15 @@ import (
 	"path/filepath"
 	"testing"
 
-	world "github.com/ElrondNetwork/elrond-vm/callback-blockchain"
+	vmi "github.com/ElrondNetwork/elrond-vm-common"
+	ielecommon "github.com/ElrondNetwork/elrond-vm/iele/common"
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
-	vmi "github.com/ElrondNetwork/elrond-vm-common"
+	worldhook "github.com/ElrondNetwork/elrond-vm/mock-hook-blockchain"
+	cryptohook "github.com/ElrondNetwork/elrond-vm/mock-hook-crypto"
 )
 
-var lastReturnCode *big.Int
+var lastReturnCode vmi.ReturnCode
 
 func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 
@@ -25,8 +27,7 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		panic(err)
 	}
 
-	ws := world.MakeInMemoryWorldState()
-	world.HookWorldState = ws
+	world := worldhook.NewMock()
 
 	contractAddrHex := "c0879ac700000000000000000000000000000000000000000000000000000000"
 	account1AddrHex := "acc1000000000000000000000000000000000000000000000000000000000000"
@@ -36,32 +37,32 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 	account1Addr, _ := hex.DecodeString(account1AddrHex)
 	account2Addr, _ := hex.DecodeString(account2AddrHex)
 
-	constractStorage := make(map[string]*big.Int)
-	constractStorage["1"+account1AddrHex] = big.NewInt(2000000000)
-	constractStorage["0"] = big.NewInt(2000000000) // total supply
+	constractStorage := make(map[string][]byte)
+	constractStorage[storageKey("01"+account1AddrHex)] = big.NewInt(2000000000).Bytes()
+	constractStorage[storageKey("00")] = big.NewInt(2000000000).Bytes() // total supply
 
-	ws.AcctMap.PutAccount(&world.Account{
+	world.AcctMap.PutAccount(&worldhook.Account{
 		Address: contractAddr,
 		Nonce:   big.NewInt(0),
 		Balance: big.NewInt(0),
 		Storage: constractStorage,
-		Code:    string(decoded),
+		Code:    decoded,
 	})
 
-	ws.AcctMap.PutAccount(&world.Account{
+	world.AcctMap.PutAccount(&worldhook.Account{
 		Address: account1Addr,
 		Nonce:   big.NewInt(0),
 		Balance: hexToBigInt("e8d4a51000"),
-		Storage: make(map[string]*big.Int),
-		Code:    "",
+		Storage: make(map[string][]byte),
+		Code:    []byte{},
 	})
 
-	ws.AcctMap.PutAccount(&world.Account{
+	world.AcctMap.PutAccount(&worldhook.Account{
 		Address: account2Addr,
 		Nonce:   big.NewInt(0),
 		Balance: hexToBigInt("e8d4a51000"),
-		Storage: make(map[string]*big.Int),
-		Code:    "",
+		Storage: make(map[string][]byte),
+		Code:    []byte{},
 	})
 
 	if b != nil { // nil when debugging
@@ -69,39 +70,38 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 	}
 
 	for benchMarkRepeat := 0; benchMarkRepeat < 1; benchMarkRepeat++ {
-		blHeader := &vmi.BlockHeader{
-			Beneficiary:   big.NewInt(0),
-			Difficulty:    big.NewInt(0),
-			Number:        big.NewInt(int64(benchMarkRepeat)),
-			GasLimit:      hexToBigInt("174876e800"),
-			UnixTimestamp: big.NewInt(0),
+		blHeader := &vmi.SCCallHeader{
+			Beneficiary: big.NewInt(0),
+			Number:      big.NewInt(int64(benchMarkRepeat)),
+			GasLimit:    hexToBigInt("174876e800"),
+			Timestamp:   big.NewInt(0),
 		}
 
 		for txi := 0; txi < nrTransfers; txi++ {
-			input := &vmi.VMInput{
-				IsCreate:      false,
-				CallerAddr:    account1Addr,
+			vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, ielecommon.Danse)
+
+			input := &vmi.ContractCallInput{
 				RecipientAddr: contractAddr,
-				InputData:     "",
 				Function:      "transfer",
-				Arguments: []*big.Int{
-					hexToBigInt(account2AddrHex),
-					big.NewInt(1),
+				VMInput: vmi.VMInput{
+					CallerAddr: account1Addr,
+					Arguments: []*big.Int{
+						hexToBigInt(account2AddrHex),
+						big.NewInt(1),
+					},
+					CallValue:   big.NewInt(0),
+					GasPrice:    big.NewInt(1),
+					GasProvided: hexToBigInt("100000"),
+					Header:      blHeader,
 				},
-				CallValue:   big.NewInt(0),
-				GasPrice:    big.NewInt(1),
-				GasProvided: hexToBigInt("100000"),
-				BlockHeader: blHeader,
-				Schedule:    vmi.Danse,
 			}
 
-			vm := eiele.ElrondIeleVM
-			output, err := vm.RunTransaction(input)
+			output, err := vm.RunSmartContractCall(input)
 			if err != nil {
 				panic(err)
 			}
 
-			if output.ReturnCode.Sign() != 0 {
+			if output.ReturnCode != vmi.Ok {
 				panic(fmt.Sprintf("returned non-zero code: %d", output.ReturnCode))
 			}
 
@@ -116,4 +116,12 @@ func hexToBigInt(hexRepresentation string) *big.Int {
 		panic("invalid hex: " + hexRepresentation)
 	}
 	return result
+}
+
+func storageKey(hexRepresentation string) string {
+	decoded, err := hex.DecodeString(hexRepresentation)
+	if err != nil {
+		panic("invalid hex: " + hexRepresentation)
+	}
+	return string(decoded)
 }

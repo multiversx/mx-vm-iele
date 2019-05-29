@@ -68,11 +68,13 @@ func runTest(testFilePath string, testGasMode gasMode, tracePretty bool, verbose
 	kinterpreter := interpreter.NewInterpreter(kryptoAdapter)
 
 	// execution itself
-	finalState, nrSteps, execErr := kinterpreter.Execute(kastInitMap)
-
+	execErr := kinterpreter.Execute(kastInitMap)
 	if execErr != nil {
 		return execErr
 	}
+
+	finalState := kinterpreter.GetState()
+	nrSteps := kinterpreter.GetNrSteps()
 
 	if !isExitCodeZero(finalState, kinterpreter) {
 		return fmt.Errorf(
