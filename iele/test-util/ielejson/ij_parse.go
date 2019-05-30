@@ -218,6 +218,10 @@ func processBlock(blockRaw oj.OJsonObject) (*Block, error) {
 		}
 	}
 
+	if len(bl.Results) != len(bl.Transactions) {
+		return nil, errors.New("mismatched number of blocks and transactions")
+	}
+
 	return &bl, nil
 }
 
@@ -265,9 +269,13 @@ func processBlockResult(blrRaw oj.OJsonObject) (*TransactionResult, error) {
 		}
 
 		if kvp.Key == "refund" {
-			blr.Refund, refundOk = parseBigInt(kvp.Value)
-			if !refundOk {
-				return nil, errors.New("invalid block result refund")
+			if isStar(kvp.Value) {
+				blr.Refund = nil
+			} else {
+				blr.Refund, refundOk = parseBigInt(kvp.Value)
+				if !refundOk {
+					return nil, errors.New("invalid block result refund")
+				}
 			}
 		}
 	}

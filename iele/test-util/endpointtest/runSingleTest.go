@@ -184,10 +184,11 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 			}
 
 			// check refund
-			expectedRefund := zeroIfNil(blResult.Refund)
-			if expectedRefund.Cmp(output.GasRefund) != 0 {
-				return fmt.Errorf("result gas refund mismatch. Want: 0x%x. Have: 0x%x",
-					expectedRefund, output.GasRefund)
+			if blResult.Refund != nil {
+				if blResult.Refund.Cmp(output.GasRefund) != 0 {
+					return fmt.Errorf("result gas refund mismatch. Want: 0x%x. Have: 0x%x",
+						blResult.Refund, output.GasRefund)
+				}
 			}
 
 			// check gas
