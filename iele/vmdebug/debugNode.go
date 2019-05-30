@@ -27,8 +27,9 @@ func main() {
 	debugElrondTest("agar/balanceOf.iele.json", false)
 	debugElrondTest("agar/withdraw_Ok.iele.json", false)
 	debugElrondTest("agar/withdraw_TooMuch.iele.json", false)
-	debugElrondTest("agar/withdrawAll_ok.iele..json", false)
-
+	debugElrondTest("agar/withdrawAll_Ok.iele.json", false)
+	debugElrondTest("agar/enrol.iele.json", false)
+	debugElrondTest("agar/start1.iele.json", false)
 }
 
 func debugElrondTest(testFile string, tracePretty bool) {

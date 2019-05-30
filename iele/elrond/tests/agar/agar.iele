@@ -9,13 +9,21 @@ contract Agar {
   @gameNumberShift = 32
 
   // cost to enter a game
-  @gameEntranceFee = 100
+  @gameEntranceFee = 0x100
 
   // The account storage is divided into:
   @ownerStorageKey = 0
   @playerBalance = 1
-  @pendingPlayers = 2
-  @playersInGame = 3
+  @playerStatus = 2
+  @enrolledQueue = 3
+  @enrolledQueueLength = 4
+  @gameCounter = 5
+  @gamePlayers = 6
+
+  // player statuses:
+  @playerStatusIdle = 0
+  @playerStatusEnrolled = 1
+  @playerStatusInGame = 2
 
   // initializes the game contract by storing in the account storage the account
   // number of the creator
@@ -28,6 +36,18 @@ contract Agar {
 define @playerBalanceKey(%address) {
   %shifted = shift @playerBalance, @addressShift
   %ored = or %shifted, %address
+  ret %ored
+}
+
+define @playerStatusKey(%address) {
+  %shifted = shift @playerStatus, @addressShift
+  %ored = or %shifted, %address
+  ret %ored
+}
+
+define @gamePlayersKey(%gameIndex) {
+  %shifted = shift @gamePlayers, @gameNumberShift
+  %ored = or %shifted, %gameIndex
   ret %ored
 }
 
@@ -82,8 +102,8 @@ define public @withdrawAll() {
   %balance = sload %balanceKey
 
   %zero = 0
-  %lt = cmp eq %balance, %zero
-  br %lt, return
+  %isBalanceZero = cmp eq %balance, %zero
+  br %isBalanceZero, return
 
   sstore %zero, %balanceKey
 
@@ -99,5 +119,115 @@ throw:
   call @iele.invalid()
 }
 
+// player enrols herself
+define public @enrol() {
+  %playerAddr = call @iele.caller()
+
+  // change status idle -> enrolled
+  %statusKey = call @playerStatusKey(%playerAddr)
+  %status = sload %statusKey
+  %notIdle = cmp ne %status, %playerStatusIdle
+  br %notIdle, throw
+  sstore @playerStatusEnrolled, %statusKey
+
+  // subtract game entry fee (if enough funds are present)
+  %balanceKey = call @playerBalanceKey(%playerAddr)
+  %balance = sload %balanceKey
+  %lt = cmp lt %balance, @gameEntranceFee
+  br %lt, throw
+  %balance = sub %balance, @gameEntranceFee
+  sstore %balance, %balanceKey
+
+  // add player to queue (to the left)
+  %queue = sload @enrolledQueue
+  %queueLength = sload @enrolledQueueLength
+  %shift = mul %queueLength, @addressShift
+  %playerAddr = shift %playerAddr, %shift
+  %queue = or %queue, %playerAddr
+  sstore %queue, @enrolledQueue
+
+  // increment queue length
+  %one = 1
+  %queueLength = add %queueLength, %one
+  sstore %queueLength, @enrolledQueueLength
+
+  ret void
+
+throw:
+  call @iele.invalid()
+}
+
+// owner starts a game, takes player from the list
+define public @startGame(%nrPlayers) {
+
+  // check that call comes from owner
+  %caller = call @iele.caller()
+  %owner = sload @ownerStorageKey
+  %notOwner = cmp ne %caller, %owner
+  br %notOwner, throw
+
+  // check queue length
+  %queueLength = sload @enrolledQueueLength
+  %notEnoughEnrolledPlayers = cmp lt %queueLength, %nrPlayers
+  br %notEnoughEnrolledPlayers, throw
+
+  // load queue
+  %queue = sload @enrolledQueue
+  %nrRemainingEnrolled = sub %queueLength, %nrPlayers
+
+  // process players entering game one by one
+  %zero = 0
+  %one = 1
+  %addressMask = shift %one, @addressShift
+  %addressMask = sub %addressMask, %one
+  %i = %nrPlayers
+  %gamePlayers = 0
+  %shiftRight = sub %zero, @addressShift
+  
+playerLoop:
+  %player = and %queue, %addressMask
+
+  
+  %notEnoughEnrolledPlayers = cmp eq %player, %zero
+  br %notEnoughEnrolledPlayers, throw
+
+  %done = cmp eq %i, %zero
+  br %done, allPlayersProcessed
+
+  // add player to player list
+  %gamePlayers = shift %gamePlayers, @addressShift
+  %gamePlayers = or %gamePlayers, %player
+
+  // save player status as in game
+  %statusKey = call @playerStatusKey(%player)
+  sstore @playerStatusInGame, %statusKey
+  
+  // update counter and queue registers
+  %i = sub %i, %one
+  %nrRemainingEnrolled = sub %nrRemainingEnrolled, %one
+  %queue = shift %queue, %shiftRight
+
+  br %one, playerLoop
+
+allPlayersProcessed:
+
+  // update queue
+  sstore %queue, @enrolledQueue
+  //sstore %nrRemainingEnrolled, @enrolledQueueLength
+
+  // retrieve and increment game counter
+  %gameIndex = sload @gameCounter
+  %newGameCounter = add %gameIndex, %one
+  sstore %newGameCounter, @gameCounter
+
+  // save game players
+  %gamePlayersKey = call @gamePlayersKey(%gameIndex)
+  sstore %gamePlayers, %gamePlayersKey
+
+  ret %gameIndex, %gamePlayers
+
+throw:
+  call @iele.invalid()
+}
 
 }
