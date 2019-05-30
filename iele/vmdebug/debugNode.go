@@ -14,12 +14,20 @@ func main() {
 	//debugTest("tests/iele/albe/factorial/factorial_positive.iele.json")
 	//debugTest("tests/iele/albe/ERC20/approve_Caller-Positive.iele.json")
 	//debugTest("tests/iele/albe/unit/blockhash.iele.json")
-	debugOriginalTest("tests/iele/albe/unit/exceptions.iele.json", false)
-	debugOriginalTest("tests/iele/danse/unit/exceptions.iele.json", false)
-	debugElrondTest("tests/iele-v2/albe/unit/exceptions.iele.json", false)
-	debugElrondTest("tests/iele-v2/danse/unit/exceptions.iele.json", false)
 	//debugTest("tests/iele-v1/albe/forwarder/create.iele.json")
 	//debugElrondTest("tests/iele-v2/danse/forwarder/copycreate.iele.json", false)
+
+	// debugOriginalTest("tests/iele/albe/unit/exceptions.iele.json", false)
+	// debugOriginalTest("tests/iele/danse/unit/exceptions.iele.json", false)
+	// debugElrondTest("tests/iele-v2/albe/unit/exceptions.iele.json", false)
+	// debugElrondTest("tests/iele-v2/danse/unit/exceptions.iele.json", false)
+
+	debugElrondTest("agar/create.iele.json", false)
+	debugElrondTest("agar/topUp1.iele.json", false)
+	debugElrondTest("agar/balanceOf.iele.json", false)
+	debugElrondTest("agar/withdraw_Ok.iele.json", false)
+	debugElrondTest("agar/withdraw_TooMuch.iele.json", false)
+	debugElrondTest("agar/withdrawAll_ok.iele..json", false)
 
 }
 

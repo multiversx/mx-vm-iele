@@ -3,7 +3,6 @@ package endpointtest
 import (
 	"bytes"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -187,17 +186,20 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 			// check refund
 			expectedRefund := zeroIfNil(blResult.Refund)
 			if expectedRefund.Cmp(output.GasRefund) != 0 {
-				return errors.New("result gas refund mismatch")
+				return fmt.Errorf("result gas refund mismatch. Want: 0x%x. Have: 0x%x",
+					expectedRefund, output.GasRefund)
 			}
 
 			// check gas
-			expectedGas := zeroIfNil(blResult.Gas)
-			if expectedGas.Cmp(output.GasRemaining) != 0 {
-				return fmt.Errorf("result gas mismatch. Want: %d. Got: %d", expectedGas, output.GasRemaining)
+			if blResult.Gas != nil {
+				if blResult.Gas.Cmp(output.GasRemaining) != 0 {
+					return fmt.Errorf("result gas mismatch. Want: %d. Got: %d", blResult.Gas, output.GasRemaining)
+				}
 			}
-
 			// check empty logs, this seems to be the value
-			if blResult.Logs == "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347" {
+			if blResult.Logs == "*" {
+				// nothing, ignore
+			} else if blResult.Logs == "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347" {
 				if len(output.Logs) != 0 {
 					return fmt.Errorf("empty logs expected. Found: %v", blResult.Logs)
 				}
@@ -239,15 +241,18 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 		}
 
 		if matchingAcct.Nonce.Cmp(postAcct.Nonce) != 0 {
-			return fmt.Errorf("bad account nonce. Want: %d. Have: %d", postAcct.Nonce, matchingAcct.Nonce)
+			return fmt.Errorf("bad account nonce. Account: %s. Want: %d. Have: %d",
+				hex.EncodeToString(matchingAcct.Address), postAcct.Nonce, matchingAcct.Nonce)
 		}
 
 		if matchingAcct.Balance.Cmp(postAcct.Balance) != 0 {
-			return fmt.Errorf("bad account balance. Want: %d. Have: %d", postAcct.Balance, matchingAcct.Balance)
+			return fmt.Errorf("bad account balance. Account: %s. Want: 0x%x. Have: 0x%x",
+				hex.EncodeToString(matchingAcct.Address), postAcct.Balance, matchingAcct.Balance)
 		}
 
 		if !bytes.Equal(matchingAcct.Code, postAcct.Code) {
-			return fmt.Errorf("bad account code. Want: [%s]. Have: [%s]", postAcct.Code, matchingAcct.Code)
+			return fmt.Errorf("bad account code. Account: %s. Want: [%s]. Have: [%s]",
+				hex.EncodeToString(matchingAcct.Address), postAcct.Code, matchingAcct.Code)
 		}
 
 		// compare storages
@@ -265,7 +270,7 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 			if !bytes.Equal(want, have) {
 				storageError += fmt.Sprintf(
 					"\n  for key %s: Want: 0x%s. Have: 0x%s",
-					k, hex.EncodeToString(want), hex.EncodeToString(have))
+					hex.EncodeToString([]byte(k)), hex.EncodeToString(want), hex.EncodeToString(have))
 			}
 		}
 		if len(storageError) > 0 {

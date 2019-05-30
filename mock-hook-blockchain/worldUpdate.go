@@ -28,7 +28,11 @@ func (b *BlockchainHookMock) UpdateBalance(address []byte, newBalance *big.Int) 
 }
 
 // UpdateWorldStateBefore ... performs gas payment, before transaction
-func (b *BlockchainHookMock) UpdateWorldStateBefore(fromAddr []byte, gasLimit *big.Int, gasPrice *big.Int) error {
+func (b *BlockchainHookMock) UpdateWorldStateBefore(
+	fromAddr []byte,
+	gasLimit *big.Int,
+	gasPrice *big.Int) error {
+
 	acct := b.AcctMap.GetAccount(fromAddr)
 	if acct == nil {
 		return errors.New("method UpdateBalance expects an existing address")

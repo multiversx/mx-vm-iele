@@ -247,9 +247,13 @@ func processBlockResult(blrRaw oj.OJsonObject) (*TransactionResult, error) {
 		}
 
 		if kvp.Key == "gas" {
-			blr.Gas, gasOk = parseBigInt(kvp.Value)
-			if !gasOk {
-				return nil, errors.New("invalid block result gas")
+			if isStar(kvp.Value) {
+				blr.Gas = nil
+			} else {
+				blr.Gas, gasOk = parseBigInt(kvp.Value)
+				if !gasOk {
+					return nil, errors.New("invalid block result gas")
+				}
 			}
 		}
 
@@ -513,4 +517,12 @@ func parseString(obj oj.OJsonObject) (string, bool) {
 		return "", false
 	}
 	return str.Value, true
+}
+
+func isStar(obj oj.OJsonObject) bool {
+	str, isStr := obj.(*oj.OJsonString)
+	if !isStr {
+		return false
+	}
+	return str.Value == "*"
 }
