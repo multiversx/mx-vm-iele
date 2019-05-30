@@ -1,0 +1,103 @@
+
+// Agar game
+contract Agar {
+
+  // address length in bits
+  @addressShift = 256
+
+  // game number length in bits
+  @gameNumberShift = 32
+
+  // cost to enter a game
+  @gameEntranceFee = 100
+
+  // The account storage is divided into:
+  @ownerStorageKey = 0
+  @playerBalance = 1
+  @pendingPlayers = 2
+  @playersInGame = 3
+
+  // initializes the game contract by storing in the account storage the account
+  // number of the creator
+  // this is the only account that is allowed to update the state of the game
+  define @init() {
+    %parent = call @iele.caller()
+    sstore %parent, @ownerStorageKey
+  }
+
+define @playerBalanceKey(%address) {
+  %shifted = shift @playerBalance, @addressShift
+  %ored = or %shifted, %address
+  ret %ored
+}
+
+define public @balanceOf(%playerAddr) {
+  // get the key for the account in the balance region
+  %balanceKey = call @playerBalanceKey(%playerAddr)
+
+  // get and return the account's current balance
+  %balance = sload %balanceKey
+  ret %balance
+}
+
+// transfer funds to contract to top up player account
+define public @topUp() {
+  %playerAddr = call @iele.caller()
+  %amount = call @iele.callvalue()
+  %balanceKey = call @playerBalanceKey(%playerAddr)
+  %balance = sload %balanceKey
+  %balance = add %balance, %amount
+  sstore %balance, %balanceKey
+
+  ret void
+}
+
+// as a player, withdraw tokens from the contract account
+define public @withdraw(%amount) {
+  %playerAddr = call @iele.caller()
+  %balanceKey = call @playerBalanceKey(%playerAddr)
+  %balance = sload %balanceKey
+
+  // ensure that the player balance can cover the value to be withdrawn
+  %lt = cmp lt %balance, %amount
+  br %lt, throw
+
+  %balance = sub %balance, %amount
+  sstore %balance, %balanceKey
+
+  // return funds by calling deposit at the player account
+  %gas = call @iele.gas()
+  %status = call @deposit at %playerAddr () send %amount , gaslimit %gas
+  br %status, throw // contract call failed
+  ret void
+
+throw:
+  call @iele.invalid()
+}
+
+// as a player, withdraw all owned funds from the contract account
+define public @withdrawAll() {
+  %playerAddr = call @iele.caller()
+  %balanceKey = call @playerBalanceKey(%playerAddr)
+  %balance = sload %balanceKey
+
+  %zero = 0
+  %lt = cmp eq %balance, %zero
+  br %lt, return
+
+  sstore %zero, %balanceKey
+
+  // return funds by calling deposit at the player account
+  %gas = call @iele.gas()
+  %status = call @deposit at %playerAddr () send %balance , gaslimit %gas
+  br %status, throw // contract call failed
+
+return:
+  ret void
+
+throw:
+  call @iele.invalid()
+}
+
+
+}
