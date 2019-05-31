@@ -30,6 +30,8 @@ func main() {
 	debugElrondTest("agar/withdrawAll_Ok.iele.json", false)
 	debugElrondTest("agar/enrol.iele.json", false)
 	debugElrondTest("agar/start1.iele.json", false)
+	debugElrondTest("agar/end.iele.json", false)
+
 }
 
 func debugElrondTest(testFile string, tracePretty bool) {
