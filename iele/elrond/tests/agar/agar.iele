@@ -1,12 +1,14 @@
-
 // Agar game
 contract Agar {
 
   // address length in bits
   @addressLengthBits = 256
 
-  // we use this to throw an error if any address input is too long
+  // we use this to throw an error is any input is a longer address than
   @maxValidAddress = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
+  // game number length in bits
+  @gameNumberShift = 32
 
   // The account storage is divided into:
   @ownerStorageKey = 0
@@ -138,6 +140,7 @@ define public @addPlayerToGame(%gameId, %player, %bet) {
 
   // validate player address
   %err = cmp gt %player, @maxValidAddress
+  sstore %err, 7
   br %err, throw
 
   // change status idle -> in game
@@ -189,7 +192,7 @@ define public @rewardWinner(%gameIndex, %winner, %prize) {
   br %err, throw
 
   // validate player address
-  %err = cmp gt %player, @maxValidAddress
+  %err = cmp gt %winner, @maxValidAddress
   br %err, throw
 
   // load game bet

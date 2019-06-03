@@ -31,7 +31,7 @@ func main() {
 	debugElrondTest("agar/addPlayerToGame.iele.json", false)
 	debugElrondTest("agar/rewardWinner.iele.json", false)
 	debugElrondTest("agar/endGame.iele.json", false)
-
+	debugElrondTest("agar/exceptions.iele.json", false)
 }
 
 func debugElrondTest(testFile string, tracePretty bool) {
