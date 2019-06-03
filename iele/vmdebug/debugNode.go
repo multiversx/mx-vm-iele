@@ -28,9 +28,9 @@ func main() {
 	debugElrondTest("agar/withdraw_Ok.iele.json", false)
 	debugElrondTest("agar/withdraw_TooMuch.iele.json", false)
 	debugElrondTest("agar/withdrawAll_Ok.iele.json", false)
-	debugElrondTest("agar/enrol.iele.json", false)
-	debugElrondTest("agar/start1.iele.json", false)
-	debugElrondTest("agar/end.iele.json", false)
+	debugElrondTest("agar/addPlayerToGame.iele.json", false)
+	debugElrondTest("agar/rewardWinner.iele.json", false)
+	debugElrondTest("agar/endGame.iele.json", false)
 
 }
 
