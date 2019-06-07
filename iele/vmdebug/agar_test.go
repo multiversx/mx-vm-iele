@@ -10,6 +10,6 @@ func TestAgar(t *testing.T) {
 	eptest.TestAllInDirectory(t,
 		elrondTestRoot,
 		"agar",
-		elrondIeleProvider{},
+		&elrondIeleProvider{},
 		world)
 }

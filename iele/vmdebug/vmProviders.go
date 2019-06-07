@@ -13,23 +13,33 @@ import (
 var world = worldhook.NewMock()
 
 type elrondIeleProvider struct {
+	tracePretty bool
 }
 
-func (elrondIeleProvider) GetVM(scheduleName string) (vmi.VMExecutionHandler, error) {
+func (p *elrondIeleProvider) GetVM(scheduleName string) (vmi.VMExecutionHandler, error) {
 	schedule, err := ielecommon.ParseSchedule(scheduleName)
 	if err != nil {
 		return nil, err
 	}
-	return eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, schedule), nil
+	vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, schedule)
+	if p.tracePretty {
+		vm.SetTracePretty()
+	}
+	return vm, nil
 }
 
 type originalIeleProvider struct {
+	tracePretty bool
 }
 
-func (originalIeleProvider) GetVM(scheduleName string) (vmi.VMExecutionHandler, error) {
+func (p *originalIeleProvider) GetVM(scheduleName string) (vmi.VMExecutionHandler, error) {
 	schedule, err := ielecommon.ParseSchedule(scheduleName)
 	if err != nil {
 		return nil, err
 	}
-	return oiele.NewOriginalIeleVM(world, cryptohook.KryptoHookMockInstance, schedule), nil
+	vm := oiele.NewOriginalIeleVM(world, cryptohook.KryptoHookMockInstance, schedule)
+	if p.tracePretty {
+		vm.SetTracePretty()
+	}
+	return vm, nil
 }

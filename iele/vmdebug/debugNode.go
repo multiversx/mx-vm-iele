@@ -22,6 +22,12 @@ func main() {
 	// debugElrondTest("tests/iele-v2/albe/unit/exceptions.iele.json", false)
 	// debugElrondTest("tests/iele-v2/danse/unit/exceptions.iele.json", false)
 
+	//debugElrondTest("tests/iele-v2/albe/ill-formed/illFormed2.iele.json", false)
+	debugOriginalTest("tests/iele/albe/ill-formed/illFormed2.iele.json", false)
+
+}
+
+func debugAgar() {
 	debugElrondTest("agar/create.iele.json", false)
 	debugElrondTest("agar/topUp1.iele.json", false)
 	debugElrondTest("agar/balanceOf.iele.json", false)
@@ -35,15 +41,10 @@ func main() {
 }
 
 func debugElrondTest(testFile string, tracePretty bool) {
-	// if tracePretty {
-	// 	eiele.InterpreterOptions = &einterpreter.ExecuteOptions{
-	// 		TracePretty: true,
-	// 		TraceKPrint: false,
-	// 		Verbose:     false,
-	// 		MaxSteps:    0,
-	// 	}
-	// }
-	err := eptest.RunJSONTest(path.Join(elrondTestRoot, testFile), elrondIeleProvider{}, world)
+	err := eptest.RunJSONTest(
+		path.Join(elrondTestRoot, testFile),
+		&elrondIeleProvider{tracePretty: tracePretty},
+		world)
 	if err == nil {
 		fmt.Println("SUCCESS")
 	} else {
@@ -52,15 +53,10 @@ func debugElrondTest(testFile string, tracePretty bool) {
 }
 
 func debugOriginalTest(testFile string, tracePretty bool) {
-	// if tracePretty {
-	// 	oiele.InterpreterOptions = &ointerpreter.ExecuteOptions{
-	// 		TracePretty: true,
-	// 		TraceKPrint: false,
-	// 		Verbose:     false,
-	// 		MaxSteps:    0,
-	// 	}
-	// }
-	err := eptest.RunJSONTest(filepath.Join(originalTestRoot, testFile), originalIeleProvider{}, world)
+	err := eptest.RunJSONTest(
+		filepath.Join(originalTestRoot, testFile),
+		&originalIeleProvider{tracePretty: tracePretty},
+		world)
 	if err == nil {
 		fmt.Println("SUCCESS")
 	} else {

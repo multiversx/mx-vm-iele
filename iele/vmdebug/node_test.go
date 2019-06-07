@@ -10,7 +10,7 @@ func TestElrondIeleTests(t *testing.T) {
 	eptest.TestAllInDirectory(t,
 		elrondTestRoot,
 		"tests/iele-v2",
-		elrondIeleProvider{},
+		&elrondIeleProvider{},
 		world)
 }
 
@@ -18,6 +18,6 @@ func TestOriginalIeleTests(t *testing.T) {
 	eptest.TestAllInDirectory(t,
 		originalTestRoot,
 		"tests/iele",
-		originalIeleProvider{},
+		&originalIeleProvider{},
 		world)
 }
