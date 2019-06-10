@@ -1,0 +1,23 @@
+// Dummy contract to test VM integration
+contract Adder {
+
+  // location in storage of the variable a
+  @aKey = 97
+
+define @init(%initial) {
+  sstore %initial, @aKey
+}
+
+define public @add(%value) {
+  %a = sload @aKey
+  %a = add %a, %value
+  sstore %a, @aKey
+  ret void
+}
+
+define public @getA() {
+  %a = sload @aKey
+  ret %a
+}
+
+}
