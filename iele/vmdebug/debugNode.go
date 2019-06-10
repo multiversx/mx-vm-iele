@@ -26,6 +26,7 @@ func main() {
 	//debugOriginalTest("tests/iele/albe/ill-formed/illFormed2.iele.json", false)
 
 	debugElrondTest("adder/adder.iele.json", false)
+	debugAgar()
 }
 
 func debugAgar() {
