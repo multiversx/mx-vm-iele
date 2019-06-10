@@ -6,10 +6,11 @@ import (
 	"math/big"
 	"strings"
 
-	keccak "github.com/ElrondNetwork/elrond-go-sandbox/hashing/keccak"
-	sha256 "github.com/ElrondNetwork/elrond-go-sandbox/hashing/sha256"
+	"crypto/sha256"
+
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
 	"golang.org/x/crypto/ripemd160"
+	"golang.org/x/crypto/sha3"
 )
 
 func hashToString(hash []byte) string {
@@ -28,16 +29,18 @@ const KryptoHookMockInstance KryptoHookMock = 0
 
 // Sha256 ... krypto function
 func (KryptoHookMock) Sha256(str string) (string, error) {
-	hasher := sha256.Sha256{}
-	byteResult := hasher.Compute(str)
+	h := sha256.New()
+	h.Write([]byte(str))
+	byteResult := h.Sum(nil)
 	hashStr := hashToString(byteResult)
 	return hashStr, nil
 }
 
 // Keccak256 ... krypto function
 func (KryptoHookMock) Keccak256(str string) (string, error) {
-	var k keccak.Keccak
-	hash := k.Compute(str)
+	h := sha3.NewLegacyKeccak256()
+	h.Write([]byte(str))
+	hash := h.Sum(nil)
 	hashStr := hashToString(hash)
 	return hashStr, nil
 }
