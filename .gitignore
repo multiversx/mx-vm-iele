@@ -8,19 +8,14 @@
 /iele/vmbenchmark/trace_*/
 /iele/vmbenchmark/*.prof
 
-/iele/original/node/*-kompiled/
 /iele/original/node/kompile/kompile
 
-/iele/original/standalone/*-kompiled/
 /iele/original/standalone/kompile/kompile
 /iele/original/standalone/main/main
 /iele/original/standalone/main/trace_*/
 
-
-/iele/elrond/node/*-kompiled/
 /iele/elrond/node/kompile/kompile
 
-/iele/elrond/standalone/*-kompiled/
 /iele/elrond/standalone/kompile/kompile
 /iele/elrond/standalone/main/main
 /iele/elrond/standalone/main/trace_*/
