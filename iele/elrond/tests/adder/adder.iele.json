@@ -95,7 +95,7 @@
                 "code": ""
             },
             "0x65fc7a83099121cf929f1767bd770416a3345f91e4b34576cb804a576fa48eb1": {
-                "nonce": "0x01",
+                "nonce": "0x00",
                 "balance": "0x00",
                 "storage": {
                     "0x61" : "0x08"
