@@ -22,11 +22,15 @@ func main() {
 	// debugElrondTest("tests/iele-v2/albe/unit/exceptions.iele.json", false)
 	// debugElrondTest("tests/iele-v2/danse/unit/exceptions.iele.json", false)
 
+	//debugElrondTest("tests/iele-v2/albe/auction/bid_higher.iele.json", false)
+	debugElrondTest("tests/iele-v2/danse/unit/collision.iele.json", false)
+	//debugElrondTest("tests/iele-v2/albe/forwarder/copycreate.iele.json", false)
+
 	//debugElrondTest("tests/iele-v2/albe/ill-formed/illFormed2.iele.json", false)
 	//debugOriginalTest("tests/iele/albe/ill-formed/illFormed2.iele.json", false)
 
-	debugElrondTest("adder/adder.iele.json", false)
-	debugAgar()
+	//debugElrondTest("adder/adder.iele.json", false)
+	// debugAgar()
 }
 
 func debugAgar() {
