@@ -236,13 +236,9 @@ func (vm *ElrondIeleVM) runTransaction(kinput m.K) (*vmi.VMOutput, error) {
 }
 
 func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.K) (*vmi.OutputAccount, error) {
-	kappAcc, kappAccOk5 := m.ExtractKApplyArgs(kacc, m.LblXltaccountXgt, 5)
-	if !kappAccOk5 {
-		var kappAccOk6 bool
-		kappAcc, kappAccOk6 = m.ExtractKApplyArgs(kacc, m.LblXltaccountXgt, 6)
-		if !kappAccOk6 {
-			return nil, errors.New("invalid account. Should be KApply with label '<account>' of length 5 or 6")
-		}
+	kappAcc, kappAccOk6 := m.ExtractKApplyArgs(kacc, m.LblXltaccountXgt, 6)
+	if !kappAccOk6 {
+		return nil, errors.New("invalid account. Should be KApply with label '<account>' of length 6")
 	}
 
 	// address
@@ -304,16 +300,23 @@ func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.K) (*vmi.OutputAccount,
 		})
 	}
 
-	// kappAcc[4] can be missing or not used
-
 	// nonce
-	kappNonce, kappNonceOk := m.ExtractKApplyArgs(kappAcc[len(kappAcc)-1], m.LblXltnonceXgt, 1) // kappAcc[4] or kappAcc[5]
+	kappNonce, kappNonceOk := m.ExtractKApplyArgs(kappAcc[4], m.LblXltnonceXgt, 1)
 	if !kappNonceOk {
 		return nil, errors.New("invalid account nonce")
 	}
 	inonce, inonceOk := kappNonce[0].(*m.Int)
 	if !inonceOk {
 		return nil, errors.New("invalid account nonce")
+	}
+
+	// exists, only checking that it is trues
+	kappExists, kappExistsOk := m.ExtractKApplyArgs(kappAcc[5], m.LblXltexistsXgt, 1)
+	if !kappExistsOk {
+		return nil, errors.New("invalid account exists tag")
+	}
+	if !m.IsTrue(kappExists[0]) {
+		return nil, errors.New("VM should only output existing accounts")
 	}
 
 	return &vmi.OutputAccount{
