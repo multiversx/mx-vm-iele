@@ -8,6 +8,7 @@ module IELE-NODE
     syntax Int ::= #getBalance(Int) [function, hook(BLOCKCHAIN.getBalance)]
                  | #getNonce(Int) [function, hook(BLOCKCHAIN.getNonce)]
     syntax Bool ::= #isCodeEmpty(Int) [function, hook(BLOCKCHAIN.isCodeEmpty)]
+                  | #accountExists(Int) [function, hook(BLOCKCHAIN.accountExists)]
  // ---------------------------------------------------------------------------
     rule <k> #loadAccount ACCT => . ... </k>
          <activeAccounts> ACCTS (.Set => SetItem(ACCT)) </activeAccounts>
@@ -19,6 +20,7 @@ module IELE-NODE
                <code> #if #isCodeEmpty(ACCT) #then #emptyCode #else .Contract #fi </code>
                <storage> .Map </storage>
                <nonce> #getNonce(ACCT) </nonce>
+               <exists> #accountExists(ACCT) </exists>
              </account>
            )
            ...
@@ -119,20 +121,15 @@ module IELE-NODE
     rule <k> #trimAccounts((ListItem(ACCT) => .List) ACCTS) ... </k>
          (<account>
            <acctID> ACCT </acctID>
-           <balance> 0 </balance>
-           <code> #emptyCode </code>
-           <nonce> 0 </nonce>
+           <exists> false </exists>
            ...
          </account> => .Bag)
     rule <k> #trimAccounts((ListItem(ACCT) => .List) ACCTS) ... </k>
          <account>
            <acctID> ACCT </acctID>
-           <balance> BAL </balance>
-           <code> CODE </code>
-           <nonce> NONCE </nonce>
+           <exists> true </exists>
            ...
          </account>
-      requires BAL =/=Int 0 orBool NONCE =/=Int 0 orBool CODE =/=K #emptyCode
 
     syntax Ints ::= #toInts(List) [function, klabel(ListToInts), symbol]
  // --------------------------------------------------------------------
@@ -156,7 +153,28 @@ module IELE-NODE
     syntax KItem ::= vmResult(return: List,gas: Int,refund: Int,status: Int,selfdestruct: List,logs: List,AccountsCell, touched: List)
     syntax KItem ::= extractConfig(GeneratedTopCell) [function, symbol]
  // ----------------------------------------------------------
-    rule extractConfig(<generatedTop>... <schedule> SCHED </schedule> <output> OUT </output> <gas> GAVAIL </gas> <refund> REFUND </refund> <k> STATUS:Int </k> <selfDestruct> SD </selfDestruct> <logData> LOGS </logData> <accounts> ACCTS </accounts> ... </generatedTop>) => vmResult(#toList(OUT),GAVAIL up/Int Sgasdivisor < SCHED >,REFUND,STATUS,Set2List(SD),LOGS,<accounts> ACCTS </accounts>, .List)
+    rule extractConfig(
+            <generatedTop>
+               ... 
+               <schedule> SCHED </schedule>
+               <output> OUT </output>
+               <gas> GAVAIL </gas>
+               <refund> REFUND </refund>
+               <k> STATUS:Int </k>
+               <selfDestruct> SD </selfDestruct>
+               <logData> LOGS </logData>
+               <accounts> ACCTS </accounts>
+               ... 
+            </generatedTop>) 
+         => 
+            vmResult(
+               #toList(OUT),
+               GAVAIL up/Int Sgasdivisor < SCHED >,
+               REFUND,STATUS,
+               Set2List(SD),
+               LOGS,
+               <accounts> ACCTS </accounts>,
+               .List)
 
 endmodule
 

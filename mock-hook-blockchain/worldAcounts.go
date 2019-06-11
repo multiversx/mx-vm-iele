@@ -7,6 +7,7 @@ type AccountMap map[string]*Account
 
 // Account ... account info
 type Account struct {
+	Exists  bool
 	Address []byte
 	Nonce   *big.Int
 	Balance *big.Int

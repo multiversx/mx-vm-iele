@@ -13,10 +13,7 @@ func (b *BlockchainHookMock) AccountExists(address []byte) (bool, error) {
 	if acct == nil {
 		return false, nil
 	}
-	if acct.Balance.Sign() == 0 && acct.Nonce.Sign() == 0 {
-		return false, nil
-	}
-	return true, nil
+	return acct.Exists, nil
 }
 
 // GetBalance should retrieve the balance of an account

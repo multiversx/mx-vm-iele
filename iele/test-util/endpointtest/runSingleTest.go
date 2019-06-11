@@ -303,6 +303,7 @@ func convertAccount(testAcct *ij.Account) *worldhook.Account {
 	}
 
 	return &worldhook.Account{
+		Exists:  true,
 		Address: testAcct.Address,
 		Nonce:   big.NewInt(0).Set(testAcct.Nonce),
 		Balance: big.NewInt(0).Set(testAcct.Balance),

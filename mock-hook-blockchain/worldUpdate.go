@@ -9,6 +9,7 @@ import (
 
 func defaultAccount(address []byte) *Account {
 	return &Account{
+		Exists:  false,
 		Address: address,
 		Nonce:   zero,
 		Balance: zero,
@@ -54,6 +55,7 @@ func (b *BlockchainHookMock) UpdateAccounts(modifiedAccounts []*vmi.OutputAccoun
 			acct = defaultAccount(modAcct.Address)
 			b.AcctMap.PutAccount(acct)
 		}
+		acct.Exists = true
 		acct.Balance = modAcct.Balance
 		acct.Nonce = modAcct.Nonce
 		acct.Code = modAcct.Code

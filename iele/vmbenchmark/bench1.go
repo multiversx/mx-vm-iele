@@ -42,6 +42,7 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 	constractStorage[storageKey("00")] = big.NewInt(2000000000).Bytes() // total supply
 
 	world.AcctMap.PutAccount(&worldhook.Account{
+		Exists:  true,
 		Address: contractAddr,
 		Nonce:   big.NewInt(0),
 		Balance: big.NewInt(0),
@@ -50,6 +51,7 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 	})
 
 	world.AcctMap.PutAccount(&worldhook.Account{
+		Exists:  true,
 		Address: account1Addr,
 		Nonce:   big.NewInt(0),
 		Balance: hexToBigInt("e8d4a51000"),
@@ -58,6 +60,7 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 	})
 
 	world.AcctMap.PutAccount(&worldhook.Account{
+		Exists:  true,
 		Address: account2Addr,
 		Nonce:   big.NewInt(0),
 		Balance: hexToBigInt("e8d4a51000"),

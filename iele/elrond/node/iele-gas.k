@@ -787,21 +787,16 @@ module IELE-GAS
     syntax KResult ::= Bool
     syntax BExp ::= Bool
                   | #accountEmpty(Int)
-    syntax Bool ::= #accountEmpty(Contract, Int, Int) [klabel(accountEmpty), function, symbol]
  // ------------------------------------------------------------------------------------------
-    rule <k> #accountEmpty(ACCT) => #accountEmpty(CODE, NONCE, BAL) ... </k>
+    rule <k> #accountEmpty(ACCT) => notBool EXISTS ... </k>
          <account>
            <acctID> ACCT </acctID>
-           <code> CODE </code>
-           <nonce> NONCE </nonce>
-           <balance> BAL </balance>
+           <exists> EXISTS </exists>
            ...
          </account>
     rule <k> (.K => #loadAccount ACCT) ~> #accountEmpty(ACCT) ... </k>
          <activeAccounts> ACCTS </activeAccounts>
       requires notBool ACCT in ACCTS
-
-    rule #accountEmpty(CODE, NONCE, BAL) => CODE ==K #emptyCode andBool NONCE ==Int 0 andBool BAL ==Int 0
 
     syntax Int ::= #allBut64th ( Int ) [function]
  // ---------------------------------------------

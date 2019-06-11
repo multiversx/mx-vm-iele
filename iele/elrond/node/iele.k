@@ -132,6 +132,7 @@ module IELE-CONFIGURATION
                         <code>     #emptyCode </code>       // Disassembled contract of account
                         <storage>  .Map       </storage>    // Permanent storage of account (for sload/sstore)
                         <nonce>    0          </nonce>      // Nonce of account
+                        <exists>   false      </exists>     // True if account exists in blockchain
                       </account>
                     </accounts>
 
@@ -431,19 +432,21 @@ module IELE-INFRASTRUCTURE
  // ----------------------------------------
     rule <k> #initAccount ACCT => #exception ACCT_COLLISION ... </k>
          <account>
-           <acctID> ACCT  </acctID>
-           <code>   CODE  </code>
-           <nonce>  NONCE </nonce>
+           <acctID> ACCT   </acctID>
+           <code>   CODE   </code>
+           <nonce>  NONCE  </nonce>
+           <exists> EXISTS </exists>
            ...
          </account>
-      requires CODE =/=K #emptyCode orBool NONCE =/=K 0
+      requires EXISTS orBool CODE =/=K #emptyCode orBool NONCE =/=K 0 
 
     rule <k> #initAccount ACCT => . ... </k>
          <account>
-           <acctID>  ACCT       </acctID>
-           <code>    #emptyCode </code>
-           <nonce>   0          </nonce>
-           <storage> _ => .Map  </storage>
+           <acctID>  ACCT          </acctID>
+           <code>    #emptyCode    </code>
+           <nonce>   0             </nonce>
+           <storage> _ => .Map     </storage>
+           <exists>  false => true </exists>
            ...
          </account>
 
@@ -512,6 +515,7 @@ module IELE-INFRASTRUCTURE
          <account>
            <acctID> ACCTTO </acctID>
            <balance> ORIGTO => ORIGTO +Int VALUE </balance>
+           <exists> _ => true </exists> // TODO: investigate if we will support this
            ...
          </account>
       requires ACCTFROM =/=K ACCTTO andBool VALUE <=Int ORIGFROM
@@ -1409,7 +1413,7 @@ module IELE
          <callValue> _ => VALUE </callValue>
          <account>
            <acctID> ACCTTO </acctID>
-           <nonce> NONCE => NONCE +Int 1 </nonce>
+           <nonce> 0 </nonce>
            ...
          </account>
 
