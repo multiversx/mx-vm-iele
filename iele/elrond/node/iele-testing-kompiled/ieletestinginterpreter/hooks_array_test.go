@@ -1,6 +1,6 @@
 package ieletestinginterpreter
 
-// File provided by the K Framework Go backend. Timestamp: 2019-06-12 02:37:11.223
+// File provided by the K Framework Go backend. Timestamp: 2019-06-12 11:57:09.485
 
 import (
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
