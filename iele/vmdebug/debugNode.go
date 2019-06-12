@@ -10,28 +10,13 @@ import (
 
 func main() {
 
-	//debugTest("tests/iele/danse/factorial/factorial_positive.iele.json")
-	//debugTest("tests/iele/albe/factorial/factorial_positive.iele.json")
-	//debugTest("tests/iele/albe/ERC20/approve_Caller-Positive.iele.json")
-	//debugTest("tests/iele/albe/unit/blockhash.iele.json")
-	//debugTest("tests/iele-v1/albe/forwarder/create.iele.json")
 	//debugElrondTest("tests/iele-v2/danse/forwarder/copycreate.iele.json", false)
-
-	// debugOriginalTest("tests/iele/albe/unit/exceptions.iele.json", false)
-	// debugOriginalTest("tests/iele/danse/unit/exceptions.iele.json", false)
-	// debugElrondTest("tests/iele-v2/albe/unit/exceptions.iele.json", false)
-	// debugElrondTest("tests/iele-v2/danse/unit/exceptions.iele.json", false)
-
-	//debugElrondTest("tests/iele-v2/albe/auction/bid_higher.iele.json", false)
-	//debugElrondTest("tests/iele-v2/danse/unit/collision.iele.json", false)
-	//debugElrondTest("tests/iele-v2/albe/forwarder/copycreate.iele.json", false)
-	debugElrondTest("tests/iele-v2/danse/ERC20/create.iele.json", false)
 
 	//debugElrondTest("tests/iele-v2/albe/ill-formed/illFormed2.iele.json", false)
 	//debugOriginalTest("tests/iele/albe/ill-formed/illFormed2.iele.json", false)
 
 	//debugElrondTest("adder/adder.iele.json", false)
-	// debugAgar()
+	//debugAgar()
 }
 
 func debugAgar() {
