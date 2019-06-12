@@ -388,7 +388,13 @@ module IELE-DATA
 
     syntax Int ::= #newAddr ( Int , Int ) [function]
  // ------------------------------------------------
-    rule #newAddr(ACCT, NONCE) => #addr(#parseHexWord(Keccak256(#rlpEncodeLength(#rlpEncodeBytes(ACCT, 20) +String #rlpEncodeWord(NONCE), 192))))
+    rule #newAddr(ACCT, NONCE) => 
+      (#parseHexWord(Keccak256(
+         Bytes2String(Int2Bytes(32, ACCT, BE)) +String Bytes2String(Int2Bytes(NONCE, BE, Unsigned))
+      ))
+      &Int #parseHexWord("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000"))
+      |Int
+      (ACCT &Int #parseHexWord("0xffff"))
 
     syntax Account ::= #sender ( String , Int , String , String )                                         [function, klabel(#senderAux)]
                      | #sender ( String )                                                                 [function, klabel(#senderAux2)]

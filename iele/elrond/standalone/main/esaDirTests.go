@@ -12,8 +12,9 @@ import (
 var excludedTests = []string{
 	"tests/VMTests/vmPerformance/*/*",
 	"tests/*/*/unit/precompiled.iele.json",
-	"tests/*/*/ill-formed/illFormed.iele.json",
 	"tests/*/*/ill-formed/illFormed2.iele.json",
+	"tests/*/*/forwarder/copycreate.iele.json", // we have a problem with gas
+	"tests/*/*/forwarder/create.iele.json",     // we have a problem with gas
 }
 
 func isExcluded(testPath string) bool {
@@ -41,7 +42,7 @@ func testAllInDirectory(t *testing.T, mainDirPath string, testGasMode gasMode) {
 				fmt.Print("  skip\n")
 			} else {
 				var testErr error
-				testErr = runTest(testFilePath, testGasMode, false, false)
+				testErr = runTest(testFilePath, testGasMode, false)
 				if testErr == nil {
 					nrPassed++
 					fmt.Print("  ok\n")

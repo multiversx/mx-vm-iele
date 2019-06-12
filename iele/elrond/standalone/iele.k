@@ -132,6 +132,7 @@ module IELE-CONFIGURATION
                         <code>     #emptyCode </code>       // Disassembled contract of account
                         <storage>  .Map       </storage>    // Permanent storage of account (for sload/sstore)
                         <nonce>    0          </nonce>      // Nonce of account
+                        <exists>   false      </exists>     // True if account exists in blockchain
                       </account>
                     </accounts>
 
@@ -1409,7 +1410,7 @@ module IELE
          <callValue> _ => VALUE </callValue>
          <account>
            <acctID> ACCTTO </acctID>
-           <nonce> NONCE => NONCE +Int 1 </nonce>
+           <nonce> 0 </nonce>
            ...
          </account>
 

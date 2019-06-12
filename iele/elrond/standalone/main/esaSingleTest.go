@@ -28,7 +28,7 @@ var ieleTestRoot = path.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork
 var kryptoAdapter = &krypto.Krypto{Upstream: cryptohook.KryptoHookMockInstance}
 
 // runTest ... runs one individual *.iele.json test
-func runTest(testFilePath string, testGasMode gasMode, tracePretty bool, verbose bool) error {
+func runTest(testFilePath string, testGasMode gasMode, tracePretty bool) error {
 	var err error
 	testFilePath, err = filepath.Abs(testFilePath)
 	if err != nil {
@@ -64,8 +64,10 @@ func runTest(testFilePath string, testGasMode gasMode, tracePretty bool, verbose
 	kastInitMap["SCHEDULE"] = []byte("`DEFAULT_IELE-GAS`(.KList)")
 	kastInitMap["MODE"] = []byte(string(testGasMode))
 
-	//options := &interpreter.ExecuteOptions{TracePretty: tracePretty, TraceKPrint: false, Verbose: verbose}
 	kinterpreter := interpreter.NewInterpreter(kryptoAdapter)
+	if tracePretty {
+		kinterpreter.SetTracePretty()
+	}
 
 	// execution itself
 	execErr := kinterpreter.Execute(kastInitMap)

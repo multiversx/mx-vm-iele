@@ -388,6 +388,7 @@ module IELE-TESTING
          <account>
            <acctID> ACCT </acctID>
            <nonce> _ => NONCE </nonce>
+           <exists> _ => true </exists>
            ...
          </account>
 
