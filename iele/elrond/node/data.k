@@ -389,7 +389,9 @@ module IELE-DATA
     syntax Int ::= #newAddr ( Int , Int ) [function]
  // ------------------------------------------------
     rule #newAddr(ACCT, NONCE) => 
-      (#parseHexWord(Keccak256(Base2String(ACCT, 16) +String Base2String(NONCE, 16)))
+      (#parseHexWord(Keccak256(
+         Bytes2String(Int2Bytes(32, ACCT, BE)) +String Bytes2String(Int2Bytes(NONCE, BE, Unsigned))
+      ))
       &Int #parseHexWord("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000"))
       |Int
       (ACCT &Int #parseHexWord("0xffff"))
