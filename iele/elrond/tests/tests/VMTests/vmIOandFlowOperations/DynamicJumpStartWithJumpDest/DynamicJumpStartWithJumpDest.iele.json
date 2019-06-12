@@ -1,0 +1,51 @@
+{
+    "DynamicJumpStartWithJumpDest": {
+        "pre": {
+            "0x0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6": {
+                "nonce": "0x00", 
+                "balance": "0x152d02c7e14af6800000", 
+                "storage": {}, 
+                "code": "0x0000009b63056900076465706f73697469000a69656c652e656372656369000769656c652e696469000a69656c652e656361646469000a69656c652e65636d756c670000000068000100026600016101026180036120040c088255006256056500060561090661800761200861800952041d26560a6500010a66000661120b61800c6120040c2c8b55018b618004f6000104660005660004660003660002fe"
+            }
+        }, 
+        "logs": "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347", 
+        "exec": {
+            "origin": "0xcd1722f3947def4cf144679da39c4c32bdc35681", 
+            "code": "0x0000009b63056900076465706f73697469000a69656c652e656372656369000769656c652e696469000a69656c652e656361646469000a69656c652e65636d756c670000000068000100026600016101026180036120040c088255006256056500060561090661800761200861800952041d26560a6500010a66000661120b61800c6120040c2c8b55018b618004f6000104660005660004660003660002fe", 
+            "caller": "0xcd1722f3947def4cf144679da39c4c32bdc35681", 
+            "gas": "0x0186a0", 
+            "value": "0x0de0b6b3a7640000", 
+            "address": "0x0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6", 
+            "data": "0x", 
+            "gasPrice": "0x5af3107a4000"
+        }, 
+        "callcreates": [], 
+        "gas": "0x011126", 
+        "env": {
+            "currentDifficulty": "0x0100", 
+            "currentCoinbase": "0x2adc25665018aa1fe0e6bc666dac8fc2697ff9ba", 
+            "currentNumber": "0x00", 
+            "currentGasLimit": "0x0f4240", 
+            "currentTimestamp": "0x01"
+        }, 
+        "_info": {
+            "comment": "", 
+            "source": "src/VMTestsFiller/vmIOandFlowOperations/DynamicJumpStartWithJumpDestFiller.json", 
+            "filledwith": "cpp-1.3.0+commit.6e0ce939.Linux.g++", 
+            "lllcversion": "Version: 0.4.18-develop.2017.9.25+commit.a72237f2.Linux.g++", 
+            "sourceHash": "c5b7749d9265656a13d743fd232f74d01694d7de1c39566d570ca1a176de51aa"
+        }, 
+        "out": "0x", 
+        "post": {
+            "0x0f572e5295c57f15886f9b263e2f6d2d6c7b5ec6": {
+                "nonce": "0x00", 
+                "balance": "0x152d02c7e14af6800000", 
+                "storage": {
+                    "0x00": "0x12"
+                }, 
+                "code": "0x0000009b63056900076465706f73697469000a69656c652e656372656369000769656c652e696469000a69656c652e656361646469000a69656c652e65636d756c670000000068000100026600016101026180036120040c088255006256056500060561090661800761200861800952041d26560a6500010a66000661120b61800c6120040c2c8b55018b618004f6000104660005660004660003660002fe"
+            }
+        }, 
+        "checkGas": false
+    }
+}
