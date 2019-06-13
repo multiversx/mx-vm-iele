@@ -1,22 +1,21 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-12 11:57:09.485
+// File provided by the K Framework Go backend. Timestamp: 2019-06-13 13:37:26.737
 
 package ieletestinginterpreter
 
 import (
 	"bufio"
 	"fmt"
+	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 	"os"
 	"path/filepath"
 	"time"
-
-	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 )
 
 // SetTracePretty makes the interpreter save pretty traces of the execution
 func (i *Interpreter) SetTracePretty() {
-	i.traceHandlers = append(i.traceHandlers, &tracePrettyDebug{
-		interpreter: i,
-	})
+    i.traceHandlers = append(i.traceHandlers, &tracePrettyDebug{
+        interpreter: i,
+    })
 }
 
 // creates a folder with the timestamp and writes each step in a separate file
