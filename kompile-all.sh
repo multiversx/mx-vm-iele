@@ -4,11 +4,11 @@
 
 ./kompile-clear.sh
 
-go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/original/node/kompile
-go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/original/standalone/kompile
+go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/cmd/kompile/iele-original-node
+go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/cmd/kompile/iele-original-standalone
 
-go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/elrond/node/kompile
-go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/iele/elrond/standalone/kompile
+go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/cmd/kompile/iele-elrond-node
+go run $GOPATH/src/github.com/ElrondNetwork/elrond-vm/cmd/kompile/iele-elrond-standalone
 
 go build ./...
 go test ./...

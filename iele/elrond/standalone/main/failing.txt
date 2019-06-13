@@ -1,7 +1,0 @@
-ok      kgoieletesting/ieletesting      171.668s
-ok      kgoieletesting/ieletesting      104.454s - countOccurences
-ok      kgoieletesting/ieletesting      108.169s - replace, replaceAll
-ok      kgoieletesting/ieletesting      103.495s - replaceAll optimized
-
-Done. Passed: 509. Failed: 0
-

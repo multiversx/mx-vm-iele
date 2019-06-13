@@ -1,21 +1,17 @@
 
+/cmd/*/trace_*/
+/cmd/*.prof
 
-/iele/vmdebug/vmdebug*
-/iele/vmdebug/trace_*/
-/iele/vmdebug/*.prof
+/cmd/iele-benchmark/iele-benchmark*
+/cmd/iele-benchmark/*.prof
 
-/iele/vmbenchmark/vmbenchmark*
-/iele/vmbenchmark/trace_*/
-/iele/vmbenchmark/*.prof
+/cmd/iele-node/iele-node
+/cmd/iele-original-node/iele-original-node
+/cmd/iele-original-standalone/iele-original-standalone
+/cmd/iele-elrond-standalone/iele-elrond-standalone
 
-/iele/original/node/kompile/kompile
+/cmd/kompile/iele-original-node/iele-original-node
+/cmd/kompile/iele-original-standalone/iele-original-standalone
+/cmd/kompile/iele-elrond-node/iele-elrond-node
+/cmd/kompile/iele-elrond-standalone/iele-elrond-standalone
 
-/iele/original/standalone/kompile/kompile
-/iele/original/standalone/main/main
-/iele/original/standalone/main/trace_*/
-
-/iele/elrond/node/kompile/kompile
-
-/iele/elrond/standalone/kompile/kompile
-/iele/elrond/standalone/main/main
-/iele/elrond/standalone/main/trace_*/
