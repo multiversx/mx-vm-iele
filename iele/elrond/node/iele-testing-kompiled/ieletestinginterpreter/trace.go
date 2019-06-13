@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-13 13:37:26.737
+// File provided by the K Framework Go backend. Timestamp: 2019-06-14 00:38:24.453
 
 // Handles generation of traces
 // (what rules were applied, in what order, what were the intermediate states).

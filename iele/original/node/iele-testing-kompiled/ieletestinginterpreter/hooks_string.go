@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-13 13:32:14.519
+// File provided by the K Framework Go backend. Timestamp: 2019-06-14 00:48:34.029
 
 package ieletestinginterpreter
 
@@ -167,10 +167,7 @@ func (stringHooksType) ord(arg m.K, lbl m.KLabel, sort m.Sort, config m.K, inter
 	}
 	asBytes := []byte(str.Value)
 	if len(asBytes) == 0 {
-		// TODO: HACK!!!!
-		// correct implementation should throw invalidArgsResult()
-		// fix after implementing lazy evaluation of && in 'requires' part of rule
-		return m.IntZero, nil
+		return invalidArgsResult()
 	}
 	return m.NewIntFromByte(asBytes[0]), nil
 }
