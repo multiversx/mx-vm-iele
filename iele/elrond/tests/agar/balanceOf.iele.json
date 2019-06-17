@@ -30,14 +30,14 @@
                         "out": ["0x100"],
                         "status": "",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     },
                     {
                         "out": ["0x00"],
                         "status": "",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     }
                 ],

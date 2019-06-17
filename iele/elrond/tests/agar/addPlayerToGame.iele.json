@@ -25,14 +25,14 @@
                         "out": [],
                         "status": "",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     },
                     {
                         "out": [],
                         "status": "",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     }
                 ],

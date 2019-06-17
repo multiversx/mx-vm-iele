@@ -24,28 +24,28 @@
                         "out": [],
                         "status": "0x04",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     },
                     {
                         "out": [],
                         "status": "0x04",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     },
                     {
                         "out": [],
                         "status": "0x04",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     },
                     {
                         "out": [],
                         "status": "0x04",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     }
                 ],

@@ -30,7 +30,7 @@
                         "out": [],
                         "status": "",
                         "gas": "*",
-                        "logs": "*",
+                        "logs": [],
                         "refund": ""
                     }
                 ],
