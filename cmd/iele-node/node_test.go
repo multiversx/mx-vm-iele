@@ -9,7 +9,7 @@ import (
 func TestElrondIeleTests(t *testing.T) {
 	eptest.TestAllInDirectory(t,
 		elrondTestRoot,
-		"tests/iele-v2",
+		"tests/iele-v3",
 		&elrondIeleProvider{},
 		world)
 }

@@ -129,14 +129,58 @@ func resultToOJ(res *TransactionResult) oj.OJsonObject {
 
 	resultOJ.Put("status", intToOJ(res.Status))
 	resultOJ.Put("gas", intToOJ(res.Gas))
-	resultOJ.Put("logs", stringToOJ(res.Logs))
+	if res.IgnoreLogs {
+		resultOJ.Put("logs", stringToOJ("*"))
+	} else {
+		if len(res.LogHash) > 0 {
+			resultOJ.Put("logs", stringToOJ(res.LogHash))
+		} else {
+			resultOJ.Put("logs", logsToOJ(res.Logs))
+		}
+	}
 	resultOJ.Put("refund", intToOJ(res.Refund))
 
 	return resultOJ
 }
 
-func byteArrayToString(address []byte) string {
-	return "0x" + hex.EncodeToString(address)
+// LogToString returns a json representation of a log entry, we use it for debugging
+func LogToString(logEntry *LogEntry) string {
+	logOJ := logToOJ(logEntry)
+	return oj.JSONString(logOJ)
+}
+
+func logToOJ(logEntry *LogEntry) oj.OJsonObject {
+	logOJ := oj.NewMap()
+	logOJ.Put("address", accountAddressToOJ(logEntry.Address))
+
+	var topicsList []oj.OJsonObject
+	for _, topic := range logEntry.Topics {
+		topicsList = append(topicsList, intToOJ(topic))
+	}
+	topicsOJ := oj.OJsonList(topicsList)
+	logOJ.Put("topics", &topicsOJ)
+
+	dataAsInt := big.NewInt(0).SetBytes(logEntry.Data)
+	logOJ.Put("data", intToOJ(dataAsInt))
+
+	return logOJ
+}
+
+func logsToOJ(logEntries []*LogEntry) oj.OJsonObject {
+	var logList []oj.OJsonObject
+	for _, logEntry := range logEntries {
+		logOJ := logToOJ(logEntry)
+		logList = append(logList, logOJ)
+	}
+	logOJList := oj.OJsonList(logList)
+	return &logOJList
+}
+
+func byteArrayToString(byteArray []byte) string {
+	if len(byteArray) == 0 {
+		return "0x00"
+	}
+	return "0x" + hex.EncodeToString(byteArray)
 }
 
 func accountAddressToOJ(address []byte) oj.OJsonObject {
@@ -149,6 +193,9 @@ func accountAddressToOJ(address []byte) oj.OJsonObject {
 func intToString(i *big.Int) string {
 	if i == nil {
 		return ""
+	}
+	if i.Sign() == 0 {
+		return "0x00"
 	}
 
 	isNegative := i.Sign() == -1

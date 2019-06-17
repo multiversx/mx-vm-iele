@@ -232,7 +232,7 @@ func processBlockResult(blrRaw oj.OJsonObject) (*TransactionResult, error) {
 	}
 
 	blr := TransactionResult{}
-	var outOk, statusOk, gasOk, logsOk, refundOk bool
+	var outOk, statusOk, gasOk, refundOk bool
 
 	for _, kvp := range blrMap.OrderedKV {
 
@@ -262,9 +262,19 @@ func processBlockResult(blrRaw oj.OJsonObject) (*TransactionResult, error) {
 		}
 
 		if kvp.Key == "logs" {
-			blr.Logs, logsOk = parseString(kvp.Value)
-			if !logsOk {
-				return nil, errors.New("invalid block result logs")
+			if isStar(kvp.Value) {
+				blr.IgnoreLogs = true
+			} else {
+				blr.IgnoreLogs = false
+				var logHashOk bool
+				blr.LogHash, logHashOk = parseString(kvp.Value)
+				if !logHashOk {
+					var logListErr error
+					blr.Logs, logListErr = processLogList(kvp.Value)
+					if logListErr != nil {
+						return nil, logListErr
+					}
+				}
 			}
 		}
 
@@ -281,6 +291,53 @@ func processBlockResult(blrRaw oj.OJsonObject) (*TransactionResult, error) {
 	}
 
 	return &blr, nil
+}
+
+func processLogList(logsRaw oj.OJsonObject) ([]*LogEntry, error) {
+	logList, isList := logsRaw.(*oj.OJsonList)
+	if !isList {
+		return nil, errors.New("unmarshalled logs list is not a list")
+	}
+	var logEntries []*LogEntry
+	for _, logRaw := range logList.AsList() {
+		logMap, isMap := logRaw.(*oj.OJsonMap)
+		if !isMap {
+			return nil, errors.New("unmarshalled log entry is not a map")
+		}
+		logEntry := LogEntry{}
+		for _, kvp := range logMap.OrderedKV {
+			if kvp.Key == "address" {
+				accountStr, strOk := parseString(kvp.Value)
+				if !strOk {
+					return nil, errors.New("unmarshalled log entry address is not a json string")
+				}
+				var err error
+				logEntry.Address, err = processAccountAddress(accountStr)
+				if err != nil {
+					return nil, err
+				}
+			}
+			if kvp.Key == "topics" {
+				var topicsOk bool
+				logEntry.Topics, topicsOk = processBigIntList(kvp.Value)
+				if !topicsOk {
+					return nil, errors.New("unmarshalled log entry topics is not big int list")
+				}
+			}
+			if kvp.Key == "data" {
+				var dataOk bool
+				dataAsInt, dataOk := parseBigInt(kvp.Value)
+				if !dataOk {
+					return nil, errors.New("cannot parse log entry data")
+				}
+				logEntry.Data = dataAsInt.Bytes()
+
+			}
+		}
+		logEntries = append(logEntries, &logEntry)
+	}
+
+	return logEntries, nil
 }
 
 func processBlockTransaction(blrRaw oj.OJsonObject) (*Transaction, error) {

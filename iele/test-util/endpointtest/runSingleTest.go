@@ -53,7 +53,7 @@ func RunJSONTest(testFilePath string, vmp VMProvider, world *worldhook.Blockchai
 		}
 	}
 
-	// toPath := strings.Replace(testFilePath, "iele-v1", "iele-v2", 1)
+	// toPath := strings.Replace(testFilePath, "iele-v2", "iele-v3", 1)
 	// fmt.Println(toPath)
 	// saveModifiedTest(toPath, top)
 
@@ -199,25 +199,58 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 				}
 			}
 			// check empty logs, this seems to be the value
-			if blResult.Logs == "*" {
+			if blResult.IgnoreLogs {
 				// nothing, ignore
-			} else if blResult.Logs == "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347" {
-				if len(output.Logs) != 0 {
-					return fmt.Errorf("empty logs expected. Found: %v", blResult.Logs)
-				}
-			} else {
-				if len(output.Logs) == 0 {
-					return fmt.Errorf("non-empty logs expected")
-				}
-				for _, log := range output.Logs {
-					if !bytes.Equal(log.Address, tx.To) {
-						return fmt.Errorf("log address mismatch. Want: %s. Got: %s",
-							hex.EncodeToString(tx.To), hex.EncodeToString(log.Address))
+			} else if len(blResult.LogHash) > 0 {
+				// for the old tests we only check if the logs are empty or not
+				if blResult.LogHash == "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347" {
+					if len(output.Logs) != 0 {
+						return fmt.Errorf("empty logs expected. Found: %v", blResult.LogHash)
+					}
+				} else {
+					if len(output.Logs) == 0 {
+						return fmt.Errorf("non-empty logs expected")
+					}
+					for _, log := range output.Logs {
+						if !bytes.Equal(log.Address, tx.To) {
+							return fmt.Errorf("log address mismatch. Want: %s. Got: %s",
+								hex.EncodeToString(tx.To), hex.EncodeToString(log.Address))
+						}
 					}
 				}
-				// ... we're not currently testing for the actual values (via the rlp hash)
+				// blResult.LogHash = ""
+				// blResult.Logs = nil
+				// for _, outLog := range output.Logs {
+				// 	blResult.Logs = append(blResult.Logs, convertLogToTestFormat(outLog))
+				// }
+			} else {
+				// this is the real log check
+				if len(blResult.Logs) != len(output.Logs) {
+					return fmt.Errorf("wrong number of logs. Want:%d. Got:%d",
+						len(blResult.Logs), len(output.Logs))
+				}
+				for i, outLog := range output.Logs {
+					testLog := blResult.Logs[i]
+					if !bytes.Equal(outLog.Address, testLog.Address) {
+						return fmt.Errorf("bad log address. Want:\n%s\nGot:\n%s",
+							ij.LogToString(testLog), ij.LogToString(convertLogToTestFormat(outLog)))
+					}
+					if len(outLog.Topics) != len(testLog.Topics) {
+						return fmt.Errorf("wrong number of log topics. Want:\n%s\nGot:\n%s",
+							ij.LogToString(testLog), ij.LogToString(convertLogToTestFormat(outLog)))
+					}
+					for ti := range outLog.Topics {
+						if outLog.Topics[ti].Cmp(testLog.Topics[ti]) != 0 {
+							return fmt.Errorf("bad log topic. Want:\n%s\nGot:\n%s",
+								ij.LogToString(testLog), ij.LogToString(convertLogToTestFormat(outLog)))
+						}
+					}
+					if !bytes.Equal(outLog.Data, testLog.Data) {
+						return fmt.Errorf("bad log data. Want:\n%s\nGot:\n%s",
+							ij.LogToString(testLog), ij.LogToString(convertLogToTestFormat(outLog)))
+					}
+				}
 
-				//spew.Dump(output.Logs)
 			}
 
 		}
@@ -311,6 +344,15 @@ func convertAccount(testAcct *ij.Account) *worldhook.Account {
 		Storage: storage,
 		Code:    []byte(testAcct.Code),
 	}
+}
+
+func convertLogToTestFormat(outputLog *vmi.LogEntry) *ij.LogEntry {
+	testLog := ij.LogEntry{
+		Address: outputLog.Address,
+		Topics:  outputLog.Topics,
+		Data:    outputLog.Data,
+	}
+	return &testLog
 }
 
 func convertBlockHeader(testBlh *ij.BlockHeader) *vmi.SCCallHeader {
