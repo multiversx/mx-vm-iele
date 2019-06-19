@@ -15,7 +15,7 @@ func main() {
 	//debugElrondTest("tests/iele-v2/albe/ill-formed/illFormed2.iele.json", false)
 	//debugOriginalTest("tests/iele/albe/ill-formed/illFormed2.iele.json", false)
 
-	debugElrondTest("tests/iele-v3/danse/ERC20/transferFrom_FromEqTo-BalanceEqAllowance.iele.json", false)
+	debugElrondTest("auction-solidity/create.iele.json", false)
 
 	//debugElrondTest("adder/adder.iele.json", false)
 	//debugAgar()

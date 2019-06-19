@@ -1,0 +1,164 @@
+contract "auction.sol:SimpleAuction" {
+
+@"beneficiary" = 1
+
+@"auctionEnd" = 2
+
+@"highestBidder" = 3
+
+@"highestBid" = 4
+
+@"ended" = 5
+
+define public @"beneficiary()"() {
+entry:
+  %callvalue = call @iele.callvalue()
+  br %callvalue, throw
+  %loaded.val = sload @"beneficiary"
+  ret %loaded.val
+
+throw:
+  revert -1
+}
+
+define public @"auctionEnd()"() {
+entry:
+  %callvalue = call @iele.callvalue()
+  br %callvalue, throw
+  %loaded.val = sload @"auctionEnd"
+  ret %loaded.val
+
+throw:
+  revert -1
+}
+
+define public @"highestBidder()"() {
+entry:
+  %callvalue = call @iele.callvalue()
+  br %callvalue, throw
+  %loaded.val = sload @"highestBidder"
+  ret %loaded.val
+
+throw:
+  revert -1
+}
+
+define public @"highestBid()"() {
+entry:
+  %callvalue = call @iele.callvalue()
+  br %callvalue, throw
+  %loaded.val = sload @"highestBid"
+  ret %loaded.val
+
+throw:
+  revert -1
+}
+
+define @init(%_beneficiary_0, %_biddingTime_1) {
+entry:
+  %callvalue = call @iele.callvalue()
+  br %callvalue, throw
+  %out.of.range = cmp lt %_beneficiary_0, 0
+  br %out.of.range, throw
+  %out.of.range = cmp gt %_beneficiary_0, 115792089237316195423570985008687907853269984665640564039457584007913129639935
+  br %out.of.range, throw
+  %out.of.range1 = cmp lt %_biddingTime_1, 0
+  br %out.of.range1, throw
+  sstore %_beneficiary_0, @"beneficiary"
+  %timestamp = call @iele.timestamp()
+  %tmp = add %timestamp, %_biddingTime_1
+  sstore %tmp, @"auctionEnd"
+
+return:
+  ret void
+
+throw:
+  revert -1
+}
+
+define public @"bid()"() {
+entry:
+  %timestamp = call @iele.timestamp()
+  %auctionEnd.val = sload @"auctionEnd"
+  %tmp = cmp le %timestamp, %auctionEnd.val
+  %tmp1 = iszero %tmp
+  br %tmp1, throw
+  %callvalue = call @iele.callvalue()
+  %highestBid.val = sload @"highestBid"
+  %tmp3 = cmp gt %callvalue, %highestBid.val
+  %tmp4 = iszero %tmp3
+  br %tmp4, throw
+  %highestBidder.val = sload @"highestBidder"
+  %tmp6 = cmp ne %highestBidder.val, 0
+  %tmp7 = iszero %tmp6
+  br %tmp7, if.end11
+  %highestBidder.val8 = sload @"highestBidder"
+  %highestBid.val9 = sload @"highestBid"
+  br %highestBid.val9, if.true
+  %tmp10 = 2300
+  br if.end
+
+if.true:
+  %tmp10 = 0
+
+if.end:
+  %status = call @"deposit" at %highestBidder.val8 () send %highestBid.val9, gaslimit %tmp10
+  br %status, throw.status
+
+if.end11:
+  %caller = call @iele.caller()
+  sstore %caller, @"highestBidder"
+  %callvalue12 = call @iele.callvalue()
+  sstore %callvalue12, @"highestBid"
+
+return:
+  ret void
+
+throw:
+  revert -1
+
+throw.status:
+  revert %status
+}
+
+define public @"settleAuction()"() {
+entry:
+  %callvalue = call @iele.callvalue()
+  br %callvalue, throw
+  %timestamp = call @iele.timestamp()
+  %auctionEnd.val = sload @"auctionEnd"
+  %tmp = cmp ge %timestamp, %auctionEnd.val
+  %tmp1 = iszero %tmp
+  br %tmp1, throw
+  %ended.val = sload @"ended"
+  %tmp2 = iszero %ended.val
+  %tmp3 = iszero %tmp2
+  br %tmp3, throw
+  sstore 1, @"ended"
+  %beneficiary.val = sload @"beneficiary"
+  %highestBid.val = sload @"highestBid"
+  br %highestBid.val, if.true
+  %tmp4 = 2300
+  br if.end
+
+if.true:
+  %tmp4 = 0
+
+if.end:
+  %status = call @"deposit" at %beneficiary.val () send %highestBid.val, gaslimit %tmp4
+  br %status, throw.status
+  %highestBidder.val = sload @"highestBidder"
+  %_2 = %highestBidder.val
+  br return
+
+return:
+  ret %_2
+
+throw:
+  revert -1
+
+throw.status:
+  revert %status
+}
+
+}
