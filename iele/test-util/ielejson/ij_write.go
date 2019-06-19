@@ -26,6 +26,12 @@ func ToOrderedJSON(testTopLevel []*Test) oj.OJsonObject {
 
 func testToOJ(test *Test) oj.OJsonObject {
 	testOJ := oj.NewMap()
+
+	if !test.CheckGas {
+		ojFalse := oj.OJsonBool(false)
+		testOJ.Put("checkGas", &ojFalse)
+	}
+
 	testOJ.Put("pre", accountsToOJ(test.Pre))
 
 	var blockList []oj.OJsonObject

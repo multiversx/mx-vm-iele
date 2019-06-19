@@ -192,7 +192,7 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 			}
 
 			// check gas
-			if blResult.Gas != nil {
+			if test.CheckGas && blResult.Gas != nil {
 				if blResult.Gas.Cmp(output.GasRemaining) != 0 {
 					return fmt.Errorf("result gas mismatch. Want: %d (0x%x). Got: %d (0x%x)",
 						blResult.Gas, blResult.Gas, output.GasRemaining, output.GasRemaining)

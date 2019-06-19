@@ -39,9 +39,16 @@ func processTest(testObj oj.OJsonObject) (*Test, error) {
 	if !isTestMap {
 		return nil, errors.New("unmarshalled test object is not a map")
 	}
-	test := Test{}
+	test := Test{CheckGas: true}
 
 	for _, kvp := range testMap.OrderedKV {
+		if kvp.Key == "checkGas" {
+			checkGasOJ, isBool := kvp.Value.(*oj.OJsonBool)
+			if !isBool {
+				return nil, errors.New("unmarshalled test checkGas flag is not boolean")
+			}
+			test.CheckGas = bool(*checkGasOJ)
+		}
 
 		if kvp.Key == "pre" {
 			preMap, isPreMap := kvp.Value.(*oj.OJsonMap)

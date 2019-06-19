@@ -8,6 +8,7 @@ import (
 // Test is a json object representing a test
 type Test struct {
 	TestName    string
+	CheckGas    bool
 	Pre         []*Account
 	Blocks      []*Block
 	Network     string
