@@ -169,11 +169,11 @@ func (vm *OriginalIeleVM) runTransaction(kinput m.K) (*vmi.VMOutput, error) {
 	}
 	var deletedAddr [][]byte
 	for _, ksd := range kSelfDestruct {
-		isd, isdOk := ksd.(*m.Int)
-		if !isdOk {
+		addrSD, sdOk := vm.blockchainAdapter.ConvertKIntToAddress(ksd)
+		if !sdOk {
 			return nil, errors.New("self destruct address not of type Int")
 		}
-		deletedAddr = append(deletedAddr, isd.Value.Bytes())
+		deletedAddr = append(deletedAddr, addrSD)
 	}
 
 	// logs
@@ -214,11 +214,11 @@ func (vm *OriginalIeleVM) runTransaction(kinput m.K) (*vmi.VMOutput, error) {
 	}
 	var touchedAddr [][]byte
 	for _, kt := range kTouched {
-		it, itOk := kt.(*m.Int)
+		it, itOk := vm.blockchainAdapter.ConvertKIntToAddress(kt)
 		if !itOk {
-			return nil, errors.New("touched address not of type Int")
+			return nil, errors.New("touched address not a valid address")
 		}
-		touchedAddr = append(touchedAddr, it.Value.Bytes())
+		touchedAddr = append(touchedAddr, it)
 	}
 
 	result := &vmi.VMOutput{
@@ -250,7 +250,7 @@ func (vm *OriginalIeleVM) convertKToModifiedAccount(kacc m.K) (*vmi.OutputAccoun
 	if !kappAddrOk {
 		return nil, errors.New("invalid account address")
 	}
-	iaddr, iaddrOk := kappAddr[0].(*m.Int)
+	iaddr, iaddrOk := vm.blockchainAdapter.ConvertKIntToAddress(kappAddr[0])
 	if !iaddrOk {
 		return nil, errors.New("invalid account address")
 	}
@@ -317,7 +317,7 @@ func (vm *OriginalIeleVM) convertKToModifiedAccount(kacc m.K) (*vmi.OutputAccoun
 	}
 
 	return &vmi.OutputAccount{
-		Address:        iaddr.Value.Bytes(),
+		Address:        iaddr,
 		Balance:        ibalance.Value,
 		Nonce:          inonce.Value,
 		StorageUpdates: storageUpdates,

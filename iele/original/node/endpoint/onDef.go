@@ -13,19 +13,26 @@ const AddressLength = 20
 
 // OriginalIeleVM is the container for the original version of IELE
 type OriginalIeleVM struct {
-	schedule     common.Schedule
-	kinterpreter *interpreter.Interpreter
+	schedule          common.Schedule
+	blockchainAdapter *blockchain.Blockchain
+	kryptoAdapter     *krypto.Krypto
+	kinterpreter      *interpreter.Interpreter
 }
 
 // NewOriginalIeleVM creates new original Iele VM instance
 func NewOriginalIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHook, schedule common.Schedule) *OriginalIeleVM {
-	blockchainAdapter := &blockchain.Blockchain{Upstream: blockchainHook}
+	blockchainAdapter := &blockchain.Blockchain{
+		Upstream:      blockchainHook,
+		AddressLength: AddressLength,
+	}
 	kryptoAdapter := &krypto.Krypto{Upstream: cryptoHook}
 	kinterpreter := interpreter.NewInterpreter(blockchainAdapter, kryptoAdapter)
 
 	return &OriginalIeleVM{
-		schedule:     schedule,
-		kinterpreter: kinterpreter,
+		schedule:          schedule,
+		blockchainAdapter: blockchainAdapter,
+		kryptoAdapter:     kryptoAdapter,
+		kinterpreter:      kinterpreter,
 	}
 }
 

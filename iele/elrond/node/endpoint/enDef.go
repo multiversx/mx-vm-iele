@@ -13,19 +13,26 @@ const AddressLength = 32
 
 // ElrondIeleVM ... Iele VM, Elrond version
 type ElrondIeleVM struct {
-	schedule     ielecommon.Schedule
-	kinterpreter *interpreter.Interpreter
+	schedule          ielecommon.Schedule
+	blockchainAdapter *blockchain.Blockchain
+	kryptoAdapter     *krypto.Krypto
+	kinterpreter      *interpreter.Interpreter
 }
 
 // NewElrondIeleVM creates new Elrond Iele VM instance
 func NewElrondIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHook, schedule ielecommon.Schedule) *ElrondIeleVM {
-	blockchainAdapter := &blockchain.Blockchain{Upstream: blockchainHook}
+	blockchainAdapter := &blockchain.Blockchain{
+		Upstream:      blockchainHook,
+		AddressLength: AddressLength,
+	}
 	kryptoAdapter := &krypto.Krypto{Upstream: cryptoHook}
 	kinterpreter := interpreter.NewInterpreter(blockchainAdapter, kryptoAdapter)
 
 	return &ElrondIeleVM{
-		schedule:     schedule,
-		kinterpreter: kinterpreter,
+		schedule:          schedule,
+		blockchainAdapter: blockchainAdapter,
+		kryptoAdapter:     kryptoAdapter,
+		kinterpreter:      kinterpreter,
 	}
 }
 
