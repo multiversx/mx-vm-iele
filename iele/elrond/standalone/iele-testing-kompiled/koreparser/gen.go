@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-14 00:44:33.979
+// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:19:21.575
 
 // This file holds the go generate command to run yacc on the grammar in koreparser.y.
 // To build koreparser:

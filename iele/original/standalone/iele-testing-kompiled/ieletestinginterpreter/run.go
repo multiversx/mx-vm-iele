@@ -1,14 +1,15 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-14 00:50:56.636
+// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:24:14.667
 
 package ieletestinginterpreter
 
 import (
 	"fmt"
-	koreparser "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/koreparser"
 	"log"
-	m "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestingmodel"
 	"math"
 	"os/exec"
+
+	m "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestingmodel"
+	koreparser "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/koreparser"
 )
 
 func callKast(kdir string, programPath string) []byte {
@@ -52,6 +53,8 @@ func (i *Interpreter) Execute(kastMap map[string][]byte) error {
 	kConfigMap := make(map[m.KMapKey]m.K)
 	for key, kastValue := range kastMap {
 		ktoken := m.KToken{Sort: m.SortKConfigVar, Value: "$" + key}
+		//fmt.Println("---------------------------------------------------------------------------")
+		//fmt.Println(string(kastValue))
 		parsedValue := koreparser.Parse(kastValue)
 		kValue := i.convertParserModelToKModel(parsedValue)
 		kConfigMap[ktoken] = kValue
