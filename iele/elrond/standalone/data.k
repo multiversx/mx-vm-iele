@@ -392,7 +392,7 @@ module IELE-DATA
       (#parseHexWord(Keccak256(
          Bytes2String(Int2Bytes(32, ACCT, BE)) +String Bytes2String(Int2Bytes(NONCE, BE, Unsigned))
       ))
-      &Int #parseHexWord("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff0000"))
+      &Int #parseHexWord("0xffffffffffffffffffffffffffffffffffffffff0000"))
       |Int
       (ACCT &Int #parseHexWord("0xffff"))
 
