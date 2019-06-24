@@ -1,15 +1,14 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:24:14.667
+// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
 
 package ieletestinginterpreter
 
 import (
 	"fmt"
+	koreparser "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/koreparser"
 	"log"
+	m "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestingmodel"
 	"math"
 	"os/exec"
-
-	m "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestingmodel"
-	koreparser "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/koreparser"
 )
 
 func callKast(kdir string, programPath string) []byte {
@@ -53,8 +52,6 @@ func (i *Interpreter) Execute(kastMap map[string][]byte) error {
 	kConfigMap := make(map[m.KMapKey]m.K)
 	for key, kastValue := range kastMap {
 		ktoken := m.KToken{Sort: m.SortKConfigVar, Value: "$" + key}
-		//fmt.Println("---------------------------------------------------------------------------")
-		//fmt.Println(string(kastValue))
 		parsedValue := koreparser.Parse(kastValue)
 		kValue := i.convertParserModelToKModel(parsedValue)
 		kConfigMap[ktoken] = kValue
@@ -101,20 +98,29 @@ func (i *Interpreter) TakeStepsNoThread(k m.K) error {
 		return err
 	}
 
-	// try to make stuck, to enable steps dependent on stuck state
-	i.currentStep++
-	i.traceStepStart()
-	i.state, err = i.makeStuck(i.state, i.state)
-	if err != nil {
-		return err
-	}
-	i.traceStepEnd()
-	i.currentStep++
+	completelyStuck := false
+	for !completelyStuck {
+		// try to make stuck, to allow execution of steps that depend on stuck state
+		// it is possible to set stuck multiple times
+		i.currentStep++
+		i.traceStepStart()
+		i.state, err = i.makeStuck(i.state, i.state)
+		if err != nil {
+			return err
+		}
+		i.traceStepEnd()
+		i.currentStep++
 
-	// run - stuck steps
-	err = i.runSteps(maxSteps)
-	if err != nil {
-		return err
+		// run - stuck steps
+		stepBeforeStuck := i.currentStep
+		err = i.runSteps(maxSteps)
+		if err != nil {
+			return err
+		}
+		if stepBeforeStuck == i.currentStep {
+			// will only stop when no other step can be performed after stuck
+			completelyStuck = true
+		}
 	}
 
 	return nil
