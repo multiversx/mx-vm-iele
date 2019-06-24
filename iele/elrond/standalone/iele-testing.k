@@ -600,9 +600,9 @@ module IELE-TESTING
     rule <k> check "out" : 0   => . ... </k> <output> .Ints </output>
     rule <k> check "out" : [ OUT ] => . ... </k> <output> OUTPUT </output> requires #toInts(OUT) ==K OUTPUT
 
-    rule check TESTID : { "logs" : LOGS } => check "logs" : LOGS ~> failure TESTID
+    rule check TESTID : { "logs" : LOGS } => .
  // ------------------------------------------------------------------------------
-    rule <k> check "logs" : HASH:String => . ... </k> <logData> SL </logData> /* requires #parseByteStack(Keccak256(#rlpEncodeLogs(SL))) ==K #parseByteStack(HASH) */
+    // rule <k> check "logs" : HASH:String => . ... </k> <logData> SL </logData> requires #parseByteStack(Keccak256(#rlpEncodeLogs(SL))) ==K #parseByteStack(HASH)
 
     rule check TESTID : { "status" : STATUS } => check "status" : STATUS ~> failure TESTID
  // --------------------------------------------------------------------------------------

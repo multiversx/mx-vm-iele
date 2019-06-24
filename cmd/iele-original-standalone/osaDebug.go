@@ -13,10 +13,10 @@ func main() {
 // .build/vm/iele-test-vm tests/iele/danse/forwarder/create.iele.json 10000
 
 func debugTest(testFile string) {
-	err := runTest(path.Join(ieleTestRoot, testFile), gasModeNormal, true)
+	err := runTest(path.Join(ieleTestRoot, testFile), gasModeNormal, false)
 	if err == nil {
 		fmt.Println("SUCCESS")
 	} else {
-		panic(err)
+		fmt.Printf("ERROR: %s\n", err.Error())
 	}
 }

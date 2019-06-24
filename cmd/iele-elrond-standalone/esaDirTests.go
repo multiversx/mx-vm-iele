@@ -18,7 +18,6 @@ var excludedTests = []string{
 	"tests/VMTests/vmPushDupSwapTest/push32AndSuicide/push32AndSuicide.iele.json",                                                         // TODO: fix
 
 	"tests/*/*/unit/precompiled.iele.json",
-	"tests/*/*/ill-formed/illFormed2.iele.json",
 	"tests/*/*/forwarder/copycreate.iele.json", // we have a problem with gas
 	"tests/*/*/forwarder/create.iele.json",     // we have a problem with gas
 }
