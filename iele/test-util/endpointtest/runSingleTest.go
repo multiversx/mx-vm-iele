@@ -92,6 +92,7 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 
 	for _, block := range test.Blocks {
 		for txIndex, tx := range block.Transactions {
+			//fmt.Printf("%d\n", txIndex)
 			beforeErr := world.UpdateWorldStateBefore(tx.From, tx.GasLimit, tx.GasPrice)
 			if beforeErr != nil {
 				return beforeErr
@@ -168,18 +169,18 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 				expectedStatus = int(blResult.Status.Int64())
 			}
 			if expectedStatus != int(output.ReturnCode) {
-				return fmt.Errorf("result code mismatch. Want: %d. Have: %d", expectedStatus, int(output.ReturnCode))
+				return fmt.Errorf("result code mismatch. Tx #%d. Want: %d. Have: %d", txIndex, expectedStatus, int(output.ReturnCode))
 			}
 
 			// check result
 			if len(output.ReturnData) != len(blResult.Out) {
-				return fmt.Errorf("result length mismatch. Want: %s. Have: %s",
-					resultAsString(blResult.Out), resultAsString(output.ReturnData))
+				return fmt.Errorf("result length mismatch. Tx #%d. Want: %s. Have: %s",
+					txIndex, resultAsString(blResult.Out), resultAsString(output.ReturnData))
 			}
 			for i, expected := range blResult.Out {
 				if expected.Cmp(output.ReturnData[i]) != 0 {
-					return fmt.Errorf("result mismatch. Want: %s. Have: %s",
-						resultAsString(blResult.Out), resultAsString(output.ReturnData))
+					return fmt.Errorf("result mismatch. Tx #%d. Want: %s. Have: %s",
+						txIndex, resultAsString(blResult.Out), resultAsString(output.ReturnData))
 				}
 			}
 
@@ -381,7 +382,8 @@ func assembleIeleCode(testPath string, value string) (string, error) {
 		return "", nil
 	}
 	if strings.HasPrefix(value, "0x") {
-		return value, nil
+		code, _ := hex.DecodeString(value[2:])
+		return string(code), nil
 	}
 
 	contractPathFilePath := filepath.Join(testPath, value)

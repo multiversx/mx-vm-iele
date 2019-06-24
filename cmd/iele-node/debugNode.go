@@ -12,13 +12,16 @@ func main() {
 
 	//debugElrondTest("tests/iele-v2/danse/forwarder/copycreate.iele.json", false)
 
-	//debugElrondTest("tests/iele-v2/albe/ill-formed/illFormed2.iele.json", false)
-	//debugOriginalTest("tests/iele/albe/ill-formed/illFormed2.iele.json", false)
+	//debugElrondTest("tests/iele-v3/danse/ill-formed/illFormed2.iele.json", false)
+	debugOriginalTest("tests/iele/danse/ill-formed/illFormed2.iele.json", false)
+	//debugOriginalTest("tests/iele/albe/ill-formed/illFormedX14.iele.json", false)
 
-	debugElrondTest("tests/iele-v3/danse/forwarder/copycreate.iele.json", false)
+	//debugElrondTest("tests/iele-v3/danse/forwarder/create.iele.json", false)
 
 	//debugElrondTest("adder/adder.iele.json", false)
 	//debugAgar()
+
+	//debugIllFormedX()
 }
 
 func debugAgar() {

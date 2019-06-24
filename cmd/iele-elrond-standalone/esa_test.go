@@ -11,6 +11,6 @@ func TestVmTests(t *testing.T) {
 }
 
 func TestIeleTests(t *testing.T) {
-	dirPath := path.Join(ieleTestRoot, "tests/iele-v2")
+	dirPath := path.Join(ieleTestRoot, "tests/iele-v3")
 	testAllInDirectory(t, dirPath, gasModeNormal)
 }

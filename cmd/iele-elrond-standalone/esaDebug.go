@@ -12,9 +12,9 @@ func main() {
 		interpreter.StartTraceReferenceComparer("ocaml_or3_1.log")
 	}
 
-	// debugTest("tests/iele/danse/ill-formed/illFormed2.iele.json")
+	debugTest("tests/iele/danse/ill-formed/illFormed2.iele.json")
 	// debugTest("tests/iele/danse/factorial/factorial_positive.iele.json")
-	debugTest("tests/iele-v2/danse/forwarder/create.iele.json")
+	//debugTest("tests/iele-v2/danse/forwarder/create.iele.json")
 }
 
 // .build/vm/iele-test-vm tests/iele/danse/forwarder/create.iele.json 10000
