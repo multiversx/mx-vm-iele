@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:19:21.575
+// File provided by the K Framework Go backend. Timestamp: 2019-06-25 00:00:28.701
 
 package ieletestinginterpreter
 
@@ -98,20 +98,29 @@ func (i *Interpreter) TakeStepsNoThread(k m.K) error {
 		return err
 	}
 
-	// try to make stuck, to enable steps dependent on stuck state
-	i.currentStep++
-	i.traceStepStart()
-	i.state, err = i.makeStuck(i.state, i.state)
-	if err != nil {
-		return err
-	}
-	i.traceStepEnd()
-	i.currentStep++
+	completelyStuck := false
+	for !completelyStuck {
+		// try to make stuck, to allow execution of steps that depend on stuck state
+		// it is possible to set stuck multiple times
+		i.currentStep++
+		i.traceStepStart()
+		i.state, err = i.makeStuck(i.state, i.state)
+		if err != nil {
+			return err
+		}
+		i.traceStepEnd()
+		i.currentStep++
 
-	// run - stuck steps
-	err = i.runSteps(maxSteps)
-	if err != nil {
-		return err
+		// run - stuck steps
+		stepBeforeStuck := i.currentStep
+		err = i.runSteps(maxSteps)
+		if err != nil {
+			return err
+		}
+		if stepBeforeStuck == i.currentStep {
+			// will only stop when no other step can be performed after stuck
+			completelyStuck = true
+		}
 	}
 
 	return nil
