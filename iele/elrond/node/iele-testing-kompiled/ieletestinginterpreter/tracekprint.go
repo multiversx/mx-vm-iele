@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:04:33.113
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
 
 package ieletestinginterpreter
 
@@ -35,18 +35,18 @@ func (t *traceKPrint) closeTrace() {
 	t.file.Close()
 }
 
-func (t *traceKPrint) traceInitialState(state m.K) {
+func (t *traceKPrint) traceInitialState(state m.KReference) {
 }
 
-func (t *traceKPrint) traceStepStart(stepNr int, currentState m.K) {
+func (t *traceKPrint) traceStepStart(stepNr int, currentState m.KReference) {
 	kast := t.interpreter.Model.KPrint(currentState)
 	t.fileWriter.WriteString(fmt.Sprintf("\nstep %d %s", stepNr, kast))
 }
 
-func (t *traceKPrint) traceStepEnd(stepNr int, currentState m.K) {
+func (t *traceKPrint) traceStepEnd(stepNr int, currentState m.KReference) {
 }
 
-func (t *traceKPrint) traceNoStep(stepNr int, currentState m.K) {
+func (t *traceKPrint) traceNoStep(stepNr int, currentState m.KReference) {
 }
 
 func (t *traceKPrint) traceRuleApply(ruleType string, stepNr int, ruleInfo string) {

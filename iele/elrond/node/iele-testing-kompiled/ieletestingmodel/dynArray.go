@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:04:33.113
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
 
 package ieletestingmodel
 
@@ -6,24 +6,24 @@ import (
 	"errors"
 )
 
-// DynamicArray ... an array that resizes automatically
+// DynamicArray is an array that resizes automatically.
 type DynamicArray struct {
 	MaxSize uint64
-	data    []K
-	Default K
+	data    []KReference
+	Default KReference
 	ms      *ModelState
 }
 
-// ErrIndexOutOfBounds ... returned when the index exceeds DynamicArray max size
+// ErrIndexOutOfBounds is returned when the index exceeds DynamicArray max size.
 var ErrIndexOutOfBounds = errors.New("DynamicArray index out of bounds")
 
-// MakeDynamicArray ... create new DynamicArray instance
-func (ms *ModelState) MakeDynamicArray(maxSize uint64, defaultVal K) *DynamicArray {
+// MakeDynamicArray creates new DynamicArray instance.
+func (ms *ModelState) MakeDynamicArray(maxSize uint64, defaultVal KReference) *DynamicArray {
 	initialSize := maxSize
 	if initialSize > 10 {
 		initialSize = 10
 	}
-	data := make([]K, initialSize)
+	data := make([]KReference, initialSize)
 	return &DynamicArray{
 		MaxSize: maxSize,
 		data:    data,
@@ -32,8 +32,8 @@ func (ms *ModelState) MakeDynamicArray(maxSize uint64, defaultVal K) *DynamicArr
 	}
 }
 
-// Get ... get element at index
-func (da *DynamicArray) Get(index uint64) (K, error) {
+// Get retrieves element at index
+func (da *DynamicArray) Get(index uint64) (KReference, error) {
 	if index >= da.MaxSize {
 		return NoResult, ErrIndexOutOfBounds
 	}
@@ -41,13 +41,13 @@ func (da *DynamicArray) Get(index uint64) (K, error) {
 		return da.Default, nil
 	}
 	val := da.data[index]
-	if val == nil {
+	if val == NullReference {
 		return da.Default, nil
 	}
 	return val, nil
 }
 
-// UpgradeSize ... increases the size of the underlying slice if necessary
+// UpgradeSize increases the size of the underlying slice if necessary
 func (da *DynamicArray) UpgradeSize(newSize uint64) {
 	if newSize > da.MaxSize {
 		newSize = da.MaxSize
@@ -55,12 +55,12 @@ func (da *DynamicArray) UpgradeSize(newSize uint64) {
 	currentLen := uint64(len(da.data))
 	if newSize > currentLen {
 		sizeInc := newSize - currentLen
-		da.data = append(da.data, make([]K, sizeInc)...)
+		da.data = append(da.data, make([]KReference, sizeInc)...)
 	}
 }
 
-// Set ... get element at index
-func (da *DynamicArray) Set(index uint64, value K) error {
+// Set updates a position in the array with a new value. It extends the array if necessary.
+func (da *DynamicArray) Set(index uint64, value KReference) error {
 	if index >= da.MaxSize {
 		return ErrIndexOutOfBounds
 	}
@@ -74,14 +74,14 @@ func (da *DynamicArray) Set(index uint64, value K) error {
 	}
 
 	if da.ms.Equals(value, da.Default) {
-		da.data[index] = nil
+		da.data[index] = NullReference
 	} else {
 		da.data[index] = value
 	}
 	return nil
 }
 
-// Equals ... deep equals
+// Equals is a deep comparison.
 func (da *DynamicArray) Equals(other *DynamicArray) bool {
 	if da == other {
 		return true
@@ -106,11 +106,11 @@ func (da *DynamicArray) Equals(other *DynamicArray) bool {
 	return true
 }
 
-// ToSlice ... convert DynamicArray to a slice of K items
-func (da *DynamicArray) ToSlice() []K {
-	slice := make([]K, len(da.data))
+// ToSlice converts the DynamicArray to a slice of K references
+func (da *DynamicArray) ToSlice() []KReference {
+	slice := make([]KReference, len(da.data))
 	for i := 0; i < len(da.data); i++ {
-		if da.data[i] == nil {
+		if da.data[i] == NullReference {
 			slice[i] = da.Default
 		} else {
 			slice[i] = da.data[i]

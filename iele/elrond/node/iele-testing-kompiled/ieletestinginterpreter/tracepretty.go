@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:04:33.113
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
 
 package ieletestinginterpreter
 
@@ -69,22 +69,23 @@ func (t *tracePrettyDebug) closeTrace() {
 	t.currentFile.Close()
 }
 
-func (t *tracePrettyDebug) traceInitialState(state m.K) {
+func (t *tracePrettyDebug) traceInitialState(state m.KReference) {
 	t.fileWriter.WriteString("initial state:\n\n")
 	t.fileWriter.WriteString(t.interpreter.Model.PrettyPrint(state))
 }
 
-func (t *tracePrettyDebug) traceStepStart(stepNr int, currentState m.K) {
-	t.newTraceFile(fmt.Sprintf("%s_step%d.log", t.dirName, stepNr))
-	t.fileWriter.WriteString(fmt.Sprintf("\n\nstep #%d begin\n\n", stepNr))
+func (t *tracePrettyDebug) traceStepStart(stepNr int, currentState m.KReference) {
+	//t.newTraceFile(fmt.Sprintf("%s_step%06d.log", t.dirName, stepNr))
+    t.newTraceFile(fmt.Sprintf("step%06d.log", stepNr))
+    t.fileWriter.WriteString(fmt.Sprintf("\n\nstep #%d begin\n\n", stepNr))
 }
 
-func (t *tracePrettyDebug) traceStepEnd(stepNr int, currentState m.K) {
+func (t *tracePrettyDebug) traceStepEnd(stepNr int, currentState m.KReference) {
 	t.fileWriter.WriteString(fmt.Sprintf("\nstep #%d end; current state:\n\n", stepNr))
 	t.fileWriter.WriteString(t.interpreter.Model.PrettyPrint(currentState))
 }
 
-func (t *tracePrettyDebug) traceNoStep(stepNr int, currentState m.K) {
+func (t *tracePrettyDebug) traceNoStep(stepNr int, currentState m.KReference) {
 	t.fileWriter.WriteString(fmt.Sprintf("\nstep #%d end, no more steps\n\n", stepNr))
 	t.fileWriter.WriteString(t.interpreter.Model.PrettyPrint(currentState))
 }

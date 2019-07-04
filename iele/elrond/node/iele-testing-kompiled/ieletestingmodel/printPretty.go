@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:04:33.113
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
 
 package ieletestingmodel
 
@@ -9,10 +9,52 @@ import (
 
 // PrettyPrint ... returns a representation of a K item that tries to be as readable as possible
 // designed for debugging purposes only
-func (ms *ModelState) PrettyPrint(k K) string {
+func (ms *ModelState) PrettyPrint(ref KReference) string {
 	var sb strings.Builder
-	k.prettyPrint(ms, &sb, 0)
+	ms.prettyPrintToStringBuilder(&sb, ref, 0)
 	return sb.String()
+}
+
+func (ms *ModelState) prettyPrintToStringBuilder(sb *strings.Builder, ref KReference, indent int) {
+	// int types
+	intStr, isInt := ms.GetIntAsDecimalString(ref)
+	if isInt {
+		intHex, _ := ms.GetIntToString(ref, 16)
+		sb.WriteString(fmt.Sprintf("Int (0x%s | %s)", intHex, intStr))
+		return
+	}
+
+	switch ref.refType {
+	case boolRef:
+		sb.WriteString(fmt.Sprintf("Bool (%t)", IsTrue(ref)))
+	case bottomRef:
+		sb.WriteString("Bottom")
+	case emptyKseqRef:
+		sb.WriteString(" .K ")
+	case nonEmptyKseqRef:
+		ks := ms.KSequenceToSlice(ref)
+		if len(ks) == 0 {
+			panic("K sequences of length 0 should have type emptyKseqRef, not nonEmptyKseqRef")
+		} else if len(ks) == 1 {
+			ms.prettyPrintToStringBuilder(sb, ks[0], indent)
+		} else {
+			for i, child := range ks {
+				if i > 0 {
+					addIndent(sb, indent)
+				}
+				ms.prettyPrintToStringBuilder(sb, child, indent)
+				if i < len(ks)-1 {
+					sb.WriteString(" ~>\n")
+				} else {
+					sb.WriteString(" ~> . ")
+				}
+			}
+		}
+	default:
+		// object types
+		obj := ms.getReferencedObject(ref)
+		obj.prettyPrint(ms, sb, indent)
+	}
 }
 
 func (k *KApply) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
@@ -32,7 +74,7 @@ func (k *KApply) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 	}
 	if !done && len(k.List) == 1 {
 		var tempSb strings.Builder
-		k.List[0].prettyPrint(ms, &tempSb, 0)
+		ms.prettyPrintToStringBuilder(&tempSb, k.List[0], 0)
 		childStr := tempSb.String()
 		if !strings.Contains(childStr, "\n") {
 			// if only one child and its representation not too big, just put everything in one row
@@ -47,10 +89,10 @@ func (k *KApply) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 		}
 	}
 	if !done {
-		for i, childk := range k.List {
+		for i, child := range k.List {
 			sb.WriteRune('\n')
 			addIndent(sb, indent+1)
-			childk.prettyPrint(ms, sb, indent+1)
+			ms.prettyPrintToStringBuilder(sb, child, indent+1)
 			if !isKCell && i < len(k.List)-1 {
 				sb.WriteString(",")
 			}
@@ -89,13 +131,13 @@ func (k *Map) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 		sb.WriteString(" <empty>")
 	} else {
 		sb.WriteString(", Data: (")
-		orderedKVPairs := k.ToOrderedKeyValuePairs()
+		orderedKVPairs := ms.MapOrderedKeyValuePairs(k)
 		for _, pair := range orderedKVPairs {
 			sb.WriteString("\n")
 			addIndent(sb, indent+1)
-			pair.Key.prettyPrint(ms, sb, indent+1)
+			ms.prettyPrintToStringBuilder(sb, pair.Key, indent+1)
 			sb.WriteString(" => ")
-			pair.Value.prettyPrint(ms, sb, indent+1)
+			ms.prettyPrintToStringBuilder(sb, pair.Value, indent+1)
 		}
 		sb.WriteRune('\n')
 		addIndent(sb, indent)
@@ -115,10 +157,10 @@ func (k *List) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 		for _, item := range k.Data {
 			sb.WriteString("\n")
 			addIndent(sb, indent+1)
-			if item == nil {
+			if item == NullReference {
 				sb.WriteString("nil")
 			} else {
-				item.prettyPrint(ms, sb, indent+1)
+				ms.prettyPrintToStringBuilder(sb, item, indent+1)
 			}
 		}
 		sb.WriteRune('\n')
@@ -136,11 +178,11 @@ func (k *Set) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 		sb.WriteString(" <empty>")
 	} else {
 		sb.WriteString(", Data: {")
-		orderedElems := k.ToOrderedElements()
+		orderedElems := ms.SetOrderedElements(k)
 		for _, elem := range orderedElems {
 			sb.WriteString("\n")
 			addIndent(sb, indent+1)
-			elem.prettyPrint(ms, sb, indent+1)
+			ms.prettyPrintToStringBuilder(sb, elem, indent+1)
 		}
 
 		sb.WriteRune('\n')
@@ -161,16 +203,12 @@ func (k *Array) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 			sb.WriteString("\n")
 			addIndent(sb, indent+1)
 			sb.WriteString(fmt.Sprintf("[%d] => ", i))
-			item.prettyPrint(ms, sb, indent+1)
+			ms.prettyPrintToStringBuilder(sb, item, indent+1)
 		}
 		sb.WriteRune('\n')
 		addIndent(sb, indent)
 		sb.WriteRune(']')
 	}
-}
-
-func (k *Int) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
-	sb.WriteString(fmt.Sprintf("Int (0x%s | %s)", k.Value.Text(16), k.Value.String()))
 }
 
 func (k *MInt) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
@@ -206,31 +244,4 @@ func (k *Bytes) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 		}
 	}
 	sb.WriteString(")")
-}
-
-func (k *Bool) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
-	sb.WriteString(fmt.Sprintf("Bool (%t)", k.Value))
-}
-
-func (k *Bottom) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
-	sb.WriteString("Bottom")
-}
-
-func (k KSequence) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
-	ks := ms.KSequenceToSlice(k)
-	if len(ks) == 0 {
-		sb.WriteString(" .K ")
-	} else {
-		for i, childk := range ks {
-			if i > 0 {
-				addIndent(sb, indent)
-			}
-			childk.prettyPrint(ms, sb, indent)
-			if i < len(ks)-1 {
-				sb.WriteString(" ~>\n")
-			} else {
-				sb.WriteString(" ~> . ")
-			}
-		}
-	}
 }

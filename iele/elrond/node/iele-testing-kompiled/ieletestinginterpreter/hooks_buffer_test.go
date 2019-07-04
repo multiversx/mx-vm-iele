@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:04:33.113
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
 
 package ieletestinginterpreter
 
@@ -9,8 +9,8 @@ import (
 
 func TestStringBuffer(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var sb m.K
-	var str m.K
+	var sb m.KReference
+	var str m.KReference
 	var err error
 	sb, err = bufferHooks.empty(m.LblDummy, m.SortString, m.InternedBottom, interpreter)
 	assertStringBufferOk(t, "", sb, err, interpreter)
@@ -18,21 +18,21 @@ func TestStringBuffer(t *testing.T) {
 	str, err = bufferHooks.toString(sb, m.LblDummy, m.SortString, m.InternedBottom, interpreter)
 	assertStringOk(t, "", str, err, interpreter)
 
-	_, err = bufferHooks.concat(sb, m.NewString("abc"), m.LblDummy, m.SortString, m.InternedBottom, interpreter)
+	_, err = bufferHooks.concat(sb, interpreter.Model.NewString("abc"), m.LblDummy, m.SortString, m.InternedBottom, interpreter)
 	assertStringBufferOk(t, "abc", sb, err, interpreter)
 
-	_, err = bufferHooks.concat(sb, m.NewString("def"), m.LblDummy, m.SortString, m.InternedBottom, interpreter)
+	_, err = bufferHooks.concat(sb, interpreter.Model.NewString("def"), m.LblDummy, m.SortString, m.InternedBottom, interpreter)
 	assertStringBufferOk(t, "abcdef", sb, err, interpreter)
 
 	str, err = bufferHooks.toString(sb, m.LblDummy, m.SortString, m.InternedBottom, interpreter)
 	assertStringOk(t, "abcdef", str, err, interpreter)
 }
 
-func assertStringBufferOk(t *testing.T, expectedStr string, actual m.K, err error, interpreter *Interpreter) {
+func assertStringBufferOk(t *testing.T, expectedStr string, actual m.KReference, err error, interpreter *Interpreter) {
 	if err != nil {
 		t.Error(err, interpreter)
 	}
-	k, typeOk := actual.(*m.StringBuffer)
+	k, typeOk := interpreter.Model.GetStringBufferObject(actual)
 	if !typeOk {
 		t.Error("Result is not a StringBuffer.")
 		return

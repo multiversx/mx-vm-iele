@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:04:33.113
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
 
 package ieletestinginterpreter
 
@@ -49,17 +49,18 @@ func (i *Interpreter) ExecuteSimple(kdir string, execFile string) {
 
 // Execute interprets the program with the structure
 func (i *Interpreter) Execute(kastMap map[string][]byte) error {
-	kConfigMap := make(map[m.KMapKey]m.K)
+	kConfigMap := make(map[m.KMapKey]m.KReference)
 	for key, kastValue := range kastMap {
-		ktoken := m.KToken{Sort: m.SortKConfigVar, Value: "$" + key}
+		ktokenRef := i.Model.NewKToken(m.SortKConfigVar, "$"+key)
+		ktokenKey, _ := i.Model.MapKey(ktokenRef)
 		parsedValue := koreparser.Parse(kastValue)
 		kValue := i.convertParserModelToKModel(parsedValue)
-		kConfigMap[ktoken] = kValue
+		kConfigMap[ktokenKey] = kValue
 	}
 
 	// top cell initialization
-	kmap := &m.Map{Sort: m.SortMap, Label: m.KLabelForMap, Data: kConfigMap}
-	evalK := &m.KApply{Label: TopCellInitializer, List: []m.K{kmap}}
+	kmap := i.Model.NewMap(m.SortMap, m.KLabelForMap, kConfigMap)
+	evalK := i.Model.NewKApply(TopCellInitializer, kmap)
 	kinit, err := i.Eval(evalK, m.InternedBottom)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -76,7 +77,7 @@ func (i *Interpreter) Execute(kastMap map[string][]byte) error {
 }
 
 // TakeStepsNoThread executes as many steps as possible given the starting configuration
-func (i *Interpreter) TakeStepsNoThread(k m.K) error {
+func (i *Interpreter) TakeStepsNoThread(k m.KReference) error {
 	i.initializeTrace()
 	defer i.closeTrace()
 
@@ -98,20 +99,29 @@ func (i *Interpreter) TakeStepsNoThread(k m.K) error {
 		return err
 	}
 
-	// try to make stuck, to enable steps dependent on stuck state
-	i.currentStep++
-	i.traceStepStart()
-	i.state, err = i.makeStuck(i.state, i.state)
-	if err != nil {
-		return err
-	}
-	i.traceStepEnd()
-	i.currentStep++
+	completelyStuck := false
+	for !completelyStuck {
+		// try to make stuck, to allow execution of steps that depend on stuck state
+		// it is possible to set stuck multiple times
+		i.currentStep++
+		i.traceStepStart()
+		i.state, err = i.makeStuck(i.state, i.state)
+		if err != nil {
+			return err
+		}
+		i.traceStepEnd()
+		i.currentStep++
 
-	// run - stuck steps
-	err = i.runSteps(maxSteps)
-	if err != nil {
-		return err
+		// run - stuck steps
+		stepBeforeStuck := i.currentStep
+		err = i.runSteps(maxSteps)
+		if err != nil {
+			return err
+		}
+		if stepBeforeStuck == i.currentStep {
+			// will only stop when no other step can be performed after stuck
+			completelyStuck = true
+		}
 	}
 
 	return nil
@@ -124,8 +134,20 @@ func (i *Interpreter) runSteps(maxSteps int) error {
 			return errMaxStepsReached
 		}
 		i.traceStepStart()
-		var err error
-		i.state, err = i.step(i.state)
+
+		// decrease all usages from the previous state
+		previousState := i.state
+		i.Model.DecreaseUsage(previousState)
+
+        var err error
+		i.state, err = i.step(previousState)
+
+		// increase all usages for the current state
+		i.Model.IncreaseUsage(i.state)
+
+		// recycle everything that didn't show up in the new state
+        i.Model.RecycleUnused(previousState)
+
 		if err == nil {
 			i.traceStepEnd()
 			i.currentStep++

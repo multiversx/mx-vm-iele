@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 20:04:33.113
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
 
 package ieletestinginterpreter
 
@@ -10,38 +10,38 @@ type setHooksType int
 
 const setHooks setHooksType = 0
 
-func (setHooksType) in(e m.K, kset m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	s, isSet := kset.(*m.Set)
+func (setHooksType) in(e m.KReference, kset m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	s, isSet := interpreter.Model.GetSetObject(kset)
 	if !isSet {
 		return invalidArgsResult()
 	}
-	setElem, setElemOk := m.MapKey(e)
+	setElem, setElemOk := interpreter.Model.MapKey(e)
 	if !setElemOk {
 		return m.NoResult, errBadSetElement
 	}
 	_, exists := s.Data[setElem]
-	return m.ToBool(exists), nil
+	return m.ToKBool(exists), nil
 }
 
-func (setHooksType) unit(lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (setHooksType) unit(lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	var data map[m.KMapKey]bool
-	return &m.Set{Sort: sort, Label: m.CollectionFor(lbl), Data: data}, nil
+	return interpreter.Model.NewSet(sort, m.CollectionFor(lbl), data), nil
 }
 
 // returns a set with 1 element
-func (setHooksType) element(e m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	setElem, setElemOk := m.MapKey(e)
+func (setHooksType) element(e m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	setElem, setElemOk := interpreter.Model.MapKey(e)
 	if !setElemOk {
 		return m.NoResult, errBadSetElement
 	}
 	data := make(map[m.KMapKey]bool)
 	data[setElem] = true
-	return &m.Set{Sort: sort, Label: m.CollectionFor(lbl), Data: data}, nil
+	return interpreter.Model.NewSet(sort, m.CollectionFor(lbl), data), nil
 }
 
-func (setHooksType) concat(kset1 m.K, kset2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	s1, isSet1 := kset1.(*m.Set)
-	s2, isSet2 := kset2.(*m.Set)
+func (setHooksType) concat(kset1 m.KReference, kset2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	s1, isSet1 := interpreter.Model.GetSetObject(kset1)
+	s2, isSet2 := interpreter.Model.GetSetObject(kset2)
 	if !isSet1 || !isSet2 {
 		return invalidArgsResult()
 	}
@@ -52,12 +52,12 @@ func (setHooksType) concat(kset1 m.K, kset2 m.K, lbl m.KLabel, sort m.Sort, conf
 	for e2 := range s2.Data {
 		data[e2] = true
 	}
-	return &m.Set{Sort: sort, Label: lbl, Data: data}, nil
+	return interpreter.Model.NewSet(sort, lbl, data), nil
 }
 
-func (setHooksType) difference(kset1 m.K, kset2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	s1, isSet1 := kset1.(*m.Set)
-	s2, isSet2 := kset2.(*m.Set)
+func (setHooksType) difference(kset1 m.KReference, kset2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	s1, isSet1 := interpreter.Model.GetSetObject(kset1)
+	s2, isSet2 := interpreter.Model.GetSetObject(kset2)
 	if !isSet1 || !isSet2 {
 		return invalidArgsResult()
 	}
@@ -68,13 +68,13 @@ func (setHooksType) difference(kset1 m.K, kset2 m.K, lbl m.KLabel, sort m.Sort, 
 			data[e1] = true
 		}
 	}
-	return &m.Set{Sort: sort, Label: lbl, Data: data}, nil
+	return interpreter.Model.NewSet(sort, lbl, data), nil
 }
 
 // tests if kset1 is a subset of kset2
-func (setHooksType) inclusion(kset1 m.K, kset2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	s1, isSet1 := kset1.(*m.Set)
-	s2, isSet2 := kset2.(*m.Set)
+func (setHooksType) inclusion(kset1 m.KReference, kset2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	s1, isSet1 := interpreter.Model.GetSetObject(kset1)
+	s2, isSet2 := interpreter.Model.GetSetObject(kset2)
 	if !isSet1 || !isSet2 {
 		return invalidArgsResult()
 	}
@@ -87,9 +87,9 @@ func (setHooksType) inclusion(kset1 m.K, kset2 m.K, lbl m.KLabel, sort m.Sort, c
 	return m.BoolTrue, nil
 }
 
-func (setHooksType) intersection(kset1 m.K, kset2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	s1, isSet1 := kset1.(*m.Set)
-	s2, isSet2 := kset2.(*m.Set)
+func (setHooksType) intersection(kset1 m.KReference, kset2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	s1, isSet1 := interpreter.Model.GetSetObject(kset1)
+	s2, isSet2 := interpreter.Model.GetSetObject(kset2)
 	if !isSet1 || !isSet2 {
 		return invalidArgsResult()
 	}
@@ -100,56 +100,56 @@ func (setHooksType) intersection(kset1 m.K, kset2 m.K, lbl m.KLabel, sort m.Sort
 	for e2 := range s2.Data {
 		data[e2] = true
 	}
-	return &m.Set{Sort: sort, Label: lbl, Data: data}, nil
+	return interpreter.Model.NewSet(sort, lbl, data), nil
 }
 
-func (setHooksType) choice(kset m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	s, isSet := kset.(*m.Set)
+func (setHooksType) choice(kset m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	s, isSet := interpreter.Model.GetSetObject(kset)
 	if !isSet {
 		return invalidArgsResult()
 	}
 	for e := range s.Data {
-		return e.ToKItem()
+		return interpreter.Model.ToKItem(e)
 	}
 	return invalidArgsResult()
 }
 
-func (setHooksType) size(kset m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	s, isSet := kset.(*m.Set)
+func (setHooksType) size(kset m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	s, isSet := interpreter.Model.GetSetObject(kset)
 	if !isSet {
 		return invalidArgsResult()
 	}
-	return m.NewIntFromInt(len(s.Data)), nil
+	return interpreter.Model.FromInt(len(s.Data)), nil
 }
 
-func (setHooksType) set2list(kset m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	s, isSet := kset.(*m.Set)
+func (setHooksType) set2list(kset m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	s, isSet := interpreter.Model.GetSetObject(kset)
 	if !isSet {
 		return invalidArgsResult()
 	}
-	var list []m.K
+	var list []m.KReference
 	for e := range s.Data {
-		elemAsKItem, err := e.ToKItem()
+		elemAsKItem, err := interpreter.Model.ToKItem(e)
 		if err != nil {
 			return m.NoResult, err
 		}
 		list = append(list, elemAsKItem)
 	}
-	return &m.List{Sort: m.SortList, Label: m.KLabelForList, Data: list}, nil
+	return interpreter.Model.NewList(m.SortList, m.KLabelForList, list), nil
 }
 
-func (setHooksType) list2set(klist m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	l, isList := klist.(*m.List)
+func (setHooksType) list2set(klist m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	l, isList := interpreter.Model.GetListObject(klist)
 	if !isList {
 		return invalidArgsResult()
 	}
 	data := make(map[m.KMapKey]bool)
 	for _, e := range l.Data {
-		setElem, setElemOk := m.MapKey(e)
+		setElem, setElemOk := interpreter.Model.MapKey(e)
 		if !setElemOk {
 			return m.NoResult, errBadSetElement
 		}
 		data[setElem] = true
 	}
-	return &m.Set{Sort: m.SortSet, Label: m.KLabelForSet, Data: data}, nil
+	return interpreter.Model.NewSet(m.SortSet, m.KLabelForSet, data), nil
 }
