@@ -6,14 +6,24 @@ import (
 )
 
 func main() {
-	debugTest("tests/iele/danse/ill-formed/illFormed2.iele.json")
+	//debugTest("tests/iele/danse/ill-formed/illFormed2.iele.json")
 	//debugTest("tests/iele-v2/albe/ERC20/approve_Caller-Positive.iele.json")
+	debugVMTest("tests/VMTests/vmBitwiseLogicOperation/not0/not0.iele.json", true)
 }
 
 // .build/vm/iele-test-vm tests/iele/danse/forwarder/create.iele.json 10000
 
-func debugTest(testFile string) {
-	err := runTest(path.Join(ieleTestRoot, testFile), gasModeNormal, false)
+func debugIeleTest(testFile string, tracePretty bool) {
+	err := runTest(path.Join(ieleTestRoot, testFile), gasModeNormal, tracePretty)
+	if err == nil {
+		fmt.Println("SUCCESS")
+	} else {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+}
+
+func debugVMTest(testFile string, tracePretty bool) {
+	err := runTest(path.Join(ieleTestRoot, testFile), gasModeVMTests, tracePretty)
 	if err == nil {
 		fmt.Println("SUCCESS")
 	} else {

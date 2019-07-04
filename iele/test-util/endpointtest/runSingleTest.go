@@ -68,10 +68,6 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 	testDirPath := filepath.Dir(testFilePath)
 
 	scheduleName := test.Network
-	vm, initErr := vmp.GetVM(scheduleName)
-	if initErr != nil {
-		return initErr
-	}
 
 	var assErr error
 	for _, acct := range test.Pre {
@@ -92,6 +88,12 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 
 	for _, block := range test.Blocks {
 		for txIndex, tx := range block.Transactions {
+			// refresh VM
+			vm, initErr := vmp.GetVM(scheduleName)
+			if initErr != nil {
+				return initErr
+			}
+
 			//fmt.Printf("%d\n", txIndex)
 			beforeErr := world.UpdateWorldStateBefore(tx.From, tx.GasLimit, tx.GasPrice)
 			if beforeErr != nil {

@@ -13,71 +13,71 @@ type Krypto struct {
 }
 
 // Sha256 adapts between K model and elrond function
-func (k *Krypto) Sha256(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	str, isStr := c.(*m.String)
+func (k *Krypto) Sha256(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	str, isStr := ms.GetString(c)
 	if !isStr {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	result, err := k.Upstream.Sha256(str.Value)
+	result, err := k.Upstream.Sha256(str)
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.NewString(result), nil
+	return ms.NewString(result), nil
 }
 
 // Keccak256 adapts between K model and elrond function
-func (k *Krypto) Keccak256(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	str, isStr := c.(*m.String)
+func (k *Krypto) Keccak256(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	str, isStr := ms.GetString(c)
 	if !isStr {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	result, err := k.Upstream.Keccak256(str.Value)
+	result, err := k.Upstream.Keccak256(str)
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.NewString(result), nil
+	return ms.NewString(result), nil
 }
 
 // Ripemd160 adapts between K model and elrond function
-func (k *Krypto) Ripemd160(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	str, isStr := c.(*m.String)
+func (k *Krypto) Ripemd160(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	str, isStr := ms.GetString(c)
 	if !isStr {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	result, err := k.Upstream.Ripemd160(str.Value)
+	result, err := k.Upstream.Ripemd160(str)
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.NewString(result), nil
+	return ms.NewString(result), nil
 }
 
 // EcdsaRecover adapts between K model and elrond function
-func (k *Krypto) EcdsaRecover(c1 m.K, c2 m.K, c3 m.K, c4 m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	hash, hashOk := c1.(*m.String)
+func (k *Krypto) EcdsaRecover(c1 m.KReference, c2 m.KReference, c3 m.KReference, c4 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	hash, hashOk := ms.GetString(c1)
 	if !hashOk {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	v, vOk := c2.(*m.Int)
+	v, vOk := ms.GetBigInt(c2)
 	if !vOk {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	r, rOk := c3.(*m.String)
+	r, rOk := ms.GetString(c3)
 	if !rOk {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	s, sOk := c4.(*m.String)
+	s, sOk := ms.GetString(c4)
 	if !sOk {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	result, err := k.Upstream.EcdsaRecover(hash.Value, v.Value, r.Value, s.Value)
+	result, err := k.Upstream.EcdsaRecover(hash, v, r, s)
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.NewString(result), nil
+	return ms.NewString(result), nil
 }
 
-func parseBn128Point(c m.K) (vmi.Bn128Point, error) {
-	kapp, isKapp := c.(*m.KApply)
+func parseBn128Point(c m.KReference, ms *m.ModelState) (vmi.Bn128Point, error) {
+	kapp, isKapp := ms.GetKApplyObject(c)
 	if !isKapp {
 		return vmi.Bn128Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
@@ -87,25 +87,25 @@ func parseBn128Point(c m.K) (vmi.Bn128Point, error) {
 	if len(kapp.List) != 2 {
 		return vmi.Bn128Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	x, isInt1 := kapp.List[0].(*m.Int)
+	x, isInt1 := ms.GetBigInt(kapp.List[0])
 	if !isInt1 {
 		return vmi.Bn128Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	y, isInt2 := kapp.List[1].(*m.Int)
+	y, isInt2 := ms.GetBigInt(kapp.List[1])
 	if !isInt2 {
 		return vmi.Bn128Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	return vmi.Bn128Point{X: x.Value, Y: y.Value}, nil
+	return vmi.Bn128Point{X: x, Y: y}, nil
 }
 
-func convertBn128Point(p vmi.Bn128Point) m.K {
-	return &m.KApply{Label: m.LblXlparenXuXcommaXuXrparenXuKRYPTO, List: []m.K{
-		m.NewInt(p.X),
-		m.NewInt(p.Y)}}
+func convertBn128Point(p vmi.Bn128Point, ms *m.ModelState) m.KReference {
+	return ms.NewKApply(m.LblXlparenXuXcommaXuXrparenXuKRYPTO,
+		ms.FromBigInt(p.X),
+		ms.FromBigInt(p.Y))
 }
 
-func parseBn128G2Point(c m.K) (vmi.Bn128G2Point, error) {
-	kapp, isKapp := c.(*m.KApply)
+func parseBn128G2Point(c m.KReference, ms *m.ModelState) (vmi.Bn128G2Point, error) {
+	kapp, isKapp := ms.GetKApplyObject(c)
 	if !isKapp {
 		return vmi.Bn128G2Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
@@ -115,28 +115,28 @@ func parseBn128G2Point(c m.K) (vmi.Bn128G2Point, error) {
 	if len(kapp.List) != 4 {
 		return vmi.Bn128G2Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	x1, isInt1 := kapp.List[0].(*m.Int)
+	x1, isInt1 := ms.GetBigInt(kapp.List[0])
 	if !isInt1 {
 		return vmi.Bn128G2Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	x2, isInt2 := kapp.List[1].(*m.Int)
+	x2, isInt2 := ms.GetBigInt(kapp.List[1])
 	if !isInt2 {
 		return vmi.Bn128G2Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	y1, isInt3 := kapp.List[0].(*m.Int)
+	y1, isInt3 := ms.GetBigInt(kapp.List[2])
 	if !isInt3 {
 		return vmi.Bn128G2Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	y2, isInt4 := kapp.List[1].(*m.Int)
+	y2, isInt4 := ms.GetBigInt(kapp.List[3])
 	if !isInt4 {
 		return vmi.Bn128G2Point{}, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	return vmi.Bn128G2Point{X1: x1.Value, X2: x2.Value, Y1: y1.Value, Y2: y2.Value}, nil
+	return vmi.Bn128G2Point{X1: x1, X2: x2, Y1: y1, Y2: y2}, nil
 }
 
 // Bn128valid adapts between K model and elrond function
-func (k *Krypto) Bn128valid(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	p, err := parseBn128Point(c)
+func (k *Krypto) Bn128valid(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	p, err := parseBn128Point(c, ms)
 	if err != nil {
 		return m.NoResult, err
 	}
@@ -144,12 +144,12 @@ func (k *Krypto) Bn128valid(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, 
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.ToBool(result), nil
+	return m.ToKBool(result), nil
 }
 
 // Bn128g2valid adapts between K model and elrond function
-func (k *Krypto) Bn128g2valid(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	p, err := parseBn128G2Point(c)
+func (k *Krypto) Bn128g2valid(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	p, err := parseBn128G2Point(c, ms)
 	if err != nil {
 		return m.NoResult, err
 	}
@@ -157,16 +157,16 @@ func (k *Krypto) Bn128g2valid(c m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.ToBool(result), nil
+	return m.ToKBool(result), nil
 }
 
 // Bn128add adapts between K model and elrond function
-func (k *Krypto) Bn128add(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	p1, err := parseBn128Point(c1)
+func (k *Krypto) Bn128add(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	p1, err := parseBn128Point(c1, ms)
 	if err != nil {
 		return m.NoResult, err
 	}
-	p2, err := parseBn128Point(c2)
+	p2, err := parseBn128Point(c2, ms)
 	if err != nil {
 		return m.NoResult, err
 	}
@@ -174,47 +174,47 @@ func (k *Krypto) Bn128add(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K)
 	if err != nil {
 		return m.NoResult, err
 	}
-	return convertBn128Point(result), nil
+	return convertBn128Point(result, ms), nil
 }
 
 // Bn128mul adapts between K model and elrond function
-func (k *Krypto) Bn128mul(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	k1, isInt := c1.(*m.Int)
+func (k *Krypto) Bn128mul(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	k1, isInt := ms.GetBigInt(c1)
 	if !isInt {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	p, err := parseBn128Point(c2)
+	p, err := parseBn128Point(c2, ms)
 	if err != nil {
 		return m.NoResult, err
 	}
-	result, err := k.Upstream.Bn128mul(k1.Value, p)
+	result, err := k.Upstream.Bn128mul(k1, p)
 	if err != nil {
 		return m.NoResult, err
 	}
-	return convertBn128Point(result), nil
+	return convertBn128Point(result, ms), nil
 }
 
 // Bn128ate adapts between K model and elrond function
-func (k *Krypto) Bn128ate(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K) (m.K, error) {
-	l1, isList := c1.(*m.List)
+func (k *Krypto) Bn128ate(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	l1, isList := ms.GetListObject(c1)
 	if !isList {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
-	l2, isList := c2.(*m.List)
+	l2, isList := ms.GetListObject(c2)
 	if !isList {
 		return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 	}
 	var p1List []vmi.Bn128Point
 	var p2List []vmi.Bn128G2Point
 	for _, k := range l1.Data {
-		p, err := parseBn128Point(k)
+		p, err := parseBn128Point(k, ms)
 		if err != nil {
 			return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 		}
 		p1List = append(p1List, p)
 	}
 	for _, k := range l2.Data {
-		p, err := parseBn128G2Point(k)
+		p, err := parseBn128G2Point(k, ms)
 		if err != nil {
 			return m.NoResult, errors.New("invalid argument(s) provided to krypto hook")
 		}
@@ -224,5 +224,5 @@ func (k *Krypto) Bn128ate(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K)
 	if err != nil {
 		return m.NoResult, err
 	}
-	return m.ToBool(result), nil
+	return m.ToKBool(result), nil
 }

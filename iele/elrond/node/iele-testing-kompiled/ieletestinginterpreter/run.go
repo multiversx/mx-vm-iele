@@ -4,11 +4,12 @@ package ieletestinginterpreter
 
 import (
 	"fmt"
-	koreparser "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/koreparser"
 	"log"
-	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 	"math"
 	"os/exec"
+
+	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
+	koreparser "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/koreparser"
 )
 
 func callKast(kdir string, programPath string) []byte {
@@ -139,14 +140,14 @@ func (i *Interpreter) runSteps(maxSteps int) error {
 		previousState := i.state
 		i.Model.DecreaseUsage(previousState)
 
-        var err error
+		var err error
 		i.state, err = i.step(previousState)
 
 		// increase all usages for the current state
 		i.Model.IncreaseUsage(i.state)
 
 		// recycle everything that didn't show up in the new state
-        i.Model.RecycleUnused(previousState)
+		i.Model.RecycleUnused(previousState)
 
 		if err == nil {
 			i.traceStepEnd()

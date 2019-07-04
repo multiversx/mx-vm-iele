@@ -93,9 +93,9 @@ func runTest(testFilePath string, testGasMode gasMode, tracePretty bool) error {
 	return nil
 }
 
-func isExitCodeZero(c m.K, kinterpreter *interpreter.Interpreter) bool {
-	if generatedTop, t := c.(*m.KApply); t && generatedTop.Label == m.ParseKLabel("<generatedTop>") { // `<generatedTop>`(`<k>`(...
-		if exitCodeCell, t := generatedTop.List[2].(*m.KApply); t && exitCodeCell.Label == m.ParseKLabel("<exit-code>") && len(exitCodeCell.List) == 1 { // `<exit-code>`(...
+func isExitCodeZero(c m.KReference, kinterpreter *interpreter.Interpreter) bool {
+	if generatedTop, t := kinterpreter.Model.GetKApplyObject(c); t && generatedTop.Label == m.ParseKLabel("<generatedTop>") { // `<generatedTop>`(`<k>`(...
+		if exitCodeCell, t := kinterpreter.Model.GetKApplyObject(generatedTop.List[2]); t && exitCodeCell.Label == m.ParseKLabel("<exit-code>") && len(exitCodeCell.List) == 1 { // `<exit-code>`(...
 			return kinterpreter.Model.Equals(exitCodeCell.List[0], m.IntZero)
 		}
 
@@ -104,12 +104,10 @@ func isExitCodeZero(c m.K, kinterpreter *interpreter.Interpreter) bool {
 	return false
 }
 
-func isKCellEmpty(c m.K, kinterpreter *interpreter.Interpreter) bool {
-	if generatedTop, t := c.(*m.KApply); t && generatedTop.Label == m.ParseKLabel("<generatedTop>") { // `<generatedTop>`(`<k>`(...
-		if kcell, t := generatedTop.List[0].(*m.KApply); t && kcell.Label == m.ParseKLabel("<k>") && len(kcell.List) == 1 { // `<k>`(...
-			if kseq, isKseq := kcell.List[0].(m.KSequence); isKseq {
-				return kinterpreter.Model.KSequenceIsEmpty(kseq)
-			}
+func isKCellEmpty(c m.KReference, kinterpreter *interpreter.Interpreter) bool {
+	if generatedTop, t := kinterpreter.Model.GetKApplyObject(c); t && generatedTop.Label == m.ParseKLabel("<generatedTop>") { // `<generatedTop>`(`<k>`(...
+		if kcell, t := kinterpreter.Model.GetKApplyObject(generatedTop.List[0]); t && kcell.Label == m.ParseKLabel("<k>") && len(kcell.List) == 1 { // `<k>`(...
+			return kinterpreter.Model.KSequenceIsEmpty(kcell.List[0])
 		}
 
 	}
