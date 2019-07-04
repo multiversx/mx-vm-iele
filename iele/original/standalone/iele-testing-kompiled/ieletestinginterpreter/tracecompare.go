@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 package ieletestinginterpreter
 
@@ -46,7 +46,7 @@ func (t *traceReferenceComparer) closeTrace() {
 	t.referenceFile.Close()
 }
 
-func (t *traceReferenceComparer) traceInitialState(state m.K) {
+func (t *traceReferenceComparer) traceInitialState(state m.KReference) {
 }
 
 func (t *traceReferenceComparer) consumeStepLine() string {
@@ -76,7 +76,7 @@ func (t *traceReferenceComparer) consumeStepLine() string {
 	return line
 }
 
-func (t *traceReferenceComparer) traceStepStart(stepNr int, currentState m.K) {
+func (t *traceReferenceComparer) traceStepStart(stepNr int, currentState m.KReference) {
 	if !t.running {
 		return
 	}
@@ -95,7 +95,7 @@ func (t *traceReferenceComparer) traceStepStart(stepNr int, currentState m.K) {
 	}
 }
 
-func (t *traceReferenceComparer) writeStateToFile(state m.K, fileName string) {
+func (t *traceReferenceComparer) writeStateToFile(state m.KReference, fileName string) {
 	file, err := os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		fmt.Println("Error while creating trace file:" + err.Error())
@@ -106,10 +106,10 @@ func (t *traceReferenceComparer) writeStateToFile(state m.K, fileName string) {
 	file.Close()
 }
 
-func (t *traceReferenceComparer) traceStepEnd(stepNr int, currentState m.K) {
+func (t *traceReferenceComparer) traceStepEnd(stepNr int, currentState m.KReference) {
 }
 
-func (t *traceReferenceComparer) traceNoStep(stepNr int, currentState m.K) {
+func (t *traceReferenceComparer) traceNoStep(stepNr int, currentState m.KReference) {
 }
 
 func (t *traceReferenceComparer) traceRuleApply(ruleType string, stepNr int, ruleInfo string) {

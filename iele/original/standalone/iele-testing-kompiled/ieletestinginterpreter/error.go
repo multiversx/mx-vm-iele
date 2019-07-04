@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 package ieletestinginterpreter
 
@@ -20,7 +20,7 @@ var noStep = &noStepError{}
 type stuckError struct {
 	ms       *m.ModelState
 	funcName string
-	args     []m.K
+	args     []m.KReference
 }
 
 func (e *stuckError) Error() string {
@@ -60,7 +60,7 @@ func (e *hookInvalidArgsError) Error() string {
 	return "Invalid argument(s) provided to hook."
 }
 
-func invalidArgsResult() (m.K, error) {
+func invalidArgsResult() (m.KReference, error) {
     return m.NoResult, &hookInvalidArgsError{}
 }
 

@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 package ieletestinginterpreter
 
@@ -11,29 +11,29 @@ type mapHooksType int
 const mapHooks mapHooksType = 0
 
 // returns a map with 1 key to value mapping
-func (mapHooksType) element(key m.K, val m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	kkey, keyOk := m.MapKey(key)
+func (mapHooksType) element(key m.KReference, val m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	kkey, keyOk := interpreter.Model.MapKey(key)
 	if !keyOk {
 		return m.NoResult, errInvalidMapKey
 	}
-	mp := make(map[m.KMapKey]m.K)
+	mp := make(map[m.KMapKey]m.KReference)
 	mp[kkey] = val
-	return &m.Map{Sort: sort, Label: m.CollectionFor(lbl), Data: mp}, nil
+	return interpreter.Model.NewMap(sort, m.CollectionFor(lbl), mp), nil
 }
 
 // returns an empty map
-func (mapHooksType) unit(lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	var mp map[m.KMapKey]m.K
-	return &m.Map{Sort: sort, Label: m.CollectionFor(lbl), Data: mp}, nil
+func (mapHooksType) unit(lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	var mp map[m.KMapKey]m.KReference
+	return interpreter.Model.NewMap(sort, m.CollectionFor(lbl), mp), nil
 }
 
-func (mh mapHooksType) lookup(kmap m.K, key m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (mh mapHooksType) lookup(kmap m.KReference, key m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return mh.lookupOrDefault(kmap, key, m.InternedBottom, lbl, sort, config, interpreter)
 }
 
-func (mapHooksType) lookupOrDefault(kmap m.K, key m.K, defaultRes m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	if mp, isMap := kmap.(*m.Map); isMap {
-		kkey, keyOk := m.MapKey(key)
+func (mapHooksType) lookupOrDefault(kmap m.KReference, key m.KReference, defaultRes m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	if mp, isMap := interpreter.Model.GetMapObject(kmap); isMap {
+		kkey, keyOk := interpreter.Model.MapKey(key)
 		if !keyOk {
 			return defaultRes, nil
 		}
@@ -44,62 +44,62 @@ func (mapHooksType) lookupOrDefault(kmap m.K, key m.K, defaultRes m.K, lbl m.KLa
 		return defaultRes, nil
 	}
 
-	if _, isBottom := kmap.(*m.Bottom); isBottom {
+	if m.IsBottom(kmap) {
 		return m.InternedBottom, nil
 	}
 
 	return invalidArgsResult()
 }
 
-func (mapHooksType) update(kmap m.K, key m.K, newValue m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
+func (mapHooksType) update(kmap m.KReference, key m.KReference, newValue m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
 	if !isMap {
 		return invalidArgsResult()
 	}
-	kkey, keyOk := m.MapKey(key)
+	kkey, keyOk := interpreter.Model.MapKey(key)
 	if !keyOk {
 		return m.NoResult, errInvalidMapKey
 	}
 	// implementing it as an "immutable" map
 	// that is, creating a copy for each update (for now)
 	// not the most efficient, not sure if necessary, but it is the safest
-	newData := make(map[m.KMapKey]m.K)
+	newData := make(map[m.KMapKey]m.KReference)
 	for oldKey, oldValue := range mp.Data {
 		newData[oldKey] = oldValue
 	}
 	newData[kkey] = newValue
-	return &m.Map{Sort: mp.Sort, Label: mp.Label, Data: newData}, nil
+	return interpreter.Model.NewMap(mp.Sort, mp.Label, newData), nil
 }
 
-func (mapHooksType) remove(kmap m.K, key m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
+func (mapHooksType) remove(kmap m.KReference, key m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
 	if !isMap {
 		return invalidArgsResult()
 	}
-	kkey, keyOk := m.MapKey(key)
+	kkey, keyOk := interpreter.Model.MapKey(key)
 	if !keyOk {
 		return m.NoResult, errInvalidMapKey
 	}
 	// no updating of input map
-	newData := make(map[m.KMapKey]m.K)
+	newData := make(map[m.KMapKey]m.KReference)
 	for oldKey, oldValue := range mp.Data {
 		if oldKey != kkey {
 			newData[oldKey] = oldValue
 		}
 	}
-	return &m.Map{Sort: mp.Sort, Label: mp.Label, Data: newData}, nil
+	return interpreter.Model.NewMap(mp.Sort, mp.Label, newData), nil
 }
 
-func (mapHooksType) concat(kmap1 m.K, kmap2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	m1, isMap1 := kmap1.(*m.Map)
-	m2, isMap2 := kmap2.(*m.Map)
+func (mapHooksType) concat(kmap1 m.KReference, kmap2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	m1, isMap1 := interpreter.Model.GetMapObject(kmap1)
+	m2, isMap2 := interpreter.Model.GetMapObject(kmap2)
 	if !isMap1 || !isMap2 {
 		return invalidArgsResult()
 	}
 	if m1.Label != m2.Label {
 		return invalidArgsResult()
 	}
-	data := make(map[m.KMapKey]m.K)
+	data := make(map[m.KMapKey]m.KReference)
 	for key, value := range m1.Data {
 		data[key] = value
 	}
@@ -113,19 +113,19 @@ func (mapHooksType) concat(kmap1 m.K, kmap2 m.K, lbl m.KLabel, sort m.Sort, conf
 			data[key] = value
 		}
 	}
-	return &m.Map{Sort: m1.Sort, Label: m1.Label, Data: data}, nil
+	return interpreter.Model.NewMap(m1.Sort, m2.Label, data), nil
 }
 
-func (mapHooksType) difference(kmap1 m.K, kmap2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	m1, isMap1 := kmap1.(*m.Map)
-	m2, isMap2 := kmap2.(*m.Map)
+func (mapHooksType) difference(kmap1 m.KReference, kmap2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	m1, isMap1 := interpreter.Model.GetMapObject(kmap1)
+	m2, isMap2 := interpreter.Model.GetMapObject(kmap2)
 	if !isMap1 || !isMap2 {
 		return invalidArgsResult()
 	}
 	if m1.Label != m2.Label {
 		return invalidArgsResult()
 	}
-	data := make(map[m.KMapKey]m.K)
+	data := make(map[m.KMapKey]m.KReference)
 	for key, value := range m1.Data {
 		_, exists := m2.Data[key]
 		if !exists {
@@ -133,11 +133,11 @@ func (mapHooksType) difference(kmap1 m.K, kmap2 m.K, lbl m.KLabel, sort m.Sort, 
 		}
 
 	}
-	return &m.Map{Sort: m1.Sort, Label: m1.Label, Data: data}, nil
+	return interpreter.Model.NewMap(m1.Sort, m2.Label, data), nil
 }
 
-func (mapHooksType) keys(kmap m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
+func (mapHooksType) keys(kmap m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
 	if !isMap {
 		return invalidArgsResult()
 	}
@@ -145,72 +145,72 @@ func (mapHooksType) keys(kmap m.K, lbl m.KLabel, sort m.Sort, config m.K, interp
 	for key := range mp.Data {
 		keySet[key] = true
 	}
-	return &m.Set{Sort: m.SortSet, Label: m.KLabelForSet, Data: keySet}, nil
+	return interpreter.Model.NewSet(m.SortSet, mp.Label, keySet), nil
 }
 
-func (mapHooksType) keysList(kmap m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
+func (mapHooksType) keysList(kmap m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
 	if !isMap {
 		return invalidArgsResult()
 	}
-	var keyList []m.K
+	var keyList []m.KReference
 	for key := range mp.Data {
-		keyAsKItem, err := key.ToKItem()
+		keyAsKItem, err := interpreter.Model.ToKItem(key)
 		if err != nil {
 			return m.NoResult, err
 		}
 		keyList = append(keyList, keyAsKItem)
 	}
-	return &m.List{Sort: m.SortList, Label: m.KLabelForList, Data: keyList}, nil
+	return interpreter.Model.NewList(m.SortList, m.KLabelForList, keyList), nil
 }
 
-func (mapHooksType) inKeys(key m.K, kmap m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
+func (mapHooksType) inKeys(key m.KReference, kmap m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
 	if !isMap {
 		return invalidArgsResult()
 	}
-	kkey, keyOk := m.MapKey(key)
+	kkey, keyOk := interpreter.Model.MapKey(key)
 	if !keyOk {
 		return m.NoResult, errInvalidMapKey
 	}
 	_, keyExists := mp.Data[kkey]
-	return m.ToBool(keyExists), nil
+	return m.ToKBool(keyExists), nil
 }
 
-func (mapHooksType) values(kmap m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
+func (mapHooksType) values(kmap m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
 	if !isMap {
 		return invalidArgsResult()
 	}
-	var valueList []m.K
+	var valueList []m.KReference
 	for _, value := range mp.Data {
 		valueList = append(valueList, value)
 	}
-	return &m.List{Sort: m.SortList, Label: m.KLabelForList, Data: valueList}, nil
+	return interpreter.Model.NewList(m.SortList, m.KLabelForList, valueList), nil
 }
 
-func (mapHooksType) choice(kmap m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
+func (mapHooksType) choice(kmap m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
 	if !isMap {
 		return invalidArgsResult()
 	}
 	for key := range mp.Data {
-		return key.ToKItem()
+		return interpreter.Model.ToKItem(key)
 	}
 	return invalidArgsResult()
 }
 
-func (mapHooksType) size(kmap m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
+func (mapHooksType) size(kmap m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
 	if !isMap {
 		return invalidArgsResult()
 	}
-	return m.NewIntFromInt(len(mp.Data)), nil
+	return interpreter.Model.FromInt(len(mp.Data)), nil
 }
 
-func (mapHooksType) inclusion(kmap1 m.K, kmap2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	m1, isMap1 := kmap1.(*m.Map)
-	m2, isMap2 := kmap2.(*m.Map)
+func (mapHooksType) inclusion(kmap1 m.KReference, kmap2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	m1, isMap1 := interpreter.Model.GetMapObject(kmap1)
+	m2, isMap2 := interpreter.Model.GetMapObject(kmap2)
 	if !isMap1 || !isMap2 {
 		return invalidArgsResult()
 	}
@@ -226,32 +226,32 @@ func (mapHooksType) inclusion(kmap1 m.K, kmap2 m.K, lbl m.KLabel, sort m.Sort, c
 	return m.BoolTrue, nil
 }
 
-func (mapHooksType) updateAll(kmap1 m.K, kmap2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	m1, isMap1 := kmap1.(*m.Map)
-	m2, isMap2 := kmap2.(*m.Map)
+func (mapHooksType) updateAll(kmap1 m.KReference, kmap2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	m1, isMap1 := interpreter.Model.GetMapObject(kmap1)
+	m2, isMap2 := interpreter.Model.GetMapObject(kmap2)
 	if !isMap1 || !isMap2 {
 		return invalidArgsResult()
 	}
 	if m1.Label != m2.Label {
 		return invalidArgsResult()
 	}
-	data := make(map[m.KMapKey]m.K)
+	data := make(map[m.KMapKey]m.KReference)
 	for key, value := range m1.Data {
 		data[key] = value
 	}
 	for key, value := range m2.Data {
 		data[key] = value
 	}
-	return &m.Map{Sort: m1.Sort, Label: m1.Label, Data: data}, nil
+	return interpreter.Model.NewMap(m1.Sort, m2.Label, data), nil
 }
 
-func (mapHooksType) removeAll(kmap m.K, kset m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	mp, isMap := kmap.(*m.Map)
-	s, isSet := kset.(*m.Set)
+func (mapHooksType) removeAll(kmap m.KReference, kset m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	mp, isMap := interpreter.Model.GetMapObject(kmap)
+	s, isSet := interpreter.Model.GetSetObject(kset)
 	if !isMap || !isSet {
 		return invalidArgsResult()
 	}
-	data := make(map[m.KMapKey]m.K)
+	data := make(map[m.KMapKey]m.KReference)
 	for key, value := range mp.Data {
 		_, exists := s.Data[key]
 		if !exists {
@@ -259,5 +259,5 @@ func (mapHooksType) removeAll(kmap m.K, kset m.K, lbl m.KLabel, sort m.Sort, con
 		}
 
 	}
-	return &m.Map{Sort: mp.Sort, Label: mp.Label, Data: data}, nil
+	return interpreter.Model.NewMap(mp.Sort, mp.Label, data), nil
 }

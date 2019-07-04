@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 package ieletestinginterpreter
 
@@ -10,48 +10,63 @@ type kreflectionHooksType int
 
 const kreflectionHooks kreflectionHooksType = 0
 
-func (kreflectionHooksType) sort(c m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	switch k := c.(type) {
-	case *m.KToken:
-		return m.NewString(k.Sort.Name()), nil
-	case *m.Int:
-		return m.NewString("Int"), nil
-	case *m.String:
-		return m.NewString("String"), nil
-	case *m.Bytes:
-		return m.NewString("Bytes"), nil
-	case *m.Bool:
-		return m.NewString("Bool"), nil
-	case *m.Map:
-		return m.NewString(k.Sort.Name()), nil
-	case *m.List:
-		return m.NewString(k.Sort.Name()), nil
-	case *m.Set:
-		return m.NewString(k.Sort.Name()), nil
-	default:
-		return m.NoResult, &hookNotImplementedError{}
+var constKReflectionSortInt = m.NewStringConstant("Int")
+var constKReflectionSortString = m.NewStringConstant("String")
+var constKReflectionSortBytes = m.NewStringConstant("Bytes")
+var constKReflectionSortbool = m.NewStringConstant("Bool")
+
+func (kreflectionHooksType) sort(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	if obj, t := interpreter.Model.GetKTokenObject(c); t {
+		return interpreter.Model.NewString(obj.Sort.Name()), nil
 	}
+	if m.IsInt(c) {
+		return constKReflectionSortInt, nil
+	}
+	if m.IsString(c) {
+		return constKReflectionSortString, nil
+	}
+	if m.IsBytes(c) {
+		return constKReflectionSortBytes, nil
+	}
+	if m.IsBool(c) {
+		return constKReflectionSortbool, nil
+	}
+	if obj, t := interpreter.Model.GetMapObject(c); t {
+		return interpreter.Model.NewString(obj.Sort.Name()), nil
+	}
+	if obj, t := interpreter.Model.GetListObject(c); t {
+		return interpreter.Model.NewString(obj.Sort.Name()), nil
+	}
+	if obj, t := interpreter.Model.GetSetObject(c); t {
+		return interpreter.Model.NewString(obj.Sort.Name()), nil
+	}
+	if obj, t := interpreter.Model.GetArrayObject(c); t {
+		return interpreter.Model.NewString(obj.Sort.Name()), nil
+	}
+
+	return m.NoResult, &hookNotImplementedError{}
+
 }
 
-func (kreflectionHooksType) getKLabel(c m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	if k, t := c.(*m.KApply); t {
-		return &m.InjectedKLabel{Label: k.Label}, nil
+func (kreflectionHooksType) getKLabel(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	if k, t := interpreter.Model.GetKApplyObject(c); t {
+		return interpreter.Model.NewInjectedKLabel(k.Label), nil
 	}
 	return m.InternedBottom, nil
 }
 
-func (kreflectionHooksType) configuration(lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (kreflectionHooksType) configuration(lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return config, nil
 }
 
 var freshCounter int
 
-func (kreflectionHooksType) fresh(c m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	if k, t := c.(*m.String); t {
+func (kreflectionHooksType) fresh(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	if k, t := interpreter.Model.GetStringObject(c); t {
 		sort := m.ParseSort(k.Value)
 		result, err := interpreter.freshFunction(sort, config, freshCounter)
 		if err != nil {
-		    return m.NoResult, err
+			return m.NoResult, err
 		}
 		freshCounter++
 		return result, nil
@@ -59,14 +74,14 @@ func (kreflectionHooksType) fresh(c m.K, lbl m.KLabel, sort m.Sort, config m.K, 
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (kreflectionHooksType) isConcrete(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (kreflectionHooksType) isConcrete(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.BoolTrue, nil
 }
 
-func (kreflectionHooksType) getenv(c m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (kreflectionHooksType) getenv(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (kreflectionHooksType) argv(lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (kreflectionHooksType) argv(lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }

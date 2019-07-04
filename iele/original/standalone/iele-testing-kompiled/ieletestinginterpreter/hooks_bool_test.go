@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 package ieletestinginterpreter
 
@@ -9,7 +9,7 @@ import (
 
 func TestBoolHooks(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var z m.K
+	var z m.KReference
 	var err error
 
 	z, err = boolHooks.and(m.BoolTrue, m.BoolTrue, m.LblDummy, m.SortBool, m.InternedBottom, interpreter)
@@ -116,11 +116,11 @@ func TestBoolHooks(t *testing.T) {
 
 }
 
-func assertBoolOk(t *testing.T, expected bool, actual m.K, err error, interpreter *Interpreter) {
+func assertBoolOk(t *testing.T, expected bool, actual m.KReference, err error, interpreter *Interpreter) {
 	if err != nil {
 		t.Error(err, interpreter)
 	}
-	expectedK := m.ToBool(expected)
+	expectedK := m.ToKBool(expected)
 	if !interpreter.Model.Equals(actual, expectedK) {
 		t.Errorf("Unexpected result. Got:%s Want:%s",
 			interpreter.Model.PrettyPrint(actual),

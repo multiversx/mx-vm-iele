@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 package ieletestinginterpreter
 
@@ -33,46 +33,46 @@ func TestAssembleKSequenceEmpty4(t *testing.T) {
 
 func TestAssembleKSequence1(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.AssembleKSequence(m.NewIntFromInt(1), m.NewIntFromInt(2))
+	kseq := interpreter.Model.AssembleKSequence(interpreter.Model.FromInt(1), interpreter.Model.FromInt(2))
 	assertKSequenceOfInts(t, kseq, interpreter, 1, 2)
 }
 
 func TestAssembleKSequence2(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.AssembleKSequence(m.EmptyKSequence, m.NewIntFromInt(1), m.NewIntFromInt(2), m.EmptyKSequence)
+	kseq := interpreter.Model.AssembleKSequence(m.EmptyKSequence, interpreter.Model.FromInt(1), interpreter.Model.FromInt(2), m.EmptyKSequence)
 	assertKSequenceOfInts(t, kseq, interpreter, 1, 2)
 }
 
 func TestAssembleKSequence3(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.AssembleKSequence(m.NewIntFromInt(1))
+	kseq := interpreter.Model.AssembleKSequence(interpreter.Model.FromInt(1))
 	assertIntOk(t, "1", kseq, nil, interpreter)
 }
 
 func TestAssembleKSequence4(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.AssembleKSequence(m.NewIntFromInt(1), m.EmptyKSequence)
+	kseq := interpreter.Model.AssembleKSequence(interpreter.Model.FromInt(1), m.EmptyKSequence)
 	assertIntOk(t, "1", kseq, nil, interpreter)
 }
 
 func TestAssembleKSequence5(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.AssembleKSequence(m.EmptyKSequence, m.NewIntFromInt(1))
+	kseq := interpreter.Model.AssembleKSequence(m.EmptyKSequence, interpreter.Model.FromInt(1))
 	assertIntOk(t, "1", kseq, nil, interpreter)
 }
 
 func TestAssembleKSequenceNest1(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq1 := interpreter.Model.AssembleKSequence(m.NewIntFromInt(1), m.NewIntFromInt(2))
-	kseq2 := interpreter.Model.AssembleKSequence(m.NewIntFromInt(3), m.NewIntFromInt(4))
+	kseq1 := interpreter.Model.AssembleKSequence(interpreter.Model.FromInt(1), interpreter.Model.FromInt(2))
+	kseq2 := interpreter.Model.AssembleKSequence(interpreter.Model.FromInt(3), interpreter.Model.FromInt(4))
 	kseq3 := interpreter.Model.AssembleKSequence(kseq1, kseq2)
 	assertKSequenceOfInts(t, kseq3, interpreter, 1, 2, 3, 4)
 }
 
 func TestAssembleKSequenceNest2(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq1 := interpreter.Model.AssembleKSequence(m.NewIntFromInt(1), m.NewIntFromInt(2), m.EmptyKSequence)
-	kseq2 := interpreter.Model.AssembleKSequence(m.NewIntFromInt(3), m.EmptyKSequence, m.NewIntFromInt(4))
+	kseq1 := interpreter.Model.AssembleKSequence(interpreter.Model.FromInt(1), interpreter.Model.FromInt(2), m.EmptyKSequence)
+	kseq2 := interpreter.Model.AssembleKSequence(interpreter.Model.FromInt(3), m.EmptyKSequence, interpreter.Model.FromInt(4))
 	kseq3 := interpreter.Model.AssembleKSequence(kseq1, m.EmptyKSequence, kseq2)
 	assertKSequenceOfInts(t, kseq3, interpreter, 1, 2, 3, 4)
 }
@@ -80,12 +80,12 @@ func TestAssembleKSequenceNest2(t *testing.T) {
 func TestAssembleKSequenceNest3(t *testing.T) {
 	interpreter := newTestInterpreter()
 	kseq1 := interpreter.Model.AssembleKSequence(m.EmptyKSequence)
-	kseq2 := interpreter.Model.AssembleKSequence(m.NewIntFromInt(3), m.EmptyKSequence, m.NewIntFromInt(4))
+	kseq2 := interpreter.Model.AssembleKSequence(interpreter.Model.FromInt(3), m.EmptyKSequence, interpreter.Model.FromInt(4))
 	kseq3 := interpreter.Model.AssembleKSequence(kseq1, m.EmptyKSequence, kseq2)
 	assertKSequenceOfInts(t, kseq3, interpreter, 3, 4)
 }
 
-func assertKSequenceEmpty(t *testing.T, actual m.K, interpreter *Interpreter) {
+func assertKSequenceEmpty(t *testing.T, actual m.KReference, interpreter *Interpreter) {
 	expected := m.EmptyKSequence
 	if !interpreter.Model.Equals(actual, expected) {
 		t.Errorf("Unexpected result. Got:%s Want:%s",
@@ -96,42 +96,42 @@ func assertKSequenceEmpty(t *testing.T, actual m.K, interpreter *Interpreter) {
 
 func TestSubSequence1(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.NewKSequence([]m.K{m.NewIntFromInt(1), m.NewIntFromInt(2)})
+	kseq := interpreter.Model.NewKSequence([]m.KReference{interpreter.Model.FromInt(1), interpreter.Model.FromInt(2)})
 	sub := interpreter.Model.KSequenceSub(kseq, 0)
 	assertKSequenceOfInts(t, sub, interpreter, 1, 2)
 }
 
 func TestSubSequence2(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.NewKSequence([]m.K{m.NewIntFromInt(1), m.NewIntFromInt(2)})
+	kseq := interpreter.Model.NewKSequence([]m.KReference{interpreter.Model.FromInt(1), interpreter.Model.FromInt(2)})
 	sub := interpreter.Model.KSequenceSub(kseq, 1)
 	assertKSequenceOfInts(t, sub, interpreter, 2)
 }
 
 func TestSubSequence3(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.NewKSequence([]m.K{m.NewIntFromInt(1), m.NewIntFromInt(2)})
+	kseq := interpreter.Model.NewKSequence([]m.KReference{interpreter.Model.FromInt(1), interpreter.Model.FromInt(2)})
 	sub := interpreter.Model.KSequenceSub(kseq, 2)
 	assertKSequenceEmpty(t, sub, interpreter)
 }
 
 func TestSubSequenceAssemble1(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.NewKSequence([]m.K{m.NewIntFromInt(1), m.NewIntFromInt(2)})
+	kseq := interpreter.Model.NewKSequence([]m.KReference{interpreter.Model.FromInt(1), interpreter.Model.FromInt(2)})
 	sub := interpreter.Model.AssembleKSequence(interpreter.Model.KSequenceSub(kseq, 0))
 	assertKSequenceOfInts(t, sub, interpreter, 1, 2)
 }
 
 func TestSubSequenceAssemble2(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.NewKSequence([]m.K{m.NewIntFromInt(1), m.NewIntFromInt(2)})
+	kseq := interpreter.Model.NewKSequence([]m.KReference{interpreter.Model.FromInt(1), interpreter.Model.FromInt(2)})
 	sub := interpreter.Model.AssembleKSequence(interpreter.Model.KSequenceGet(kseq, 0), interpreter.Model.KSequenceSub(kseq, 1))
 	assertKSequenceOfInts(t, sub, interpreter, 1, 2)
 }
 
 func TestSubSequenceAssemble3(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.NewKSequence([]m.K{m.NewIntFromInt(1), m.NewIntFromInt(2)})
+	kseq := interpreter.Model.NewKSequence([]m.KReference{interpreter.Model.FromInt(1), interpreter.Model.FromInt(2)})
 	sub := interpreter.Model.AssembleKSequence(
 		interpreter.Model.KSequenceGet(kseq, 0),
 		interpreter.Model.KSequenceGet(kseq, 1),
@@ -150,7 +150,7 @@ func TestSubSequenceEmpty(t *testing.T) {
 
 func TestKSequenceLength(t *testing.T) {
 	interpreter := newTestInterpreter()
-	kseq := interpreter.Model.NewKSequence([]m.K{m.NewIntFromInt(1), m.NewIntFromInt(2)})
+	kseq := interpreter.Model.NewKSequence([]m.KReference{interpreter.Model.FromInt(1), interpreter.Model.FromInt(2)})
 
 	length := interpreter.Model.KSequenceLength(kseq)
 	if length != 2 {
@@ -158,10 +158,10 @@ func TestKSequenceLength(t *testing.T) {
 	}
 }
 
-func assertKSequenceOfInts(t *testing.T, actual m.K, interpreter *Interpreter, ints ...int) {
-	var ks []m.K
+func assertKSequenceOfInts(t *testing.T, actual m.KReference, interpreter *Interpreter, ints ...int) {
+	var ks []m.KReference
 	for _, i := range ints {
-		ks = append(ks, m.NewIntFromInt(i))
+		ks = append(ks, interpreter.Model.FromInt(i))
 	}
 	expected := interpreter.Model.NewKSequence(ks)
 	if !interpreter.Model.Equals(actual, expected) {

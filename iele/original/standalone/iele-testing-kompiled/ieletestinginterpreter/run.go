@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 package ieletestinginterpreter
 
@@ -49,17 +49,18 @@ func (i *Interpreter) ExecuteSimple(kdir string, execFile string) {
 
 // Execute interprets the program with the structure
 func (i *Interpreter) Execute(kastMap map[string][]byte) error {
-	kConfigMap := make(map[m.KMapKey]m.K)
+	kConfigMap := make(map[m.KMapKey]m.KReference)
 	for key, kastValue := range kastMap {
-		ktoken := m.KToken{Sort: m.SortKConfigVar, Value: "$" + key}
+		ktokenRef := i.Model.NewKToken(m.SortKConfigVar, "$"+key)
+		ktokenKey, _ := i.Model.MapKey(ktokenRef)
 		parsedValue := koreparser.Parse(kastValue)
 		kValue := i.convertParserModelToKModel(parsedValue)
-		kConfigMap[ktoken] = kValue
+		kConfigMap[ktokenKey] = kValue
 	}
 
 	// top cell initialization
-	kmap := &m.Map{Sort: m.SortMap, Label: m.KLabelForMap, Data: kConfigMap}
-	evalK := &m.KApply{Label: TopCellInitializer, List: []m.K{kmap}}
+	kmap := i.Model.NewMap(m.SortMap, m.KLabelForMap, kConfigMap)
+	evalK := i.Model.NewKApply(TopCellInitializer, kmap)
 	kinit, err := i.Eval(evalK, m.InternedBottom)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -76,7 +77,7 @@ func (i *Interpreter) Execute(kastMap map[string][]byte) error {
 }
 
 // TakeStepsNoThread executes as many steps as possible given the starting configuration
-func (i *Interpreter) TakeStepsNoThread(k m.K) error {
+func (i *Interpreter) TakeStepsNoThread(k m.KReference) error {
 	i.initializeTrace()
 	defer i.closeTrace()
 
@@ -133,8 +134,20 @@ func (i *Interpreter) runSteps(maxSteps int) error {
 			return errMaxStepsReached
 		}
 		i.traceStepStart()
-		var err error
-		i.state, err = i.step(i.state)
+
+		// decrease all usages from the previous state
+		previousState := i.state
+		i.Model.DecreaseUsage(previousState)
+
+        var err error
+		i.state, err = i.step(previousState)
+
+		// increase all usages for the current state
+		i.Model.IncreaseUsage(i.state)
+
+		// recycle everything that didn't show up in the new state
+        i.Model.RecycleUnused(previousState)
+
 		if err == nil {
 			i.traceStepEnd()
 			i.currentStep++

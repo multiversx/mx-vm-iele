@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 package ieletestinginterpreter
 
@@ -10,75 +10,75 @@ type ioHooksType int
 
 const ioHooks ioHooksType = 0
 
-func (ioHooksType) close(c m.K,lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) close(c m.KReference,lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) getc(c m.K,lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) getc(c m.KReference,lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) open(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) open(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) putc(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) putc(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) read(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) read(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) seek(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) seek(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) seekEnd(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) seekEnd(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) tell(c m.K,lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) tell(c m.KReference,lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) write(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) write(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) lock(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) lock(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) unlock(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) unlock(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) log(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) log(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) stat(c m.K,lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) stat(c m.KReference,lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) lstat(c m.K,lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) lstat(c m.KReference,lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) opendir(c m.K,lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) opendir(c m.KReference,lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) parse(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) parse(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) parseInModule(c1 m.K, c2 m.K, c3 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) parseInModule(c1 m.KReference, c2 m.KReference, c3 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (ioHooksType) system(c m.K,lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (ioHooksType) system(c m.KReference,lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return m.NoResult, &hookNotImplementedError{}
 }
 

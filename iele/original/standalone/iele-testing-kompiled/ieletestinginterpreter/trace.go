@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-24 23:27:10.928
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:18:31.546
 
 // Handles generation of traces
 // (what rules were applied, in what order, what were the intermediate states).
@@ -17,10 +17,10 @@ var traceHandlers []traceHandler
 type traceHandler interface {
 	initialize()
 	closeTrace()
-	traceInitialState(state m.K)
-	traceStepStart(stepNr int, currentState m.K)
-	traceStepEnd(stepNr int, currentState m.K)
-	traceNoStep(stepNr int, currentState m.K)
+	traceInitialState(state m.KReference)
+	traceStepStart(stepNr int, currentState m.KReference)
+	traceStepEnd(stepNr int, currentState m.KReference)
+	traceNoStep(stepNr int, currentState m.KReference)
 	traceRuleApply(ruleType string, stepNr int, ruleInfo string)
 }
 
@@ -36,7 +36,7 @@ func (i *Interpreter) closeTrace() {
 	}
 }
 
-func (i *Interpreter) traceInitialState(state m.K) {
+func (i *Interpreter) traceInitialState(state m.KReference) {
 	for _, t := range i.traceHandlers {
 		t.traceInitialState(state)
 	}
