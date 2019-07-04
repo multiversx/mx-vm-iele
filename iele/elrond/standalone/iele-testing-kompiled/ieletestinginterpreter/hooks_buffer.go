@@ -1,34 +1,33 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-25 00:00:28.701
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:14:15.638
 
 package ieletestinginterpreter
 
 import (
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/standalone/iele-testing-kompiled/ieletestingmodel"
-	"strings"
 )
 
 type bufferHooksType int
 
 const bufferHooks bufferHooksType = 0
 
-func (bufferHooksType) empty(lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	return &m.StringBuffer{Value: strings.Builder{}}, nil
+func (bufferHooksType) empty(lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	return interpreter.Model.NewStringBuffer(), nil
 }
 
-func (bufferHooksType) concat(kbuf m.K, kstr m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	buf, ok1 := kbuf.(*m.StringBuffer)
-	str, ok2 := kstr.(*m.String)
+func (bufferHooksType) concat(kbuf m.KReference, kstr m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	buf, ok1 := interpreter.Model.GetStringBufferObject(kbuf)
+	str, ok2 := interpreter.Model.GetStringObject(kstr)
 	if !ok1 || !ok2 {
 		return invalidArgsResult()
 	}
 	buf.Value.WriteString(str.Value)
-	return buf, nil
+	return kbuf, nil
 }
 
-func (bufferHooksType) toString(kbuf m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	buf, ok := kbuf.(*m.StringBuffer)
+func (bufferHooksType) toString(kbuf m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	buf, ok := interpreter.Model.GetStringBufferObject(kbuf)
 	if !ok {
 		return invalidArgsResult()
 	}
-	return m.NewString(buf.Value.String()), nil
+	return interpreter.Model.NewString(buf.Value.String()), nil
 }

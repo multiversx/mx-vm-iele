@@ -1,6 +1,6 @@
 package ieletestinginterpreter
 
-// File provided by the K Framework Go backend. Timestamp: 2019-06-25 00:00:28.701
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:14:15.638
 
 import (
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/standalone/iele-testing-kompiled/ieletestingmodel"
@@ -9,134 +9,134 @@ import (
 
 func TestArrayMake(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
-	var int3 = m.NewIntFromInt(3)
-	var int5 = m.NewIntFromInt(5)
+	var int3 = interpreter.Model.FromInt(3)
+	var int5 = interpreter.Model.FromInt(5)
 	var bottom = m.InternedBottom
 
 	arr, err = arrayHooks.makeEmpty(int3, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, bottom, bottom}, arr, err, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, bottom, bottom}, arr, err, interpreter)
 
 	arr, err = arrayHooks.make(int3, int5, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, int5, []m.K{int5, int5, int5}, arr, err, interpreter)
+	assertArrayOk(t, int5, []m.KReference{int5, int5, int5}, arr, err, interpreter)
 
 	arr, err = arrayHooks.ctor(bottom, int5, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, bottom, bottom, bottom, bottom}, arr, err, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, bottom, bottom, bottom, bottom}, arr, err, interpreter)
 
 }
 
 // Without default (default = bottom)
 func TestArrayMakeUpdateRemoveLookup1(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
-	var elem m.K
-	var int3 = m.NewIntFromInt(3)
-	var int5 = m.NewIntFromInt(5)
-	var int7 = m.NewIntFromInt(7)
+	var elem m.KReference
+	var int3 = interpreter.Model.FromInt(3)
+	var int5 = interpreter.Model.FromInt(5)
+	var int7 = interpreter.Model.FromInt(7)
 	var bottom = m.InternedBottom
 
 	// create
 	arr, err = arrayHooks.makeEmpty(int3, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, bottom, bottom}, arr, err, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, bottom, bottom}, arr, err, interpreter)
 
 	// updates
-	arrayHooks.update(arr, m.NewIntFromInt(1), int5, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, int5, bottom}, arr, err, interpreter)
+	arrayHooks.update(arr, interpreter.Model.FromInt(1), int5, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, int5, bottom}, arr, err, interpreter)
 
-	arrayHooks.update(arr, m.NewIntFromInt(2), int7, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, int5, int7}, arr, err, interpreter)
+	arrayHooks.update(arr, interpreter.Model.FromInt(2), int7, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, int5, int7}, arr, err, interpreter)
 
 	// test some lookups
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(0), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(0), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertBottomOk(t, elem, err, interpreter)
 
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertIntOk(t, "5", elem, err, interpreter)
 
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(2), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(2), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertIntOk(t, "7", elem, err, interpreter)
 
 	// remove
-	arrayHooks.remove(arr, m.NewIntFromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, bottom, int7}, arr, err, interpreter)
+	arrayHooks.remove(arr, interpreter.Model.FromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, bottom, int7}, arr, err, interpreter)
 
 	// lookup again
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertBottomOk(t, elem, err, interpreter)
 }
 
 // With default
 func TestArrayMakeUpdateRemoveLookup2(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
-	var elem m.K
-	var int3 = m.NewIntFromInt(3)
-	var int5 = m.NewIntFromInt(5)
-	var int7 = m.NewIntFromInt(7)
-	var defElem = m.NewIntFromInt(20)
+	var elem m.KReference
+	var int3 = interpreter.Model.FromInt(3)
+	var int5 = interpreter.Model.FromInt(5)
+	var int7 = interpreter.Model.FromInt(7)
+	var defElem = interpreter.Model.FromInt(20)
 
 	// create
 	arr, err = arrayHooks.make(int3, defElem, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, defElem, []m.K{defElem, defElem, defElem}, arr, err, interpreter)
+	assertArrayOk(t, defElem, []m.KReference{defElem, defElem, defElem}, arr, err, interpreter)
 
 	// updates
-	arrayHooks.update(arr, m.NewIntFromInt(1), int5, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, defElem, []m.K{defElem, int5, defElem}, arr, err, interpreter)
+	arrayHooks.update(arr, interpreter.Model.FromInt(1), int5, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, defElem, []m.KReference{defElem, int5, defElem}, arr, err, interpreter)
 
-	arrayHooks.update(arr, m.NewIntFromInt(2), int7, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, defElem, []m.K{defElem, int5, int7}, arr, err, interpreter)
+	arrayHooks.update(arr, interpreter.Model.FromInt(2), int7, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, defElem, []m.KReference{defElem, int5, int7}, arr, err, interpreter)
 
 	// test some lookups
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(0), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(0), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertIntOk(t, "20", elem, err, interpreter)
 
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertIntOk(t, "5", elem, err, interpreter)
 
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(2), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(2), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertIntOk(t, "7", elem, err, interpreter)
 
 	// remove
-	arrayHooks.remove(arr, m.NewIntFromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, defElem, []m.K{defElem, defElem, int7}, arr, err, interpreter)
+	arrayHooks.remove(arr, interpreter.Model.FromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, defElem, []m.KReference{defElem, defElem, int7}, arr, err, interpreter)
 
 	// lookup again
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(1), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertIntOk(t, "20", elem, err, interpreter)
 }
 
 func TestArrayIncreaseSize(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
-	var elem m.K
-	var defElem = m.NewIntFromInt(120)
+	var elem m.KReference
+	var defElem = interpreter.Model.FromInt(120)
 
 	// create
-	arr, err = arrayHooks.make(m.NewIntFromInt(20), defElem, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, defElem, []m.K{defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem}, arr, err, interpreter)
+	arr, err = arrayHooks.make(interpreter.Model.FromInt(20), defElem, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, defElem, []m.KReference{defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem}, arr, err, interpreter)
 
 	// grow
-	_, err = arrayHooks.update(arr, m.NewIntFromInt(11), m.NewIntFromInt(500), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, defElem, []m.K{defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, m.NewIntFromInt(500)}, arr, err, interpreter)
+	_, err = arrayHooks.update(arr, interpreter.Model.FromInt(11), interpreter.Model.FromInt(500), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, defElem, []m.KReference{defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, interpreter.Model.FromInt(500)}, arr, err, interpreter)
 
 	// remove
-	_, err = arrayHooks.remove(arr, m.NewIntFromInt(11), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, defElem, []m.K{defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem}, arr, err, interpreter)
+	_, err = arrayHooks.remove(arr, interpreter.Model.FromInt(11), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, defElem, []m.KReference{defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem, defElem}, arr, err, interpreter)
 
 	// test below the limit
-	_, err = arrayHooks.update(arr, m.NewIntFromInt(19), m.NewIntFromInt(700), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	_, err = arrayHooks.update(arr, interpreter.Model.FromInt(19), interpreter.Model.FromInt(700), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	if err != nil {
 		t.Error(err, interpreter)
 	}
-	elem, err = arrayHooks.lookup(arr, m.NewIntFromInt(19), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	elem, err = arrayHooks.lookup(arr, interpreter.Model.FromInt(19), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertIntOk(t, "700", elem, err, interpreter)
 
 	// test above the limit
-	_, err = arrayHooks.update(arr, m.NewIntFromInt(20), m.NewIntFromInt(700), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	_, err = arrayHooks.update(arr, interpreter.Model.FromInt(20), interpreter.Model.FromInt(700), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	if err == nil {
 		t.Error("ErrIndexOutOfBounds expected")
 	}
@@ -144,75 +144,85 @@ func TestArrayIncreaseSize(t *testing.T) {
 
 func TestArrayUpdateAll1(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
 	var bottom = m.InternedBottom
 
-	arr, _ = arrayHooks.makeEmpty(m.NewIntFromInt(4), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	list1 := &m.List{Sort: m.SortInt, Data: []m.K{m.NewIntFromInt(1), m.NewIntFromInt(2)}}
-	arrayHooks.updateAll(arr, m.NewIntFromInt(1), list1, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, m.NewIntFromInt(1), m.NewIntFromInt(2), bottom}, arr, err, interpreter)
+	arr, _ = arrayHooks.makeEmpty(interpreter.Model.FromInt(4), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	list1 := interpreter.Model.NewList(m.SortInt, m.KLabelForList,
+		[]m.KReference{
+			interpreter.Model.FromInt(1),
+			interpreter.Model.FromInt(2),
+		})
+	arrayHooks.updateAll(arr, interpreter.Model.FromInt(1), list1, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, interpreter.Model.FromInt(1), interpreter.Model.FromInt(2), bottom}, arr, err, interpreter)
 }
 
 func TestArrayUpdateAll2(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
 	var bottom = m.InternedBottom
 
-	arr, _ = arrayHooks.makeEmpty(m.NewIntFromInt(4), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	list2 := &m.List{Sort: m.SortInt, Data: []m.K{m.NewIntFromInt(1), m.NewIntFromInt(2), m.NewIntFromInt(3), m.NewIntFromInt(4)}}
-	arrayHooks.updateAll(arr, m.NewIntFromInt(1), list2, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, m.NewIntFromInt(1), m.NewIntFromInt(2), m.NewIntFromInt(3)}, arr, err, interpreter)
+	arr, _ = arrayHooks.makeEmpty(interpreter.Model.FromInt(4), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	list2 := interpreter.Model.NewList(m.SortInt, m.KLabelForList,
+		[]m.KReference{
+			interpreter.Model.FromInt(1),
+			interpreter.Model.FromInt(2),
+			interpreter.Model.FromInt(3),
+			interpreter.Model.FromInt(4),
+		})
+	arrayHooks.updateAll(arr, interpreter.Model.FromInt(1), list2, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, interpreter.Model.FromInt(1), interpreter.Model.FromInt(2), interpreter.Model.FromInt(3)}, arr, err, interpreter)
 }
 
 func TestArrayFill1(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
 	var bottom = m.InternedBottom
-	var fill = m.NewIntFromInt(123)
+	var fill = interpreter.Model.FromInt(123)
 
-	arr, _ = arrayHooks.makeEmpty(m.NewIntFromInt(4), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	arrayHooks.fill(arr, m.NewIntFromInt(1), m.NewIntFromInt(3), fill, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, fill, fill, bottom}, arr, err, interpreter)
+	arr, _ = arrayHooks.makeEmpty(interpreter.Model.FromInt(4), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	arrayHooks.fill(arr, interpreter.Model.FromInt(1), interpreter.Model.FromInt(3), fill, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, fill, fill, bottom}, arr, err, interpreter)
 }
 
 func TestArrayFill2(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
 	var bottom = m.InternedBottom
-	var fill = m.NewIntFromInt(123)
+	var fill = interpreter.Model.FromInt(123)
 
-	arr, _ = arrayHooks.makeEmpty(m.NewIntFromInt(4), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	arrayHooks.fill(arr, m.NewIntFromInt(1), m.NewIntFromInt(10), fill, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, bottom, []m.K{bottom, fill, fill, fill}, arr, err, interpreter)
+	arr, _ = arrayHooks.makeEmpty(interpreter.Model.FromInt(4), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	arrayHooks.fill(arr, interpreter.Model.FromInt(1), interpreter.Model.FromInt(10), fill, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, bottom, []m.KReference{bottom, fill, fill, fill}, arr, err, interpreter)
 }
 
 func TestArrayInKeys(t *testing.T) {
 	interpreter := newTestInterpreter()
-	var arr m.K
+	var arr m.KReference
 	var err error
-	var result m.K
-	var defElem = m.NewIntFromInt(20)
+	var result m.KReference
+	var defElem = interpreter.Model.FromInt(20)
 
 	// create
-	arr, err = arrayHooks.make(m.NewIntFromInt(2), defElem, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
-	assertArrayOk(t, defElem, []m.K{defElem, defElem}, arr, err, interpreter)
+	arr, err = arrayHooks.make(interpreter.Model.FromInt(2), defElem, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	assertArrayOk(t, defElem, []m.KReference{defElem, defElem}, arr, err, interpreter)
 
 	// updates
-	arrayHooks.update(arr, m.IntZero, m.NewIntFromInt(5), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	arrayHooks.update(arr, m.IntZero, interpreter.Model.FromInt(5), m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 
 	// test
 	result, err = arrayHooks.inKeys(m.IntZero, arr, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertBoolOk(t, true, result, err, interpreter)
 
-	result, err = arrayHooks.inKeys(m.NewIntFromInt(1), arr, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
+	result, err = arrayHooks.inKeys(interpreter.Model.FromInt(1), arr, m.LblDummy, m.SortInt, m.InternedBottom, interpreter)
 	assertBoolOk(t, false, result, err, interpreter)
 }
 
-func assertArrayOk(t *testing.T, expectedDefault m.K, expectedElems []m.K, a m.K, err error, interpreter *Interpreter) {
+func assertArrayOk(t *testing.T, expectedDefault m.KReference, expectedElems []m.KReference, a m.KReference, err error, interpreter *Interpreter) {
 	if err != nil {
 		t.Error(err, interpreter)
 	}
@@ -226,7 +236,7 @@ func assertArrayOk(t *testing.T, expectedDefault m.K, expectedElems []m.K, a m.K
 
 	}*/
 
-	arr, isArray := a.(*m.Array)
+	arr, isArray := interpreter.Model.GetArrayObject(a)
 	if !isArray {
 		t.Error("Result is not an Array.")
 		return
@@ -253,12 +263,11 @@ func assertArrayOk(t *testing.T, expectedDefault m.K, expectedElems []m.K, a m.K
 	}
 }
 
-func assertBottomOk(t *testing.T, actual m.K, err error, interpreter *Interpreter) {
+func assertBottomOk(t *testing.T, actual m.KReference, err error, interpreter *Interpreter) {
 	if err != nil {
 		t.Error(err, interpreter)
 	}
-	_, isBottom := actual.(*m.Bottom)
-	if !isBottom {
+	if !m.IsBottom(actual) {
 		t.Errorf("Bottom expected. Got: %s", interpreter.Model.PrettyPrint(actual))
 		return
 	}

@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-25 00:00:28.701
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:14:15.638
 
 package ieletestinginterpreter
 
@@ -7,18 +7,18 @@ import (
 	"testing"
 )
 
-var inputBackup []m.K
+var inputBackup []m.KReference
 
 // saves a copy of the arguments, so we can later check if they changed during the call
-func (interpreter *Interpreter) backupInput(args ...m.K) {
-	inputBackup = make([]m.K, len(args))
+func (interpreter *Interpreter) backupInput(args ...m.KReference) {
+	inputBackup = make([]m.KReference, len(args))
 	for i := 0; i < len(args); i++ {
 		inputBackup[i] = interpreter.Model.DeepCopy(args[i])
 	}
 }
 
 // checks that arguments didn't change in the hook
-func (interpreter *Interpreter) checkImmutable(t *testing.T, args ...m.K) {
+func (interpreter *Interpreter) checkImmutable(t *testing.T, args ...m.KReference) {
 	if len(args) != len(inputBackup) {
 		t.Error("Test not set up properly. Should be the same number of parameters as the last backupInput call.")
 	}
@@ -41,7 +41,7 @@ func newTestInterpreter() *Interpreter {
 		Model:         model,
 		MaxSteps:      0,
 		currentStep:   -1,
-		state:         nil,
+		state:         m.NullReference,
 		traceHandlers: nil,
 		Verbose:       false,
 	}

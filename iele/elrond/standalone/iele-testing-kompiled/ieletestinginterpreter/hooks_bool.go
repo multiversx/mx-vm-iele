@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-06-25 00:00:28.701
+// File provided by the K Framework Go backend. Timestamp: 2019-07-04 13:14:15.638
 
 package ieletestinginterpreter
 
@@ -10,72 +10,72 @@ type boolHooksType int
 
 const boolHooks boolHooksType = 0
 
-func (boolHooksType) and(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	b1, ok1 := c1.(*m.Bool)
-	b2, ok2 := c2.(*m.Bool)
+func (boolHooksType) and(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	b1, ok1 := m.CastToBool(c1)
+	b2, ok2 := m.CastToBool(c2)
 	if ok1 && ok2 {
-		return m.ToBool(b1.Value && b2.Value), nil
+		return m.ToKBool(b1 && b2), nil
 	}
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (h boolHooksType) andThen(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (h boolHooksType) andThen(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return h.and(c1, c2, lbl, sort, config, interpreter)
 }
 
-func (boolHooksType) or(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	b1, ok1 := c1.(*m.Bool)
-	b2, ok2 := c2.(*m.Bool)
+func (boolHooksType) or(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	b1, ok1 := m.CastToBool(c1)
+	b2, ok2 := m.CastToBool(c2)
 	if ok1 && ok2 {
-		return m.ToBool(b1.Value || b2.Value), nil
+		return m.ToKBool(b1 || b2), nil
 	}
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (h boolHooksType) orElse(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
+func (h boolHooksType) orElse(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	return h.or(c1, c2, lbl, sort, config, interpreter)
 }
 
-func (boolHooksType) not(c m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	b, ok := c.(*m.Bool)
+func (boolHooksType) not(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	b, ok := m.CastToBool(c)
 	if ok {
-		return m.ToBool(!b.Value), nil
+		return m.ToKBool(!b), nil
 	}
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (boolHooksType) implies(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	b1, ok1 := c1.(*m.Bool)
-	b2, ok2 := c2.(*m.Bool)
+func (boolHooksType) implies(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	b1, ok1 := m.CastToBool(c1)
+	b2, ok2 := m.CastToBool(c2)
 	if ok1 && ok2 {
-		return m.ToBool((!b1.Value) || b2.Value), nil
+		return m.ToKBool((!b1) || b2), nil
 	}
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (boolHooksType) ne(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	b1, ok1 := c1.(*m.Bool)
-	b2, ok2 := c2.(*m.Bool)
+func (boolHooksType) ne(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	b1, ok1 := m.CastToBool(c1)
+	b2, ok2 := m.CastToBool(c2)
 	if ok1 && ok2 {
-		return m.ToBool(b1.Value != b2.Value), nil
+		return m.ToKBool(b1 != b2), nil
 	}
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (boolHooksType) eq(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	b1, ok1 := c1.(*m.Bool)
-	b2, ok2 := c2.(*m.Bool)
+func (boolHooksType) eq(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	b1, ok1 := m.CastToBool(c1)
+	b2, ok2 := m.CastToBool(c2)
 	if ok1 && ok2 {
-		return m.ToBool(b1.Value == b2.Value), nil
+		return m.ToKBool(b1 == b2), nil
 	}
 	return m.NoResult, &hookNotImplementedError{}
 }
 
-func (boolHooksType) xor(c1 m.K, c2 m.K, lbl m.KLabel, sort m.Sort, config m.K, interpreter *Interpreter) (m.K, error) {
-	b1, ok1 := c1.(*m.Bool)
-	b2, ok2 := c2.(*m.Bool)
+func (boolHooksType) xor(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
+	b1, ok1 := m.CastToBool(c1)
+	b2, ok2 := m.CastToBool(c2)
 	if ok1 && ok2 {
-		return m.ToBool(b1.Value != b2.Value), nil
+		return m.ToKBool(b1 != b2), nil
 	}
 	return m.NoResult, &hookNotImplementedError{}
 }
