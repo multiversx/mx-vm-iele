@@ -1,15 +1,14 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestinginterpreter
 
 import (
 	"fmt"
+	koreparser "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/koreparser"
 	"log"
+	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 	"math"
 	"os/exec"
-
-	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
-	koreparser "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/koreparser"
 )
 
 func callKast(kdir string, programPath string) []byte {
@@ -138,16 +137,16 @@ func (i *Interpreter) runSteps(maxSteps int) error {
 
 		// decrease all usages from the previous state
 		previousState := i.state
-		i.Model.DecreaseUsage(previousState)
+		//i.Model.DecreaseUsage(previousState)
 
-		var err error
+        var err error
 		i.state, err = i.step(previousState)
 
 		// increase all usages for the current state
-		i.Model.IncreaseUsage(i.state)
+		//i.Model.IncreaseUsage(i.state)
 
 		// recycle everything that didn't show up in the new state
-		i.Model.RecycleUnused(previousState)
+        //i.Model.RecycleUnused(previousState)
 
 		if err == nil {
 			i.traceStepEnd()

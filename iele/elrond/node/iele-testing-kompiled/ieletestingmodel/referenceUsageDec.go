@@ -1,10 +1,10 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
 // DecreaseUsage decrements all reference counters in tree below given root
 // and sends to the recycle bin all objects left without references.
-// This goes recursively through the whole tree.
+// This goes recursively through the whole sub-tree.
 func (ms *ModelState) DecreaseUsage(ref KReference) {
 	if ref.constantObject {
 		return
@@ -19,23 +19,21 @@ func (ms *ModelState) DecreaseUsage(ref KReference) {
 	case bigIntRef:
 		obj, _ := ms.getBigIntObject(ref)
 		if obj.reuseStatus == active {
-            obj.referenceCount--
-        }
+			obj.referenceCount--
+		}
 	case nonEmptyKseqRef:
 		ks := ms.KSequenceToSlice(ref)
 		for _, child := range ks {
+			ms.DecreaseUsage(child)
+		}
+	case kapplyRef:
+		for _, child := range ms.kapplyArgSlice(ref) {
 			ms.DecreaseUsage(child)
 		}
 	default:
 		// object types
 		obj := ms.getReferencedObject(ref)
 		obj.decreaseUsage(ms)
-	}
-}
-
-func (k *KApply) decreaseUsage(ms *ModelState) {
-	for _, child := range k.List {
-		ms.DecreaseUsage(child)
 	}
 }
 

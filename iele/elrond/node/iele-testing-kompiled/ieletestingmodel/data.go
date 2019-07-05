@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -24,18 +24,21 @@ type KObject interface {
 type objectReuseStatus int
 
 const (
-    active objectReuseStatus = iota
-    inRecycleBin
-    preserved
+	active objectReuseStatus = iota
+	inRecycleBin
+	preserved
 )
 
 // ModelState holds the state of the executor at a certain moment
 type ModelState struct {
-	initialized bool
-
 	// allKs keeps all KSequences into one large structure
 	// all KSequences point to this structure
 	allKs *ksequenceSliceContainer
+
+	// contains all KApply args, concatenated into one slice
+	// KApply references contain the start position and arity,
+	// so enough data to find their args in this slice
+	allKApplyArgs []KReference
 
 	// keeps big int objects, big int references point here
 	bigInts []*bigInt
@@ -81,33 +84,29 @@ func addConstantObject(obj KObject) KReference {
 // NewModel creates a new blank model.
 func NewModel() *ModelState {
 	ms := &ModelState{}
-	ms.Init()
+	ms.allKs = &ksequenceSliceContainer{}
+	ms.allKApplyArgs = make([]KReference, 0, 1000000)
+	ms.allObjects = make([]KObject, 0, 10000)
+	ms.memoTables = nil
 	return ms
 }
 
-// Init prepares model for execution
-func (ms *ModelState) Init() {
-	if ms.initialized {
-		return
-	}
-	ms.initialized = true
-	ms.allKs = &ksequenceSliceContainer{}
-	ms.allObjects = nil
+// Clear resets the model as if it were new,
+// but does not free the memory allocated by previous execution.
+func (ms *ModelState) Clear() {
+	ms.allKApplyArgs = ms.allKApplyArgs[:0]
+	ms.allObjects = ms.allObjects[:0]
+	ms.recycleAllInts()
 	ms.memoTables = nil
-}
-
-// ClearModel ... clean up any data left from previous executions, to save memory
-func (ms *ModelState) ClearModel() {
-	ms.initialized = false
-	ms.Init()
 }
 
 // PrintStats simply prints some statistics to the console.
 // Useful for checking the size of the model data.
 func (ms *ModelState) PrintStats() {
 	fmt.Printf("Nr. BigInt objects: %d\n", len(ms.bigInts))
-	fmt.Printf("Nr. objects: %d\n", len(ms.allObjects))
 	fmt.Printf("Nr. K sequence slices: %d\n", len(ms.allKs.allSlices))
+	fmt.Printf("Nr. KApply args: %d\n", len(ms.allKApplyArgs))
+	fmt.Printf("Nr. objects: %d\n", len(ms.allObjects))
 	fmt.Printf("Recycle bin\n")
 	fmt.Printf("     BigInt    %d\n", len(ms.bigIntRecycleBin))
 }

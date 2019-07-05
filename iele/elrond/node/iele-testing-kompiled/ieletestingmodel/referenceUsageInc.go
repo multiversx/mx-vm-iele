@@ -1,9 +1,9 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
 // IncreaseUsage increments all reference counters in tree below given root.
-// It goes recursively through the whole tree.
+// It goes recursively through the whole sub-tree.
 func (ms *ModelState) IncreaseUsage(ref KReference) {
 	if ref.constantObject {
 		return
@@ -18,27 +18,25 @@ func (ms *ModelState) IncreaseUsage(ref KReference) {
 	case bigIntRef:
 		obj, _ := ms.getBigIntObject(ref)
 		if obj.reuseStatus == active {
-		    if obj.referenceCount < 1 {
-		        obj.referenceCount = 1
-		    } else {
-		        obj.referenceCount++
-		    }
+			if obj.referenceCount < 1 {
+				obj.referenceCount = 1
+			} else {
+				obj.referenceCount++
+			}
 		}
 	case nonEmptyKseqRef:
 		ks := ms.KSequenceToSlice(ref)
 		for _, child := range ks {
 			ms.IncreaseUsage(child)
 		}
+	case kapplyRef:
+		for _, child := range ms.kapplyArgSlice(ref) {
+			ms.IncreaseUsage(child)
+		}
 	default:
 		// object types
 		obj := ms.getReferencedObject(ref)
 		obj.increaseUsage(ms)
-	}
-}
-
-func (k *KApply) increaseUsage(ms *ModelState) {
-	for _, child := range k.List {
-		ms.IncreaseUsage(child)
 	}
 }
 

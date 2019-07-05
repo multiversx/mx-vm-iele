@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestinginterpreter
 
@@ -34,11 +34,8 @@ func (interpreter *Interpreter) checkImmutable(t *testing.T, args ...m.KReferenc
 // does not initialize external hooks, even if they exist in the project
 // do not make public, the only public constructor should be the one in interpreterDef.go
 func newTestInterpreter() *Interpreter {
-	model := &m.ModelState{}
-	model.Init()
-
 	return &Interpreter {
-		Model:         model,
+		Model:         m.NewModel(),
 		MaxSteps:      0,
 		currentStep:   -1,
 		state:         m.NullReference,

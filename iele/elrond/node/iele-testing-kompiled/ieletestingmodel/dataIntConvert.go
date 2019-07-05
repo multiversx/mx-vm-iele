@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -84,7 +84,8 @@ func (ms *ModelState) GetBigIntUnsafe(ref KReference) (*big.Int, bool) {
 }
 
 // GetBigInt yields a big.Int cast from any K integer object, if possible.
-// Does not provide any big.Int object from the model, only copies.
+// Does not provide any big.Int object from the model, only copies,
+// so it is safe to use anywhere.
 func (ms *ModelState) GetBigInt(ref KReference) (*big.Int, bool) {
 	small, isSmall := getSmallInt(ref)
 	if isSmall {

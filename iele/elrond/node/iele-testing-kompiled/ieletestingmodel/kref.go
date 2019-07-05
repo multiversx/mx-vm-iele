@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -37,6 +37,7 @@ type KReference struct {
 	constantObject bool
 	value1         uint32
 	value2         uint32
+	value3         uint32
 }
 
 // NullReference is the zero-value of KReference. It doesn't point to anything.

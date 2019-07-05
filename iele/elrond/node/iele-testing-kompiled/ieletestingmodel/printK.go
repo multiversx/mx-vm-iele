@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -43,6 +43,8 @@ func (ms *ModelState) kprintToStringBuilder(sb *strings.Builder, ref KReference)
 				}
 			}
 		}
+	case kapplyRef:
+		kprintKApply(ms, sb, ms.KApplyLabel(ref), ms.kapplyArgSlice(ref))
 	default:
 		// object types
 		obj := ms.getReferencedObject(ref)
@@ -56,25 +58,21 @@ func kprintKLabel(sb *strings.Builder, klabel KLabel) {
 	sb.WriteString("`")
 }
 
-func kprintKApply(ms *ModelState, sb *strings.Builder, label KLabel, children []KReference) {
+func kprintKApply(ms *ModelState, sb *strings.Builder, label KLabel, args []KReference) {
 	kprintKLabel(sb, label)
 	sb.WriteString("(")
 
-	if len(children) == 0 {
+	if len(args) == 0 {
 		sb.WriteString(".KList")
 	} else {
-		for i, child := range children {
+		for i, child := range args {
 			ms.kprintToStringBuilder(sb, child)
-			if i < len(children)-1 {
+			if i < len(args)-1 {
 				sb.WriteString(", ")
 			}
 		}
 		sb.WriteRune(')')
 	}
-}
-
-func (k *KApply) kprint(ms *ModelState, sb *strings.Builder) {
-	kprintKApply(ms, sb, k.Label, k.List)
 }
 
 func (k *InjectedKLabel) kprint(ms *ModelState, sb *strings.Builder) {

@@ -1,8 +1,8 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
-// Preserve marks that none of the objects below given root can be recycled.
+// Preserve prevents argument and any objects contained by it from being recycled ever again.
 func (ms *ModelState) Preserve(ref KReference) {
 	if ref.constantObject {
 		return
@@ -22,16 +22,14 @@ func (ms *ModelState) Preserve(ref KReference) {
 		for _, child := range ks {
 			ms.Preserve(child)
 		}
+	case kapplyRef:
+		for _, child := range ms.kapplyArgSlice(ref) {
+			ms.Preserve(child)
+		}
 	default:
 		// object types
 		obj := ms.getReferencedObject(ref)
 		obj.preserve(ms)
-	}
-}
-
-func (k *KApply) preserve(ms *ModelState) {
-	for _, child := range k.List {
-		ms.Preserve(child)
 	}
 }
 

@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -12,6 +12,13 @@ func (ms *ModelState) CollectionsToK(ref KReference) KReference {
 			newKs[i] = obj.collectionsToK(ms)
 		}
 		return ms.NewKSequence(newKs)
+	} else if ref.refType == kapplyRef {
+		argSlice := ms.kapplyArgSlice(ref)
+		newArgs := make([]KReference, len(argSlice))
+		for i, child := range argSlice {
+			newArgs[i] = ms.CollectionsToK(child)
+		}
+		return ms.NewKApply(ms.KApplyLabel(ref), newArgs...)
 	} else if ref.refType == mapRef ||
 		ref.refType == listRef ||
 		ref.refType == setRef ||
@@ -53,7 +60,7 @@ func (k *Map) collectionsToK(ms *ModelState) KReference {
 
 func (k *List) collectionsToK(ms *ModelState) KReference {
 	if len(k.Data) == 0 {
-		return ms.KApply0Ref(UnitFor(k.Label))
+		return ms.NewKApply(UnitFor(k.Label))
 	}
 
 	elemLabel := ElementFor(k.Label)
@@ -73,7 +80,7 @@ func (k *List) collectionsToK(ms *ModelState) KReference {
 
 func (k *Set) collectionsToK(ms *ModelState) KReference {
 	if len(k.Data) == 0 {
-		return ms.KApply0Ref(UnitFor(k.Label))
+		return ms.NewKApply(UnitFor(k.Label))
 	}
 
 	// sort keys
@@ -111,14 +118,6 @@ func (k *Array) collectionsToK(ms *ModelState) KReference {
 
 	return result
 
-}
-
-func (k *KApply) collectionsToK(ms *ModelState) KReference {
-	newList := make([]KReference, len(k.List))
-	for i, child := range k.List {
-		newList[i] = ms.CollectionsToK(child)
-	}
-	return ms.NewKApply(k.Label, newList...)
 }
 
 func (k *InjectedKLabel) collectionsToK(ms *ModelState) KReference {

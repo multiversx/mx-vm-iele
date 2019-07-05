@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -33,31 +33,27 @@ func (ms *ModelState) Equals(ref1 KReference, ref2 KReference) bool {
 		panic("there shouldn't be different references of type emptyKseqRef, only one")
 	case nonEmptyKseqRef:
 		return ms.ksequenceEquals(ref1, ref2)
+	case kapplyRef:
+		if ms.KApplyLabel(ref1) != ms.KApplyLabel(ref2) {
+			return false
+		}
+		if ms.KApplyArity(ref1) != ms.KApplyArity(ref2) {
+			return false
+		}
+		argSlice1 := ms.kapplyArgSlice(ref1)
+		argSlice2 := ms.kapplyArgSlice(ref2)
+		for i := 0; i < len(argSlice1); i++ {
+			if !ms.Equals(argSlice1[i], argSlice2[i]) {
+				return false
+			}
+		}
+		return true
 	default:
 		// object types
 		obj1 := ms.getReferencedObject(ref1)
 		obj2 := ms.getReferencedObject(ref2)
 		return obj1.equals(ms, obj2)
 	}
-}
-
-func (k *KApply) equals(ms *ModelState, arg KObject) bool {
-	other, typeOk := arg.(*KApply)
-	if !typeOk {
-		panic("equals between different types should have been handled during reference Equals")
-	}
-	if k.Label != other.Label {
-		return false
-	}
-	if len(k.List) != len(other.List) {
-		return false
-	}
-	for i := 0; i < len(k.List); i++ {
-		if !ms.Equals(k.List[i], other.List[i]) {
-			return false
-		}
-	}
-	return true
 }
 
 func (k *InjectedKLabel) equals(ms *ModelState, arg KObject) bool {

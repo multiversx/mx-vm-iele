@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -95,7 +95,7 @@ func (k KToken) toKItem(ms *ModelState) (KReference, error) {
 }
 
 func (mapKey kmapKeyKApply0) toKItem(ms *ModelState) (KReference, error) {
-	return ms.KApply0Ref(mapKey.label), nil
+	return ms.NewKApply(mapKey.label), nil
 }
 
 func (mapKey kmapKeyKApply1) toKItem(ms *ModelState) (KReference, error) {

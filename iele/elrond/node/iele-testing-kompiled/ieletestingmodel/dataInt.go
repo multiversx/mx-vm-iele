@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -113,6 +113,24 @@ func (ms *ModelState) getBigIntObject(ref KReference) (*bigInt, bool) {
 		panic("reference points to bigInt that was recycled in the mean time and can no longer be used in this context")
 	}
 	return obj, true
+}
+
+func (ms *ModelState) recycleAllInts() {
+	if cap(ms.bigIntRecycleBin) < len(ms.bigInts) {
+		ms.bigIntRecycleBin = make([]KReference, len(ms.bigInts))
+	} else {
+		ms.bigIntRecycleBin = ms.bigIntRecycleBin[:len(ms.bigInts)]
+	}
+	for i, bo := range ms.bigInts {
+		bo.referenceCount = 0
+		bo.reuseStatus = inRecycleBin
+		ms.bigIntRecycleBin[i] = KReference{
+			refType:        bigIntRef,
+			constantObject: false,
+			value1:         uint32(i),
+			value2:         bo.recycleCount,
+		}
+	}
 }
 
 func convertSmallIntRefToBigInt(ref KReference) (*big.Int, bool) {

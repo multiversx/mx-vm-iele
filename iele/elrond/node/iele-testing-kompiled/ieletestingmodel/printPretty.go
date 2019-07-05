@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -50,6 +50,8 @@ func (ms *ModelState) prettyPrintToStringBuilder(sb *strings.Builder, ref KRefer
 				}
 			}
 		}
+	case kapplyRef:
+		ms.prettyPrintKApply(sb, ms.KApplyLabel(ref), ms.kapplyArgSlice(ref), indent)
 	default:
 		// object types
 		obj := ms.getReferencedObject(ref)
@@ -57,8 +59,8 @@ func (ms *ModelState) prettyPrintToStringBuilder(sb *strings.Builder, ref KRefer
 	}
 }
 
-func (k *KApply) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
-	lblName := k.Label.Name()
+func (ms *ModelState) prettyPrintKApply(sb *strings.Builder, label KLabel, args []KReference, indent int) {
+	lblName := label.Name()
 	isKCell := strings.HasPrefix(lblName, "<") && strings.HasSuffix(lblName, ">")
 
 	// begin
@@ -69,12 +71,12 @@ func (k *KApply) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 
 	// contents
 	done := false
-	if len(k.List) == 0 {
+	if len(args) == 0 {
 		done = true
 	}
-	if !done && len(k.List) == 1 {
+	if !done && len(args) == 1 {
 		var tempSb strings.Builder
-		ms.prettyPrintToStringBuilder(&tempSb, k.List[0], 0)
+		ms.prettyPrintToStringBuilder(&tempSb, args[0], 0)
 		childStr := tempSb.String()
 		if !strings.Contains(childStr, "\n") {
 			// if only one child and its representation not too big, just put everything in one row
@@ -89,11 +91,11 @@ func (k *KApply) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 		}
 	}
 	if !done {
-		for i, child := range k.List {
+		for i, child := range args {
 			sb.WriteRune('\n')
 			addIndent(sb, indent+1)
 			ms.prettyPrintToStringBuilder(sb, child, indent+1)
-			if !isKCell && i < len(k.List)-1 {
+			if !isKCell && i < len(args)-1 {
 				sb.WriteString(",")
 			}
 		}

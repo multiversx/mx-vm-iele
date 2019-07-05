@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-04 01:26:11.488
+// File provided by the K Framework Go backend. Timestamp: 2019-07-05 04:12:39.818
 
 package ieletestingmodel
 
@@ -27,6 +27,13 @@ func (ms *ModelState) DeepCopy(ref KReference) KReference {
 		newRef, newObj := ms.newBigIntObjectNoRecycle()
 		newObj.bigValue.Set(obj.bigValue)
 		return newRef
+	case kapplyRef:
+		argSlice := ms.kapplyArgSlice(ref)
+		argCopy := make([]KReference, len(argSlice))
+		for i, child := range argSlice {
+			argCopy[i] = ms.DeepCopy(child)
+		}
+		return ms.NewKApply(ms.KApplyLabel(ref), argCopy...)
 	default:
 		// object types
 		obj := ms.getReferencedObject(ref)
@@ -38,14 +45,6 @@ func (ms *ModelState) DeepCopy(ref KReference) KReference {
 		}
 		return ms.addObject(obj)
 	}
-}
-
-func (k *KApply) deepCopy(ms *ModelState) KObject {
-	listCopy := make([]KReference, len(k.List))
-	for i, child := range k.List {
-		listCopy[i] = ms.DeepCopy(child)
-	}
-	return &KApply{Label: k.Label, List: listCopy}
 }
 
 func (k *InjectedKLabel) deepCopy(ms *ModelState) KObject {
