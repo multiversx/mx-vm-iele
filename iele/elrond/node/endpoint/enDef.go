@@ -36,6 +36,12 @@ func NewElrondIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHoo
 	}
 }
 
+// ClearVMState resets the VM state without freeing up the memory,
+// so the same memory can be reused on the next execution.
+func (vm *ElrondIeleVM) ClearVMState() {
+	vm.kinterpreter.Model.Clear()
+}
+
 // SetTracePretty turns on pretty trace creation, use for debugging only
 func (vm *ElrondIeleVM) SetTracePretty() {
 	vm.kinterpreter.SetTracePretty()

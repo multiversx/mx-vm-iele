@@ -68,6 +68,9 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		Code:    []byte{},
 	})
 
+	// create the VM and allocate some memory
+	vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, ielecommon.Danse)
+
 	if b != nil { // nil when debugging
 		b.ResetTimer()
 	}
@@ -81,7 +84,7 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		}
 
 		for txi := 0; txi < nrTransfers; txi++ {
-			vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, ielecommon.Danse)
+			vm.ClearVMState()
 
 			input := &vmi.ContractCallInput{
 				RecipientAddr: contractAddr,
