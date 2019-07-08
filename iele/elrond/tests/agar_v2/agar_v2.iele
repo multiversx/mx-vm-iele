@@ -170,8 +170,6 @@ define @addPlayerToGameStateChange(%gameId, %player, %bet) {
   // change status idle -> in game
   %statusKey = call @playerStatusKey(%player)
   %status = sload %statusKey
-  %err = cmp ne %status, %playerStatusIdle
-  br %err, throw
   sstore @playerStatusInGame, %statusKey
 
   // subtract game entry fee (if enough funds are present)
