@@ -29,7 +29,7 @@
                         "value": "0x00",
                         "to": "",
                         "arguments": [],
-                        "contractCode": "agar.iele",
+                        "contractCode": "agar_v2.iele",
                         "gasPrice": "0x01",
                         "from": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234"
                     }
@@ -61,7 +61,7 @@
                 "storage": {
                     "0x00": "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000001234"
                 },
-                "code": "agar.iele"
+                "code": "agar_v2.iele"
             }
         }
     }
