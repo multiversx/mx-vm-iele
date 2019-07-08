@@ -252,11 +252,9 @@ define public @endGame(%gameIndex) {
   %err = cmp ne %caller, %owner
   br %err, throw
 
-  // check that game bet is down to 0
+  // load leftover game bet
   %gameBetKey = call @gameBetKey(%gameIndex)
   %gameBet = sload %gameBetKey
-  %err = cmp ne %gameBet, 0
-  br %err, throw
 
   // load game player list
   %gamePlayersKey = call @gamePlayersKey(%gameIndex)
@@ -279,6 +277,7 @@ playerStatusLoop:
   sstore @playerStatusIdle, %statusKey
 
   %gamePlayers = shift %gamePlayers, %shiftRight
+  %previousPlayer = %player
 
   br 1, playerStatusLoop
 
@@ -287,6 +286,25 @@ allPlayersProcessed:
   // clear game data in storage
   sstore 0, %gamePlayersKey
 
+  // reward the first player in game with any leftover bet
+  // this shouldn't normally happen
+  // we handle the scenario just in case
+
+  // first, jump to the end if %gameBet is in fact 0, as it should be
+  // nothing more needed in this scenario
+  %betOk = cmp eq %gameBet, 0
+  br %betOk, return
+
+  // %previousPlayer is the first player that joined the game
+  // it is the last player loaded before we ended the loop (because %gamePlayers is a stack)
+  // if it is 0, it means the game was empty, this should not be possible
+  %err = cmp eq %previousPlayer, 0
+  br %err, throw
+
+  // we reward the first player
+  call @rewardWinner(%gameIndex, %previousPlayer, %gameBet)
+
+return:
   ret void
 
 throw:
