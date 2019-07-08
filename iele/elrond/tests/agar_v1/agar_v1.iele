@@ -140,7 +140,6 @@ define public @addPlayerToGame(%gameId, %player, %bet) {
 
   // validate player address
   %err = cmp gt %player, @maxValidAddress
-  sstore %err, 7
   br %err, throw
 
   // change status idle -> in game
