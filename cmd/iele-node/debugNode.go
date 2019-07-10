@@ -19,7 +19,8 @@ func main() {
 	//debugElrondTest("tests/iele-v3/danse/forwarder/create.iele.json", false)
 
 	//debugElrondTest("adder/adder.iele.json", false)
-	debugElrondTest("agar_v2/joinGame.iele.json", false)
+	debugElrondTest("agar_v2/topUp_withdraw.iele.json", false)
+	//debugElrondTest("agar_v2/withdraw_Ok.iele.json", false)
 	//debugAgarV2()
 
 	//debugIllFormedX()
