@@ -20,7 +20,7 @@ const (
 	Danse
 )
 
-// ParseSchedule ... get schedule with name
+// ParseSchedule yields the schedule with the given name. It is used in tests.
 func ParseSchedule(scheduleName string) (Schedule, error) {
 	switch scheduleName {
 	case "Default":

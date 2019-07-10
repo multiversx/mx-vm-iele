@@ -80,7 +80,7 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		}
 
 		for txi := 0; txi < nrTransfers; txi++ {
-			vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, eiele.Danse)
+			vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, eiele.ElrondDefault)
 
 			input := &vmi.ContractCallInput{
 				RecipientAddr: contractAddr,
