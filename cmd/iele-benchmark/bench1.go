@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	ielecommon "github.com/ElrondNetwork/elrond-vm/iele/common"
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
 	worldhook "github.com/ElrondNetwork/elrond-vm/mock-hook-blockchain"
@@ -81,7 +80,7 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		}
 
 		for txi := 0; txi < nrTransfers; txi++ {
-			vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, ielecommon.Danse)
+			vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, eiele.Danse)
 
 			input := &vmi.ContractCallInput{
 				RecipientAddr: contractAddr,

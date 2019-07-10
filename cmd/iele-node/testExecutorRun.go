@@ -1,4 +1,4 @@
-package endpointtest
+package main
 
 import (
 	"bytes"
@@ -17,75 +17,12 @@ import (
 	ij "github.com/ElrondNetwork/elrond-vm/iele/test-util/ielejson"
 )
 
-// RunJSONTest ... only playing around for now
-func RunJSONTest(testFilePath string, vmp VMProvider, world *worldhook.BlockchainHookMock) error {
-	var err error
-	testFilePath, err = filepath.Abs(testFilePath)
-	if err != nil {
-		return err
-	}
-
-	// Open our jsonFile
-	var jsonFile *os.File
-	jsonFile, err = os.Open(testFilePath)
-	// if we os.Open returns an error then handle it
-	if err != nil {
-		return err
-	}
-
-	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
-
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		return err
-	}
-
-	top, parseErr := ij.ParseTopLevel(byteValue)
-	if parseErr != nil {
-		return parseErr
-	}
-
-	for _, test := range top {
-		testErr := runTest(testFilePath, test, vmp, world)
-		if testErr != nil {
-			return testErr
-		}
-	}
-
-	// toPath := strings.Replace(testFilePath, "iele-v2", "iele-v3", 1)
-	// fmt.Println(toPath)
-	// saveModifiedTest(toPath, top)
-
-	return nil
-}
-
-func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhook.BlockchainHookMock) error {
+func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.BlockchainHookMock) error {
 	// reset world
 	world.Clear()
 	world.Blockhashes = test.BlockHashes
-
-	testDirPath := filepath.Dir(testFilePath)
-
-	scheduleName := test.Network
-	vm, initErr := vmp.GetVM(scheduleName)
-	if initErr != nil {
-		return initErr
-	}
-
-	var assErr error
 	for _, acct := range test.Pre {
-		acct.Code, assErr = assembleIeleCode(testDirPath, acct.Code)
-		if assErr != nil {
-			return assErr
-		}
 		world.AcctMap.PutAccount(convertAccount(acct))
-	}
-	for _, acct := range test.PostState {
-		acct.Code, assErr = assembleIeleCode(testDirPath, acct.Code)
-		if assErr != nil {
-			return assErr
-		}
 	}
 
 	//spew.Dump(world.AcctMap)
@@ -101,13 +38,8 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 			var output *vmi.VMOutput
 
 			if tx.IsCreate {
-				assembledCode, assErr := assembleIeleCode(testDirPath, tx.ContractCode)
-				if assErr != nil {
-					return assErr
-				}
-
 				input := &vmi.ContractCreateInput{
-					ContractCode: []byte(assembledCode),
+					ContractCode: []byte(tx.AssembledCode),
 					VMInput: vmi.VMInput{
 						CallerAddr:  tx.From,
 						Arguments:   tx.Arguments,

@@ -3,21 +3,34 @@ package main
 import (
 	"testing"
 
-	eptest "github.com/ElrondNetwork/elrond-vm/iele/test-util/endpointtest"
+	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
 )
 
+var excludedTests = []string{
+	//"tests/VMTests/vmPerformance/*/*",
+	"tests/*/*/unit/precompiled.iele.json",
+}
+
 func TestElrondIeleTests(t *testing.T) {
-	eptest.TestAllInDirectory(t,
+	err := controller.RunAllIeleTestsInDirectory(
 		elrondTestRoot,
 		"tests/iele-v3",
-		&elrondIeleProvider{},
-		world)
+		excludedTests,
+		newElrondIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestOriginalIeleTests(t *testing.T) {
-	eptest.TestAllInDirectory(t,
-		originalTestRoot,
-		"tests/iele",
-		&originalIeleProvider{},
-		world)
+	err := controller.RunAllIeleTestsInDirectory(
+		elrondTestRoot,
+		"tests/iele-v3",
+		excludedTests,
+		newOriginalIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
 }

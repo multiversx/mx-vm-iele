@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"path"
 	"path/filepath"
 
-	eptest "github.com/ElrondNetwork/elrond-vm/iele/test-util/endpointtest"
+	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
 )
 
 func main() {
@@ -42,10 +41,10 @@ func debugAgarV2() {
 }
 
 func debugElrondTest(testFile string, tracePretty bool) {
-	err := eptest.RunJSONTest(
-		path.Join(elrondTestRoot, testFile),
-		&elrondIeleProvider{tracePretty: tracePretty},
-		world)
+	err := controller.RunSingleIeleTest(
+		filepath.Join(elrondTestRoot, testFile),
+		newElrondIeleTestExecutor(false))
+
 	if err == nil {
 		fmt.Println("SUCCESS")
 	} else {
@@ -54,10 +53,10 @@ func debugElrondTest(testFile string, tracePretty bool) {
 }
 
 func debugOriginalTest(testFile string, tracePretty bool) {
-	err := eptest.RunJSONTest(
-		filepath.Join(originalTestRoot, testFile),
-		&originalIeleProvider{tracePretty: tracePretty},
-		world)
+	err := controller.RunSingleIeleTest(
+		filepath.Join(elrondTestRoot, testFile),
+		newOriginalIeleTestExecutor(false))
+
 	if err == nil {
 		fmt.Println("SUCCESS")
 	} else {

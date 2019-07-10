@@ -2,25 +2,24 @@ package endpoint
 
 import (
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	ielecommon "github.com/ElrondNetwork/elrond-vm/iele/common"
 	blockchain "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/hookadapter/blockchain"
 	krypto "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/hookadapter/krypto"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestinginterpreter"
 )
 
-// AddressLength ... Account address length expected by the VM
+// AddressLength is the account address length expected by the VM
 const AddressLength = 32
 
-// ElrondIeleVM ... Iele VM, Elrond version
+// ElrondIeleVM represents a Iele VM, Elrond version
 type ElrondIeleVM struct {
-	schedule          ielecommon.Schedule
+	schedule          Schedule
 	blockchainAdapter *blockchain.Blockchain
 	kryptoAdapter     *krypto.Krypto
 	kinterpreter      *interpreter.Interpreter
 }
 
 // NewElrondIeleVM creates new Elrond Iele VM instance
-func NewElrondIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHook, schedule ielecommon.Schedule) *ElrondIeleVM {
+func NewElrondIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHook, schedule Schedule) *ElrondIeleVM {
 	blockchainAdapter := &blockchain.Blockchain{
 		Upstream:      blockchainHook,
 		AddressLength: AddressLength,

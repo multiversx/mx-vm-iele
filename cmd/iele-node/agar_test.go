@@ -3,21 +3,29 @@ package main
 import (
 	"testing"
 
-	eptest "github.com/ElrondNetwork/elrond-vm/iele/test-util/endpointtest"
+	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
 )
 
 func TestAgarV1(t *testing.T) {
-	eptest.TestAllInDirectory(t,
+	err := controller.RunAllIeleTestsInDirectory(
 		elrondTestRoot,
 		"agar_v1",
-		&elrondIeleProvider{},
-		world)
+		nil,
+		newElrondIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
 }
 
 func TestAgarV2(t *testing.T) {
-	eptest.TestAllInDirectory(t,
+	err := controller.RunAllIeleTestsInDirectory(
 		elrondTestRoot,
 		"agar_v2",
-		&elrondIeleProvider{},
-		world)
+		nil,
+		newElrondIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
 }

@@ -3,13 +3,17 @@ package main
 import (
 	"testing"
 
-	eptest "github.com/ElrondNetwork/elrond-vm/iele/test-util/endpointtest"
+	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
 )
 
 func TestAuctionSolidity(t *testing.T) {
-	eptest.TestAllInDirectory(t,
+	err := controller.RunAllIeleTestsInDirectory(
 		elrondTestRoot,
-		"auction-solidity",
-		&elrondIeleProvider{},
-		world)
+		"agar_v1",
+		nil,
+		newElrondIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
 }

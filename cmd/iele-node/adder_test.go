@@ -3,13 +3,18 @@ package main
 import (
 	"testing"
 
-	eptest "github.com/ElrondNetwork/elrond-vm/iele/test-util/endpointtest"
+	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
 )
 
 func TestAdder(t *testing.T) {
-	eptest.TestAllInDirectory(t,
+	err := controller.RunAllIeleTestsInDirectory(
 		elrondTestRoot,
 		"adder",
-		&elrondIeleProvider{},
-		world)
+		nil,
+		newElrondIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
+
 }

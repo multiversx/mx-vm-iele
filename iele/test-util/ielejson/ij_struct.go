@@ -68,16 +68,17 @@ type LogEntry struct {
 
 // Transaction is a json object representing a transaction
 type Transaction struct {
-	Nonce        *big.Int
-	Value        *big.Int
-	IsCreate     bool
-	From         []byte
-	To           []byte
-	Function     string
-	ContractCode string
-	Arguments    []*big.Int
-	GasPrice     *big.Int
-	GasLimit     *big.Int
+	Nonce         *big.Int
+	Value         *big.Int
+	IsCreate      bool
+	From          []byte
+	To            []byte
+	Function      string
+	ContractCode  string
+	AssembledCode string
+	Arguments     []*big.Int
+	GasPrice      *big.Int
+	GasLimit      *big.Int
 }
 
 // FindAccount by address
