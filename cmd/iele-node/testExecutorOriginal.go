@@ -32,7 +32,11 @@ func (te *originalIeleTestExecutor) Run(test *ij.Test) error {
 	}
 	vm, found := te.scheduleVMs[scheduleName]
 	if !found {
-		vm = oiele.NewOriginalIeleVM(te.world, cryptohook.KryptoHookMockInstance, schedule)
+		originalIeleVM := oiele.NewOriginalIeleVM(te.world, cryptohook.KryptoHookMockInstance, schedule)
+		if te.tracePretty {
+			originalIeleVM.SetTracePretty()
+		}
+		vm = originalIeleVM
 		te.scheduleVMs[scheduleName] = vm
 	}
 

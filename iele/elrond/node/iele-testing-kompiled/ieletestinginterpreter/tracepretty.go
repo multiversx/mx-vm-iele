@@ -5,17 +5,18 @@ package ieletestinginterpreter
 import (
 	"bufio"
 	"fmt"
-	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 	"os"
 	"path/filepath"
 	"time"
+
+	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 )
 
 // SetTracePretty makes the interpreter save pretty traces of the execution
 func (i *Interpreter) SetTracePretty() {
-    i.traceHandlers = append(i.traceHandlers, &tracePrettyDebug{
-        interpreter: i,
-    })
+	i.traceHandlers = append(i.traceHandlers, &tracePrettyDebug{
+		interpreter: i,
+	})
 }
 
 // creates a folder with the timestamp and writes each step in a separate file
@@ -75,7 +76,7 @@ func (t *tracePrettyDebug) traceInitialState(state m.K) {
 }
 
 func (t *tracePrettyDebug) traceStepStart(stepNr int, currentState m.K) {
-	t.newTraceFile(fmt.Sprintf("%s_step%d.log", t.dirName, stepNr))
+	t.newTraceFile(fmt.Sprintf("step%06d.log", stepNr))
 	t.fileWriter.WriteString(fmt.Sprintf("\n\nstep #%d begin\n\n", stepNr))
 }
 

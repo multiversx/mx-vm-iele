@@ -32,7 +32,11 @@ func (te *elrondIeleTestExecutor) Run(test *ij.Test) error {
 	}
 	vm, found := te.scheduleVMs[scheduleName]
 	if !found {
-		vm = eiele.NewElrondIeleVM(te.world, cryptohook.KryptoHookMockInstance, schedule)
+		elrondIeleVM := eiele.NewElrondIeleVM(te.world, cryptohook.KryptoHookMockInstance, schedule)
+		if te.tracePretty {
+			elrondIeleVM.SetTracePretty()
+		}
+		vm = elrondIeleVM
 		te.scheduleVMs[scheduleName] = vm
 	}
 

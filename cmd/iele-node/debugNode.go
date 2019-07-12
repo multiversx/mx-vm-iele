@@ -18,8 +18,8 @@ func main() {
 	//debugElrondTest("tests/iele-v3/danse/forwarder/create.iele.json", false)
 
 	//debugElrondTest("adder/adder.iele.json", false)
-	debugElrondTest("agar_v2/topUp_withdraw.iele.json", false)
-	//debugElrondTest("agar_v2/withdraw_Ok.iele.json", false)
+	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false)
+	debugElrondTest("agar_v1/endGame.iele.json", true)
 	//debugAgarV2()
 
 	//debugIllFormedX()
@@ -43,7 +43,7 @@ func debugAgarV2() {
 func debugElrondTest(testFile string, tracePretty bool) {
 	err := controller.RunSingleIeleTest(
 		filepath.Join(elrondTestRoot, testFile),
-		newElrondIeleTestExecutor(false))
+		newElrondIeleTestExecutor(tracePretty))
 
 	if err == nil {
 		fmt.Println("SUCCESS")
@@ -55,7 +55,7 @@ func debugElrondTest(testFile string, tracePretty bool) {
 func debugOriginalTest(testFile string, tracePretty bool) {
 	err := controller.RunSingleIeleTest(
 		filepath.Join(elrondTestRoot, testFile),
-		newOriginalIeleTestExecutor(false))
+		newOriginalIeleTestExecutor(tracePretty))
 
 	if err == nil {
 		fmt.Println("SUCCESS")

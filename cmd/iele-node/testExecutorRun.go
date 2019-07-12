@@ -281,6 +281,12 @@ func convertBlockHeader(testBlh *ij.BlockHeader) *vmi.SCCallHeader {
 		GasLimit:    testBlh.GasLimit,
 		Timestamp:   testBlh.UnixTimestamp,
 	}
+	// return &vmi.SCCallHeader{
+	// 	Beneficiary: big.NewInt(0),
+	// 	Number:      big.NewInt(0),
+	// 	GasLimit:    big.NewInt(0),
+	// 	Timestamp:   big.NewInt(0),
+	// }
 }
 
 var zero = big.NewInt(0)
