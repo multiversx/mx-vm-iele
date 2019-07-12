@@ -21,6 +21,13 @@ func (vm *OriginalIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput)
 		return nil, fmt.Errorf("caller address is not %d bytes in length", AddressLength)
 	}
 
+	// subtract initial gas (G0)
+	g0, g0Err := vm.G0Create(input)
+	if g0Err != nil {
+		return nil, g0Err
+	}
+	gasProvided := big.NewInt(0).Sub(input.GasProvided, g0)
+
 	// convert input
 	kapp := &m.KApply{Label: m.LblRunVM, List: []m.K{
 		m.BoolTrue,
@@ -30,7 +37,7 @@ func (vm *OriginalIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput)
 		convertArgs(input.Arguments),
 		m.NewInt(input.CallValue),
 		m.NewInt(input.GasPrice),
-		m.NewInt(input.GasProvided),
+		m.NewInt(gasProvided),
 		m.NewInt(input.Header.Beneficiary),
 		m.IntZero, // difficulty
 		m.NewInt(input.Header.Number),
@@ -55,6 +62,13 @@ func (vm *OriginalIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*v
 		return nil, fmt.Errorf("recipient address is not %d bytes in length", AddressLength)
 	}
 
+	// subtract initial gas (G0)
+	g0, g0Err := vm.G0Call(input)
+	if g0Err != nil {
+		return nil, g0Err
+	}
+	gasProvided := big.NewInt(0).Sub(input.GasProvided, g0)
+
 	kapp := &m.KApply{Label: m.LblRunVM, List: []m.K{
 		m.BoolFalse,
 		m.NewIntFromBytes(input.RecipientAddr),
@@ -63,7 +77,7 @@ func (vm *OriginalIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*v
 		convertArgs(input.Arguments),
 		m.NewInt(input.CallValue),
 		m.NewInt(input.GasPrice),
-		m.NewInt(input.GasProvided),
+		m.NewInt(gasProvided),
 		m.NewInt(input.Header.Beneficiary),
 		m.IntZero, // difficulty
 		m.NewInt(input.Header.Number),
