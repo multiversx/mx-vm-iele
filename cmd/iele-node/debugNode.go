@@ -13,13 +13,13 @@ func main() {
 
 	//debugElrondTest("tests/iele-v3/danse/ill-formed/illFormed2.iele.json", false)
 	//debugOriginalTest("tests/iele/danse/ill-formed/illFormed2.iele.json", false)
-	//debugOriginalTest("tests/iele/albe/ill-formed/illFormedX14.iele.json", false)
+	debugOriginalTest("tests/iele/albe/ERC20/create.iele.json", false)
 
 	//debugElrondTest("tests/iele-v3/danse/forwarder/create.iele.json", false)
 
 	//debugElrondTest("adder/adder.iele.json", false)
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false)
-	debugElrondTest("agar_v1/endGame.iele.json", true)
+	//ebugElrondTest("agar_v1/endGame.iele.json", true)
 	//debugAgarV2()
 
 	//debugIllFormedX()
@@ -54,7 +54,7 @@ func debugElrondTest(testFile string, tracePretty bool) {
 
 func debugOriginalTest(testFile string, tracePretty bool) {
 	err := controller.RunSingleIeleTest(
-		filepath.Join(elrondTestRoot, testFile),
+		filepath.Join(originalTestRoot, testFile),
 		newOriginalIeleTestExecutor(tracePretty))
 
 	if err == nil {

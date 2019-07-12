@@ -15,8 +15,8 @@ type originalIeleTestExecutor struct {
 	world       *worldhook.BlockchainHookMock
 }
 
-func newOriginalIeleTestExecutor(tracePretty bool) *elrondIeleTestExecutor {
-	return &elrondIeleTestExecutor{
+func newOriginalIeleTestExecutor(tracePretty bool) *originalIeleTestExecutor {
+	return &originalIeleTestExecutor{
 		tracePretty: tracePretty,
 		scheduleVMs: make(map[string]vmi.VMExecutionHandler),
 		world:       worldhook.NewMock(),

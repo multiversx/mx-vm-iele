@@ -25,8 +25,8 @@ func TestElrondIeleTests(t *testing.T) {
 
 func TestOriginalIeleTests(t *testing.T) {
 	err := controller.RunAllIeleTestsInDirectory(
-		elrondTestRoot,
-		"tests/iele-v3",
+		originalTestRoot,
+		"tests/iele",
 		excludedTests,
 		newOriginalIeleTestExecutor(false))
 
