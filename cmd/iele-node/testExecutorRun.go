@@ -119,7 +119,7 @@ func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Blockcha
 				}
 			}
 			// burned := big.NewInt(0).Sub(tx.GasLimit, output.GasRemaining)
-			// fmt.Printf("consumed: %d   refund: %d\n", burned, output.GasRefund)
+			// fmt.Printf("all: 0x%x  remaining: 0x%x  consumed: 0x%x   refund: 0x%x\n", tx.GasLimit, output.GasRemaining, burned, output.GasRefund)
 
 			// check empty logs, this seems to be the value
 			if blResult.IgnoreLogs {
@@ -255,6 +255,9 @@ func resultAsString(result []*big.Int) string {
 func convertAccount(testAcct *ij.Account) *worldhook.Account {
 	storage := make(map[string][]byte)
 	for _, stkvp := range testAcct.Storage {
+		if stkvp.Value == nil {
+			panic("why?")
+		}
 		key := string(stkvp.Key.Bytes())
 		storage[key] = stkvp.Value.Bytes()
 	}
