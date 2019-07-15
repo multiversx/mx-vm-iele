@@ -17,11 +17,11 @@ func main() {
 	//debugOriginalTest("tests/iele/albe/ERC20/create.iele.json", false)
 
 	//debugElrondTest("auction-solidity/create.iele.json", false)
-	//debugElrondTest("agar_v2/addPlayerToGame.iele.json", false)
+	debugElrondTestnetTest("agar_v2/withdraw_TooMuch.iele.json", true)
 
 	//debugElrondTest("adder/adder.iele.json", false)
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", true)
-	debugElrondTest("agar_v1/create.iele.json", false)
+	//debugElrondTest("agar_v1/create.iele.json", false)
 	//debugAgarV2()
 
 	//debugIllFormedX()
@@ -58,6 +58,18 @@ func debugOriginalTest(testFile string, tracePretty bool) {
 	err := controller.RunSingleIeleTest(
 		filepath.Join(originalTestRoot, testFile),
 		newOriginalIeleTestExecutor(tracePretty))
+
+	if err == nil {
+		fmt.Println("SUCCESS")
+	} else {
+		fmt.Printf("ERROR: %s\n", err.Error())
+	}
+}
+
+func debugElrondTestnetTest(testFile string, tracePretty bool) {
+	err := controller.RunSingleIeleTest(
+		filepath.Join(elrondTestRoot, testFile),
+		newElrondTestnetIeleTestExecutor(tracePretty))
 
 	if err == nil {
 		fmt.Println("SUCCESS")

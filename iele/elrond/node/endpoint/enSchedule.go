@@ -19,8 +19,11 @@ const (
 	// Danse is the IELE "DANSE" gas model, this is the latest version.
 	Danse
 
-	// ElrondDefault is the current gas model for Elrond, it is currently identical to Danse.
+	// ElrondDefault is the default gas model for Elrond, it is currently identical to Danse.
 	ElrondDefault
+
+	// ElrondTestnet is a gas model with minimal gas costs, used for the Elrond testnet.
+	ElrondTestnet
 )
 
 // ParseSchedule yields the schedule with the given name. It is used in tests.
@@ -32,10 +35,10 @@ func ParseSchedule(scheduleName string) (Schedule, error) {
 		return Albe, nil
 	case "Danse":
 		return Danse, nil
-	case "Elrond":
-		return ElrondDefault, nil
 	case "ElrondDefault":
 		return ElrondDefault, nil
+	case "ElrondTestnet":
+		return ElrondTestnet, nil
 	default:
 		return VMTests, errors.New("unknown IELE schedule name")
 	}
@@ -51,6 +54,8 @@ func (vm *ElrondIeleVM) scheduleToK(schedule Schedule) m.KReference {
 		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("DANSE_IELE-CONSTANTS"))
 	case ElrondDefault:
 		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("DANSE_IELE-CONSTANTS"))
+	case ElrondTestnet:
+		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("ELRONDTESTNET_IELE-CONSTANTS"))
 	default:
 		panic("unknown IELE schedule")
 	}

@@ -21,6 +21,7 @@ module IELE-CONSTANTS
     syntax Mode ::= "NORMAL" [klabel(NORMAL), symbol] | "VMTESTS"
     syntax Schedule ::= "ALBE"
                       | "DANSE"
+                      | "ELRONDTESTNET"
 endmodule
 
 

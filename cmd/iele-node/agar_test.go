@@ -29,3 +29,15 @@ func TestAgarV2(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestAgarV2TestnetGas(t *testing.T) {
+	err := controller.RunAllIeleTestsInDirectory(
+		elrondTestRoot,
+		"agar_v2",
+		nil,
+		newElrondTestnetIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
+}

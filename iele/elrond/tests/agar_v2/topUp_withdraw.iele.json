@@ -28,14 +28,14 @@
                     {
                         "out": [],
                         "status": "",
-                        "gas": "0xf6b8a",
+                        "gas": "*",
                         "logs": [],
                         "refund": ""
                     },
                     {
                         "out": [],
                         "status": "",
-                        "gas": "0xf7bbb",
+                        "gas": "*",
                         "logs": [],
                         "refund": ""
                     }

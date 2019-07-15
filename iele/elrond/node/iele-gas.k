@@ -1095,7 +1095,6 @@ module IELE-GAS
 
 
 
-
  // Danse
  // ---------------------------
     rule Gmove          < DANSE > => 2000
@@ -1184,6 +1183,116 @@ module IELE-GAS
     rule Gnewmove      << DANSE >> => true
     rule Gnewarith     << DANSE >> => true
     rule SCHEDCONST    << DANSE >> => SCHEDCONST << ALBE >> [owise]
+
+
+
+
+
+
+
+
+
+
+
+
+// Elrond Testnet - all gas costs set to 1
+// ---------------------------
+    rule Gmove          < ELRONDTESTNET > => 1
+    rule Greadstate     < ELRONDTESTNET > => 1
+    rule Gadd           < ELRONDTESTNET > => 1
+    rule Gaddword       < ELRONDTESTNET > => 1
+    rule Gmul           < ELRONDTESTNET > => 1
+    rule Gmulword       < ELRONDTESTNET > => 1
+    rule Gmulkara       < ELRONDTESTNET > => 1
+    rule Gdiv           < ELRONDTESTNET > => 1
+    rule Gdivword       < ELRONDTESTNET > => 1
+    rule Gdivkara       < ELRONDTESTNET > => 1
+    rule Gexpkara       < ELRONDTESTNET > => 1
+    rule Gexpword       < ELRONDTESTNET > => 1
+    rule Gexp           < ELRONDTESTNET > => 1
+    rule Gexpmodkara    < ELRONDTESTNET > => 1
+    rule Gexpmodmod     < ELRONDTESTNET > => 1
+    rule Gexpmodexp     < ELRONDTESTNET > => 1
+    rule Gexpmod        < ELRONDTESTNET > => 1
+    rule Gnot           < ELRONDTESTNET > => 1
+    rule Gnotword       < ELRONDTESTNET > => 1
+    rule Gbitwise       < ELRONDTESTNET > => 1
+    rule Gbitwiseword   < ELRONDTESTNET > => 1
+    rule Glogarithm     < ELRONDTESTNET > => 1
+    rule Glogarithmword < ELRONDTESTNET > => 1
+    rule Gbyte          < ELRONDTESTNET > => 1
+    rule Gtwos          < ELRONDTESTNET > => 1
+    rule Gtwosword      < ELRONDTESTNET > => 1
+    rule Gsext          < ELRONDTESTNET > => 1
+    rule Gsextword      < ELRONDTESTNET > => 1
+    rule Gbswap         < ELRONDTESTNET > => 1
+    rule Gbswapword     < ELRONDTESTNET > => 1
+    rule Giszero        < ELRONDTESTNET > => 1
+    rule Gcmp           < ELRONDTESTNET > => 1
+    rule Gcmpword       < ELRONDTESTNET > => 1
+    rule Gbr            < ELRONDTESTNET > => 1
+    rule Gbrcond        < ELRONDTESTNET > => 1
+    rule Gblockhash     < ELRONDTESTNET > => 1
+    rule Gsha3          < ELRONDTESTNET > => 1
+    rule Gsha3word      < ELRONDTESTNET > => 1
+    rule Gloadcell      < ELRONDTESTNET > => 1
+    rule Gload          < ELRONDTESTNET > => 1
+    rule Gloadword      < ELRONDTESTNET > => 1
+    rule Gstorecell     < ELRONDTESTNET > => 1
+    rule Gstore         < ELRONDTESTNET > => 1
+    rule Gstoreword     < ELRONDTESTNET > => 1
+    rule Gbalance       < ELRONDTESTNET > => 1
+    rule Gextcodesize   < ELRONDTESTNET > => 1
+    rule Gcalladdress   < ELRONDTESTNET > => 1
+    rule Glog           < ELRONDTESTNET > => 1
+    rule Glogdata       < ELRONDTESTNET > => 1
+    rule Glogtopic      < ELRONDTESTNET > => 1
+    rule Gsstore        < ELRONDTESTNET > => 1
+    rule Gsstoreword    < ELRONDTESTNET > => 1
+    rule Gsstorekey     < ELRONDTESTNET > => 1
+    rule Gsstoreset     < ELRONDTESTNET > => 1
+    rule Rsstoreset     < ELRONDTESTNET > => 1
+    rule Gsstoresetkey  < ELRONDTESTNET > => 1
+    rule Gsload         < ELRONDTESTNET > => 1
+    rule Gsloadkey      < ELRONDTESTNET > => 1
+    rule Gsloadword     < ELRONDTESTNET > => 1
+    rule Gselfdestruct  < ELRONDTESTNET > => 1
+    rule Gcallmemory    < ELRONDTESTNET > => 1
+    rule Gcallreg       < ELRONDTESTNET > => 1
+    rule Glocalcall     < ELRONDTESTNET > => 1
+    rule Gcall          < ELRONDTESTNET > => 1
+    rule Gcallstipend   < ELRONDTESTNET > => 1
+    rule Gcallvalue     < ELRONDTESTNET > => 1
+    rule Gnewaccount    < ELRONDTESTNET > => 1
+    rule Gcreate        < ELRONDTESTNET > => 1
+    rule Gcopycreate    < ELRONDTESTNET > => 1
+    rule Gcodedeposit   < ELRONDTESTNET > => 1
+    rule Gecrec         < ELRONDTESTNET > => 1
+    rule Gsha256        < ELRONDTESTNET > => 1
+    rule Gsha256word    < ELRONDTESTNET > => 1
+    rule Grip160        < ELRONDTESTNET > => 1
+    rule Grip160word    < ELRONDTESTNET > => 1
+    rule Gecadd         < ELRONDTESTNET > => 1
+    rule Gecmul         < ELRONDTESTNET > => 1
+    rule Gecpairing     < ELRONDTESTNET > => 1
+    rule Gecpairingpair < ELRONDTESTNET > => 1
+    rule Gmemory        < ELRONDTESTNET > => 1
+    rule Gquadcoeff     < ELRONDTESTNET > => 1
+    rule Gtransaction   < ELRONDTESTNET > => 1
+    rule Gtxcreate      < ELRONDTESTNET > => 1
+    rule Gtxdatazero    < ELRONDTESTNET > => 1
+    rule Gtxdatanonzero < ELRONDTESTNET > => 1
+    rule Rselfdestruct  < ELRONDTESTNET > => 1
+    rule Rb             < ELRONDTESTNET > => 1
+
+ 
+    rule Sgasdivisor < ELRONDTESTNET > => 1
+    rule SCHEDCONST  < ELRONDTESTNET > => SCHEDCONST < ALBE > [owise]
+
+    rule Gnewmove      << ELRONDTESTNET >> => true
+    rule Gnewarith     << ELRONDTESTNET >> => true
+    rule SCHEDCONST    << ELRONDTESTNET >> => SCHEDCONST << ALBE >> [owise]
     
+
 endmodule
 

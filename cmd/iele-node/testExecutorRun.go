@@ -118,6 +118,9 @@ func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Blockcha
 						blResult.Gas, blResult.Gas, output.GasRemaining, output.GasRemaining)
 				}
 			}
+			// burned := big.NewInt(0).Sub(tx.GasLimit, output.GasRemaining)
+			// fmt.Printf("consumed: %d   refund: %d\n", burned, output.GasRefund)
+
 			// check empty logs, this seems to be the value
 			if blResult.IgnoreLogs {
 				// nothing, ignore
