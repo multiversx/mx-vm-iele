@@ -21,6 +21,13 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 		return nil, fmt.Errorf("caller address is not %d bytes in length", AddressLength)
 	}
 
+	// subtract initial gas (G0)
+	g0, g0Err := vm.G0Create(input)
+	if g0Err != nil {
+		return nil, g0Err
+	}
+	gasProvided := big.NewInt(0).Sub(input.GasProvided, g0)
+
 	// convert input
 	kapp := vm.kinterpreter.Model.NewKApply(m.LblRunVM,
 		m.BoolTrue,
@@ -32,6 +39,7 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 		vm.kinterpreter.Model.FromBigInt(input.GasPrice),
 		vm.kinterpreter.Model.FromBigInt(input.GasProvided),
 		vm.kinterpreter.Model.FromBigInt(input.Header.Beneficiary),
+
 		m.IntZero, // difficulty
 		vm.kinterpreter.Model.FromBigInt(input.Header.Number),
 		vm.kinterpreter.Model.FromBigInt(input.Header.GasLimit),
@@ -55,6 +63,13 @@ func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi
 		return nil, fmt.Errorf("recipient address is not %d bytes in length", AddressLength)
 	}
 
+	// subtract initial gas (G0)
+	g0, g0Err := vm.G0Call(input)
+	if g0Err != nil {
+		return nil, g0Err
+	}
+	gasProvided := big.NewInt(0).Sub(input.GasProvided, g0)
+
 	kapp := vm.kinterpreter.Model.NewKApply(m.LblRunVM,
 		m.BoolFalse,
 		vm.kinterpreter.Model.IntFromBytes(input.RecipientAddr),
@@ -63,7 +78,7 @@ func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi
 		vm.convertArgs(input.Arguments),
 		vm.kinterpreter.Model.FromBigInt(input.CallValue),
 		vm.kinterpreter.Model.FromBigInt(input.GasPrice),
-		vm.kinterpreter.Model.FromBigInt(input.GasProvided),
+		vm.kinterpreter.Model.FromBigInt(gasProvided),
 		vm.kinterpreter.Model.FromBigInt(input.Header.Beneficiary),
 		m.IntZero, // difficulty
 		vm.kinterpreter.Model.FromBigInt(input.Header.Number),

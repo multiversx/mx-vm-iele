@@ -1,4 +1,4 @@
-package endpointtest
+package main
 
 import (
 	"bytes"
@@ -8,59 +8,14 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
-	"strings"
 
-	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 	worldhook "github.com/ElrondNetwork/elrond-vm/mock-hook-blockchain"
 
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
 	ij "github.com/ElrondNetwork/elrond-vm/iele/test-util/ielejson"
 )
 
-// RunJSONTest ... only playing around for now
-func RunJSONTest(testFilePath string, vmp VMProvider, world *worldhook.BlockchainHookMock) error {
-	var err error
-	testFilePath, err = filepath.Abs(testFilePath)
-	if err != nil {
-		return err
-	}
-
-	// Open our jsonFile
-	var jsonFile *os.File
-	jsonFile, err = os.Open(testFilePath)
-	// if we os.Open returns an error then handle it
-	if err != nil {
-		return err
-	}
-
-	// defer the closing of our jsonFile so that we can parse it later on
-	defer jsonFile.Close()
-
-	byteValue, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		return err
-	}
-
-	top, parseErr := ij.ParseTopLevel(byteValue)
-	if parseErr != nil {
-		return parseErr
-	}
-
-	for _, test := range top {
-		testErr := runTest(testFilePath, test, vmp, world)
-		if testErr != nil {
-			return testErr
-		}
-	}
-
-	// toPath := strings.Replace(testFilePath, "iele-v2", "iele-v3", 1)
-	// fmt.Println(toPath)
-	// saveModifiedTest(toPath, top)
-
-	return nil
-}
-
-func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhook.BlockchainHookMock) error {
+func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.BlockchainHookMock) error {
 	// reset world
 	world.Clear()
 	world.Blockhashes = test.BlockHashes
@@ -70,18 +25,9 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 	scheduleName := test.Network
 
 	var assErr error
+
 	for _, acct := range test.Pre {
-		acct.Code, assErr = assembleIeleCode(testDirPath, acct.Code)
-		if assErr != nil {
-			return assErr
-		}
 		world.AcctMap.PutAccount(convertAccount(acct))
-	}
-	for _, acct := range test.PostState {
-		acct.Code, assErr = assembleIeleCode(testDirPath, acct.Code)
-		if assErr != nil {
-			return assErr
-		}
 	}
 
 	//spew.Dump(world.AcctMap)
@@ -103,28 +49,17 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 			var output *vmi.VMOutput
 
 			if tx.IsCreate {
-				assembledCode, assErr := assembleIeleCode(testDirPath, tx.ContractCode)
-				if assErr != nil {
-					return assErr
-				}
-
 				input := &vmi.ContractCreateInput{
-					ContractCode: []byte(assembledCode),
+					ContractCode: []byte(tx.AssembledCode),
 					VMInput: vmi.VMInput{
 						CallerAddr:  tx.From,
 						Arguments:   tx.Arguments,
 						CallValue:   tx.Value,
 						GasPrice:    tx.GasPrice,
-						GasProvided: nil,
+						GasProvided: tx.GasLimit,
 						Header:      convertBlockHeader(block.BlockHeader),
 					},
 				}
-
-				g0, g0Err := vm.G0Create(input)
-				if g0Err != nil {
-					return g0Err
-				}
-				input.GasProvided = big.NewInt(0).Sub(tx.GasLimit, g0)
 
 				var err error
 				output, err = vm.RunSmartContractCreate(input)
@@ -140,16 +75,10 @@ func runTest(testFilePath string, test *ij.Test, vmp VMProvider, world *worldhoo
 						Arguments:   tx.Arguments,
 						CallValue:   tx.Value,
 						GasPrice:    tx.GasPrice,
-						GasProvided: nil,
+						GasProvided: tx.GasLimit,
 						Header:      convertBlockHeader(block.BlockHeader),
 					},
 				}
-
-				g0, g0Err := vm.G0Call(input)
-				if g0Err != nil {
-					return g0Err
-				}
-				input.GasProvided = big.NewInt(0).Sub(tx.GasLimit, g0)
 
 				var err error
 				output, err = vm.RunSmartContractCall(input)
@@ -365,6 +294,12 @@ func convertBlockHeader(testBlh *ij.BlockHeader) *vmi.SCCallHeader {
 		GasLimit:    testBlh.GasLimit,
 		Timestamp:   testBlh.UnixTimestamp,
 	}
+	// return &vmi.SCCallHeader{
+	// 	Beneficiary: big.NewInt(0),
+	// 	Number:      big.NewInt(0),
+	// 	GasLimit:    big.NewInt(0),
+	// 	Timestamp:   big.NewInt(0),
+	// }
 }
 
 var zero = big.NewInt(0)
@@ -374,36 +309,6 @@ func zeroIfNil(i *big.Int) *big.Int {
 		return zero
 	}
 	return i
-}
-
-// make the tests run faster, by not repeating code assembly over and over again
-var assembledCodeCache = make(map[string]string)
-
-func assembleIeleCode(testPath string, value string) (string, error) {
-	if value == "" {
-		return "", nil
-	}
-	if strings.HasPrefix(value, "0x") {
-		code, _ := hex.DecodeString(value[2:])
-		return string(code), nil
-	}
-
-	contractPathFilePath := filepath.Join(testPath, value)
-
-	cached, foundInCache := assembledCodeCache[contractPathFilePath]
-	if foundInCache {
-		return cached, nil
-	}
-
-	compiledBytes := compiler.AssembleIeleCode(contractPathFilePath)
-	decoded, err := hex.DecodeString(string(compiledBytes))
-	if err != nil {
-		return "", err
-	}
-
-	result := string(decoded)
-	assembledCodeCache[contractPathFilePath] = result
-	return result, nil
 }
 
 // tool to modify tests

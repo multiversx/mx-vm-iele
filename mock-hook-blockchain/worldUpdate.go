@@ -28,7 +28,7 @@ func (b *BlockchainHookMock) UpdateBalance(address []byte, newBalance *big.Int) 
 	return nil
 }
 
-// UpdateWorldStateBefore ... performs gas payment, before transaction
+// UpdateWorldStateBefore performs gas payment, before transaction
 func (b *BlockchainHookMock) UpdateWorldStateBefore(
 	fromAddr []byte,
 	gasLimit *big.Int,

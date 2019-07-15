@@ -2,7 +2,6 @@ package endpoint
 
 import (
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	common "github.com/ElrondNetwork/elrond-vm/iele/common"
 	blockchain "github.com/ElrondNetwork/elrond-vm/iele/original/node/hookadapter/blockchain"
 	krypto "github.com/ElrondNetwork/elrond-vm/iele/original/node/hookadapter/krypto"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/original/node/iele-testing-kompiled/ieletestinginterpreter"
@@ -14,14 +13,14 @@ const AddressLength = 20
 // OriginalIeleVM defines an object containing the state of the Iele VM.
 // This is the original version.
 type OriginalIeleVM struct {
-	schedule          common.Schedule
+	schedule          Schedule
 	blockchainAdapter *blockchain.Blockchain
 	kryptoAdapter     *krypto.Krypto
 	kinterpreter      *interpreter.Interpreter
 }
 
 // NewOriginalIeleVM creates new original Iele VM instance
-func NewOriginalIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHook, schedule common.Schedule) *OriginalIeleVM {
+func NewOriginalIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHook, schedule Schedule) *OriginalIeleVM {
 	blockchainAdapter := &blockchain.Blockchain{
 		Upstream:      blockchainHook,
 		AddressLength: AddressLength,

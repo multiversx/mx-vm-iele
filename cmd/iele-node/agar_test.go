@@ -3,13 +3,29 @@ package main
 import (
 	"testing"
 
-	eptest "github.com/ElrondNetwork/elrond-vm/iele/test-util/endpointtest"
+	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
 )
 
-func TestAgar(t *testing.T) {
-	eptest.TestAllInDirectory(t,
+func TestAgarV1(t *testing.T) {
+	err := controller.RunAllIeleTestsInDirectory(
 		elrondTestRoot,
-		"agar",
-		&elrondIeleProvider{},
-		world)
+		"agar_v1",
+		nil,
+		newElrondIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestAgarV2(t *testing.T) {
+	err := controller.RunAllIeleTestsInDirectory(
+		elrondTestRoot,
+		"agar_v2",
+		nil,
+		newElrondIeleTestExecutor(false))
+
+	if err != nil {
+		t.Error(err)
+	}
 }

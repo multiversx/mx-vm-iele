@@ -1,4 +1,6 @@
 
+/vendor
+
 /cmd/*/trace_*/
 /cmd/*.prof
 
