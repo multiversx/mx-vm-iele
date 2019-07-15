@@ -41,9 +41,9 @@ func ParseSchedule(scheduleName string) (Schedule, error) {
 	}
 }
 
-func (vm *ElrondIeleVM) scheduleToK(schedule ielecommon.Schedule) m.KReference {
+func (vm *ElrondIeleVM) scheduleToK(schedule Schedule) m.KReference {
 	switch schedule {
-	case Default:
+	case VMTests:
 		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("DEFAULT_IELE-GAS"))
 	case Albe:
 		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("ALBE_IELE-CONSTANTS"))

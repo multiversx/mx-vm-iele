@@ -20,12 +20,6 @@ func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Blockcha
 	world.Clear()
 	world.Blockhashes = test.BlockHashes
 
-	testDirPath := filepath.Dir(testFilePath)
-
-	scheduleName := test.Network
-
-	var assErr error
-
 	for _, acct := range test.Pre {
 		world.AcctMap.PutAccount(convertAccount(acct))
 	}
@@ -34,12 +28,6 @@ func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Blockcha
 
 	for _, block := range test.Blocks {
 		for txIndex, tx := range block.Transactions {
-			// refresh VM
-			vm, initErr := vmp.GetVM(scheduleName)
-			if initErr != nil {
-				return initErr
-			}
-
 			//fmt.Printf("%d\n", txIndex)
 			beforeErr := world.UpdateWorldStateBefore(tx.From, tx.GasLimit, tx.GasPrice)
 			if beforeErr != nil {

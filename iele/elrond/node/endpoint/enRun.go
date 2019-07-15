@@ -37,7 +37,7 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 		vm.convertArgs(input.Arguments),
 		vm.kinterpreter.Model.FromBigInt(input.CallValue),
 		vm.kinterpreter.Model.FromBigInt(input.GasPrice),
-		vm.kinterpreter.Model.FromBigInt(input.GasProvided),
+		vm.kinterpreter.Model.FromBigInt(gasProvided),
 		vm.kinterpreter.Model.FromBigInt(input.Header.Beneficiary),
 
 		m.IntZero, // difficulty

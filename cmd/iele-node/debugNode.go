@@ -14,14 +14,14 @@ func main() {
 	//debugElrondTest("tests/iele-v3/danse/ill-formed/illFormed2.iele.json", false)
 	//debugOriginalTest("tests/iele/danse/ill-formed/illFormed2.iele.json", false)
 	//debugOriginalTest("tests/iele/albe/ill-formed/illFormedX14.iele.json", false)
-	debugOriginalTest("tests/iele/albe/ERC20/create.iele.json", false)
+	//debugOriginalTest("tests/iele/albe/ERC20/create.iele.json", false)
 
 	//debugElrondTest("auction-solidity/create.iele.json", false)
-	debugElrondTest("agar/addPlayerToGame.iele.json", false)
+	//debugElrondTest("agar_v2/addPlayerToGame.iele.json", false)
 
 	//debugElrondTest("adder/adder.iele.json", false)
-	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false)
-	//ebugElrondTest("agar_v1/endGame.iele.json", true)
+	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", true)
+	debugElrondTest("agar_v1/create.iele.json", false)
 	//debugAgarV2()
 
 	//debugIllFormedX()

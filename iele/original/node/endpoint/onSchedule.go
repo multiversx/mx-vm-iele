@@ -34,7 +34,7 @@ func ParseSchedule(scheduleName string) (Schedule, error) {
 	}
 }
 
-func (vm *OriginalIeleVM) scheduleToK(schedule ielecommon.Schedule) m.KReference {
+func (vm *OriginalIeleVM) scheduleToK(schedule Schedule) m.KReference {
 	switch schedule {
 	case Default:
 		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("DEFAULT_IELE-GAS"))
