@@ -9,7 +9,7 @@ import (
 	oj "github.com/ElrondNetwork/elrond-vm/iele/test-util/orderedjson"
 )
 
-// ParseTopLevel ... converts json string to object representation
+// ParseTopLevel converts json string to object representation
 func ParseTopLevel(jsonString []byte) ([]*Test, error) {
 
 	jobj, err := oj.ParseOrderedJSON(jsonString)

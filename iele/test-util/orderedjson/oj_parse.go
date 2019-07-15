@@ -35,7 +35,7 @@ func isWhitespace(c byte) bool {
 	return c == ' ' || c == '\n' || c == '\r' || c == '\t'
 }
 
-// ParseOrderedJSON ... parses JSON preserving order in maps
+// ParseOrderedJSON parses JSON preserving order in maps
 func ParseOrderedJSON(input []byte) (OJsonObject, error) {
 	stateStack := &jsonParserStateStack{}
 	stateStack.push(&jsonParserStateAnyObjPlaceholder{})

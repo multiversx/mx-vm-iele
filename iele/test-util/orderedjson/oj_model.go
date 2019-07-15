@@ -4,41 +4,42 @@ import (
 	"strings"
 )
 
-// OJsonObject ... ordered JSON tree object interface
+// OJsonObject is an ordered JSON tree object interface
 type OJsonObject interface {
 	writeJSON(sb *strings.Builder, indent int)
 }
 
-// OJsonKeyValuePair ... since this ir ordered JSON, maps are really ordered lists of key value pairs, this class
+// OJsonKeyValuePair is a key-value pair in a JSON map.
+// Since this is ordered JSON, maps are really ordered lists of key value pairs.
 type OJsonKeyValuePair struct {
 	Key   string
 	Value OJsonObject
 }
 
-// OJsonMap ... ordered map, actually a list of key value pairs
+// OJsonMap is an ordered map, actually a list of key value pairs
 type OJsonMap struct {
 	KeySet    map[string]bool
 	OrderedKV []*OJsonKeyValuePair
 }
 
-// OJsonList ... JSON list
+// OJsonList is a JSON list
 type OJsonList []OJsonObject
 
-// OJsonString ... JSON string value
+// OJsonString is a JSON string value
 type OJsonString struct {
 	Value string
 }
 
-// OJsonBool ... JSON bool value
+// OJsonBool is a JSON bool value
 type OJsonBool bool
 
-// NewMap ... create new ordered "map" instance
+// NewMap is a create new ordered "map" instance
 func NewMap() *OJsonMap {
 	KeySet := make(map[string]bool)
 	return &OJsonMap{KeySet: KeySet, OrderedKV: nil}
 }
 
-// Put ... put into map. Nothing if key exists in map
+// Put puts into map. Does nothing if key exists in map.
 func (j *OJsonMap) Put(key string, value OJsonObject) {
 	_, alreadyInserted := j.KeySet[key]
 	if !alreadyInserted {
@@ -48,12 +49,12 @@ func (j *OJsonMap) Put(key string, value OJsonObject) {
 	}
 }
 
-// Size ... size of ordered map
+// Size yields the size of ordered map.
 func (j *OJsonMap) Size() int {
 	return len(j.OrderedKV)
 }
 
-// RefreshKeySet ... recreate the key set from the key value pairs
+// RefreshKeySet recreates the key set from the key value pairs.
 func (j *OJsonMap) RefreshKeySet() {
 	j.KeySet = make(map[string]bool)
 	for _, kv := range j.OrderedKV {
@@ -61,7 +62,7 @@ func (j *OJsonMap) RefreshKeySet() {
 	}
 }
 
-// AsList ... returns it represented as a slice of objects
+// AsList converts a JSON list to a slice of objects.
 func (j *OJsonList) AsList() []OJsonObject {
 	return []OJsonObject(*j)
 }

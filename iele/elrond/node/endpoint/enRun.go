@@ -103,7 +103,7 @@ func (vm *ElrondIeleVM) convertArgs(args []*big.Int) m.KReference {
 	return kargList
 }
 
-// RunTransaction ... executes transaction contract code in VM
+// RunTransaction executes transaction contract code in VM
 func (vm *ElrondIeleVM) runTransaction(kinput m.KReference) (*vmi.VMOutput, error) {
 
 	mode := vm.kinterpreter.Model.NewKApply(m.LblNORMAL)

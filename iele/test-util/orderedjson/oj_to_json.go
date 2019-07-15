@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// JSONString ... returns a formatted string representation of an ordered JSON
+// JSONString returns a formatted string representation of an ordered JSON
 func JSONString(j OJsonObject) string {
 	var sb strings.Builder
 	j.writeJSON(&sb, 0)

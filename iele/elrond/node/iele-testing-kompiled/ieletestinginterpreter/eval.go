@@ -6,7 +6,7 @@ import (
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 )
 
-// TopCellInitializer ... label passed to Eval to initialize the top cell
+// TopCellInitializer is a label passed to Eval to initialize the top cell
 const TopCellInitializer m.KLabel = m.LblInitGeneratedTopCell
 
 // Eval ... evaluates a KApply item based on its label and arguments

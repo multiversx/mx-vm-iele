@@ -27,7 +27,7 @@ var ieleTestRoot = path.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork
 
 var kryptoAdapter = &krypto.Krypto{Upstream: cryptohook.KryptoHookMockInstance}
 
-// runTest ... runs one individual *.iele.json test
+// runTest runs one individual *.iele.json test
 func runTest(testFilePath string, testGasMode gasMode, tracePretty bool) error {
 	var err error
 	testFilePath, err = filepath.Abs(testFilePath)

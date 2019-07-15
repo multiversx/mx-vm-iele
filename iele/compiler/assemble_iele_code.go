@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// AssembleIeleCode ... calls the Haskell compiler to assemble contract code
+// AssembleIeleCode calls the Haskell compiler to assemble contract code
 func AssembleIeleCode(contractPathFilePath string) string {
 	initPrecompiledMap()
 	precompiled, found := tryRetrievePrecompiled(contractPathFilePath)
