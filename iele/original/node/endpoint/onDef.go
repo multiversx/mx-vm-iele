@@ -8,10 +8,11 @@ import (
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/original/node/iele-testing-kompiled/ieletestinginterpreter"
 )
 
-// AddressLength ... Account address length expected by the VM
+// AddressLength is the account address length expected by the VM.
 const AddressLength = 20
 
-// OriginalIeleVM is the container for the original version of IELE
+// OriginalIeleVM defines an object containing the state of the Iele VM.
+// This is the original version.
 type OriginalIeleVM struct {
 	schedule          common.Schedule
 	blockchainAdapter *blockchain.Blockchain
@@ -38,8 +39,8 @@ func NewOriginalIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoH
 
 // ClearVMState resets the VM state without freeing up the memory,
 // so the same memory can be reused on the next execution.
-func (vm *ElrondIeleVM) ClearVMState() {
-	//vm.kinterpreter.Model.Clear()
+func (vm *OriginalIeleVM) ClearVMState() {
+	vm.kinterpreter.Model.Clear()
 }
 
 // SetTracePretty turns on pretty trace creation, use for debugging only

@@ -5,14 +5,14 @@ import (
 	m "github.com/ElrondNetwork/elrond-vm/iele/original/node/iele-testing-kompiled/ieletestingmodel"
 )
 
-func scheduleToK(schedule ielecommon.Schedule) m.K {
+func (vm *OriginalIeleVM) scheduleToK(schedule ielecommon.Schedule) m.KReference {
 	switch schedule {
 	case ielecommon.Default:
-		return &m.KApply{Label: m.ParseKLabel("DEFAULT_IELE-GAS")}
+		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("DEFAULT_IELE-GAS"))
 	case ielecommon.Albe:
-		return &m.KApply{Label: m.ParseKLabel("ALBE_IELE-CONSTANTS")}
+		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("ALBE_IELE-CONSTANTS"))
 	case ielecommon.Danse:
-		return &m.KApply{Label: m.ParseKLabel("DANSE_IELE-CONSTANTS")}
+		return vm.kinterpreter.Model.NewKApply(m.ParseKLabel("DANSE_IELE-CONSTANTS"))
 	default:
 		panic("unknown IELE schedule")
 	}
