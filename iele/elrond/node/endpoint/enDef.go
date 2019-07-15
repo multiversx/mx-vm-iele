@@ -8,10 +8,11 @@ import (
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestinginterpreter"
 )
 
-// AddressLength ... Account address length expected by the VM
+// AddressLength is the account address length expected by the VM.
 const AddressLength = 32
 
-// ElrondIeleVM ... Iele VM, Elrond version
+// ElrondIeleVM defines an object containing the state of the Iele VM.
+// This is the Elrond version.
 type ElrondIeleVM struct {
 	schedule          ielecommon.Schedule
 	blockchainAdapter *blockchain.Blockchain
