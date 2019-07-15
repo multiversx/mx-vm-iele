@@ -36,12 +36,6 @@ func NewOriginalIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoH
 	}
 }
 
-// ClearVMState resets the VM state without freeing up the memory,
-// so the same memory can be reused on the next execution.
-func (vm *OriginalIeleVM) ClearVMState() {
-	vm.kinterpreter.Model.Clear()
-}
-
 // SetTracePretty turns on pretty trace creation, use for debugging only
 func (vm *OriginalIeleVM) SetTracePretty() {
 	vm.kinterpreter.SetTracePretty()

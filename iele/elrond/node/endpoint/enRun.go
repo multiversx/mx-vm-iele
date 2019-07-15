@@ -21,6 +21,10 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 		return nil, fmt.Errorf("caller address is not %d bytes in length", AddressLength)
 	}
 
+	// reset the VM state without freeing up the memory,
+	// so the same memory can be reused on the next execution
+	vm.kinterpreter.Model.Clear()
+
 	// subtract initial gas (G0)
 	g0, g0Err := vm.G0Create(input)
 	if g0Err != nil {

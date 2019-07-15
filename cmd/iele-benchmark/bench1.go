@@ -83,8 +83,6 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		}
 
 		for txi := 0; txi < nrTransfers; txi++ {
-			vm.ClearVMState()
-
 			input := &vmi.ContractCallInput{
 				RecipientAddr: contractAddr,
 				Function:      "transfer",
