@@ -17,7 +17,9 @@ func main() {
 	//debugOriginalTest("tests/iele/albe/ERC20/create.iele.json", false)
 
 	//debugElrondTest("auction-solidity/create.iele.json", false)
-	debugElrondTestnetTest("agar_v2/withdraw_TooMuch.iele.json", true)
+	//debugElrondTestnetTest("agar_v2/withdraw_TooMuch.iele.json", true)
+
+	debugElrondTest("agar_v2/rewardAndSendToWallet.iele.json", false)
 
 	//debugElrondTest("adder/adder.iele.json", false)
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", true)
