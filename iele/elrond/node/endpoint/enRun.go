@@ -21,6 +21,8 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 		return nil, fmt.Errorf("caller address is not %d bytes in length", AddressLength)
 	}
 
+	vm.logCreateInput(input)
+
 	// reset the VM state without freeing up the memory,
 	// so the same memory can be reused on the next execution
 	vm.kinterpreter.Model.Clear()
@@ -66,6 +68,12 @@ func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi
 	if len(input.RecipientAddr) != AddressLength {
 		return nil, fmt.Errorf("recipient address is not %d bytes in length", AddressLength)
 	}
+
+	vm.logCallInput(input)
+
+	// reset the VM state without freeing up the memory,
+	// so the same memory can be reused on the next execution
+	vm.kinterpreter.Model.Clear()
 
 	// subtract initial gas (G0)
 	g0, g0Err := vm.G0Call(input)
@@ -252,6 +260,9 @@ func (vm *ElrondIeleVM) runTransaction(kinput m.KReference) (*vmi.VMOutput, erro
 	}
 
 	//vm.kinterpreter.Model.PrintStats()
+
+	vm.logInputAccounts()
+	vm.logOutput(result)
 
 	return result, nil
 }

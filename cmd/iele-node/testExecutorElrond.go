@@ -11,16 +11,30 @@ import (
 
 type elrondIeleTestExecutor struct {
 	tracePretty bool
+	logIO       bool
 	scheduleVMs map[string]vmi.VMExecutionHandler
 	world       *worldhook.BlockchainHookMock
 }
 
-func newElrondIeleTestExecutor(tracePretty bool) *elrondIeleTestExecutor {
+func newElrondIeleTestExecutor() *elrondIeleTestExecutor {
 	return &elrondIeleTestExecutor{
-		tracePretty: tracePretty,
+		tracePretty: false,
+		logIO:       false,
 		scheduleVMs: make(map[string]vmi.VMExecutionHandler),
 		world:       worldhook.NewMock(),
 	}
+}
+
+// SetTracePretty turns on pretty trace creation, use for debugging only
+func (te *elrondIeleTestExecutor) SetTracePretty(tracePretty bool) *elrondIeleTestExecutor {
+	te.tracePretty = tracePretty
+	return te
+}
+
+// SetLogIO causes the VM to print to console all inputs, data from hooks and output
+func (te *elrondIeleTestExecutor) SetLogIO() *elrondIeleTestExecutor {
+	te.logIO = true
+	return te
 }
 
 // Run executes an individual Iele test.
@@ -35,6 +49,9 @@ func (te *elrondIeleTestExecutor) Run(test *ij.Test) error {
 		elrondIeleVM := eiele.NewElrondIeleVM(te.world, cryptohook.KryptoHookMockInstance, schedule)
 		if te.tracePretty {
 			elrondIeleVM.SetTracePretty()
+		}
+		if te.logIO {
+			elrondIeleVM.SetLogIO()
 		}
 		vm = elrondIeleVM
 		te.scheduleVMs[scheduleName] = vm

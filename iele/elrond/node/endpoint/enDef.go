@@ -17,6 +17,7 @@ type ElrondIeleVM struct {
 	blockchainAdapter *blockchain.Blockchain
 	kryptoAdapter     *krypto.Krypto
 	kinterpreter      *interpreter.Interpreter
+	logIO             bool
 }
 
 // NewElrondIeleVM creates new Elrond Iele VM instance
@@ -24,6 +25,7 @@ func NewElrondIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHoo
 	blockchainAdapter := &blockchain.Blockchain{
 		Upstream:      blockchainHook,
 		AddressLength: AddressLength,
+		LogToConsole:  false,
 	}
 	kryptoAdapter := &krypto.Krypto{Upstream: cryptoHook}
 	kinterpreter := interpreter.NewInterpreter(blockchainAdapter, kryptoAdapter)
@@ -39,4 +41,10 @@ func NewElrondIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHoo
 // SetTracePretty turns on pretty trace creation, use for debugging only
 func (vm *ElrondIeleVM) SetTracePretty() {
 	vm.kinterpreter.SetTracePretty()
+}
+
+// SetLogIO causes the VM to print to console all inputs, data from hooks and output
+func (vm *ElrondIeleVM) SetLogIO() {
+	vm.logIO = true
+	vm.blockchainAdapter.LogToConsole = true
 }

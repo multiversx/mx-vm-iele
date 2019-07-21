@@ -15,6 +15,14 @@ type Blockchain struct {
 
 	// AddressLength is the expected length of an address, in bytes
 	AddressLength int
+
+	// LogToConsole when set to true causes the adapter to also print all operations to console
+	LogToConsole bool
+
+	// inputAccounts is a structure where we store account data as it was loaded in the interpreter,
+	// if logging is enabled.
+	// Used for logging only.
+	inputAccounts map[string]*vmi.OutputAccount
 }
 
 // ConvertKIntToAddress takes a K Int and converts it to an address with the correct number of bytes,
@@ -51,6 +59,7 @@ func (b *Blockchain) GetBalance(c m.KReference, lbl m.KLabel, sort m.Sort, confi
 	if err != nil {
 		return m.NoResult, err
 	}
+	b.logBalance(acctAddr, result)
 	return ms.FromBigInt(result), nil
 }
 
@@ -64,6 +73,7 @@ func (b *Blockchain) GetNonce(c m.KReference, lbl m.KLabel, sort m.Sort, config 
 	if err != nil {
 		return m.NoResult, err
 	}
+	b.logNonce(acctAddr, result)
 	return ms.FromBigInt(result), nil
 }
 
@@ -103,10 +113,12 @@ func (b *Blockchain) GetStorageData(kaddr m.KReference, kindex m.KReference, lbl
 	if !isInt2 {
 		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := b.Upstream.GetStorageData(acctAddr, index.Bytes())
+	indexBytes := index.Bytes()
+	result, err := b.Upstream.GetStorageData(acctAddr, indexBytes)
 	if err != nil {
 		return m.NoResult, err
 	}
+	b.logStorage(acctAddr, indexBytes, result)
 	return ms.IntFromBytes(result), nil
 }
 

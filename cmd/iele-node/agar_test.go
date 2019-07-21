@@ -11,7 +11,7 @@ func TestAgarV1(t *testing.T) {
 		elrondTestRoot,
 		"agar_v1",
 		nil,
-		newElrondIeleTestExecutor(false))
+		newElrondIeleTestExecutor())
 
 	if err != nil {
 		t.Error(err)
@@ -23,7 +23,7 @@ func TestAgarV2(t *testing.T) {
 		elrondTestRoot,
 		"agar_v2",
 		nil,
-		newElrondIeleTestExecutor(false))
+		newElrondIeleTestExecutor())
 
 	if err != nil {
 		t.Error(err)

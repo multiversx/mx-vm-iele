@@ -47,7 +47,7 @@ func debugAgarV2() {
 func debugElrondTest(testFile string, tracePretty bool) {
 	err := controller.RunSingleIeleTest(
 		filepath.Join(elrondTestRoot, testFile),
-		newElrondIeleTestExecutor(tracePretty))
+		newElrondIeleTestExecutor().SetTracePretty(tracePretty))
 
 	if err == nil {
 		fmt.Println("SUCCESS")

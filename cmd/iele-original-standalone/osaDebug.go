@@ -8,7 +8,7 @@ import (
 func main() {
 	//debugTest("tests/iele/danse/ill-formed/illFormed2.iele.json")
 	//debugTest("tests/iele-v2/albe/ERC20/approve_Caller-Positive.iele.json")
-	debugVMTest("tests/VMTests/vmBitwiseLogicOperation/not0/not0.iele.json", true)
+	debugVMTest("tests/VMTests/vmPerformance/loop-mul/loop-mul.iele.json", false)
 }
 
 // .build/vm/iele-test-vm tests/iele/danse/forwarder/create.iele.json 10000

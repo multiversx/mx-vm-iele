@@ -11,7 +11,7 @@ func TestAuctionSolidity(t *testing.T) {
 		elrondTestRoot,
 		"agar_v1",
 		nil,
-		newElrondIeleTestExecutor(false))
+		newElrondIeleTestExecutor())
 
 	if err != nil {
 		t.Error(err)

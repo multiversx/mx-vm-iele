@@ -7,7 +7,6 @@ import (
 )
 
 var excludedTests = []string{
-	//"tests/VMTests/vmPerformance/*/*",
 	"tests/*/*/unit/precompiled.iele.json",
 }
 
@@ -16,7 +15,7 @@ func TestElrondIeleTests(t *testing.T) {
 		elrondTestRoot,
 		"tests/iele-v3",
 		excludedTests,
-		newElrondIeleTestExecutor(false))
+		newElrondIeleTestExecutor())
 
 	if err != nil {
 		t.Error(err)

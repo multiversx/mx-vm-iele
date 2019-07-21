@@ -11,7 +11,7 @@ func TestAdder(t *testing.T) {
 		elrondTestRoot,
 		"adder",
 		nil,
-		newElrondIeleTestExecutor(false))
+		newElrondIeleTestExecutor())
 
 	if err != nil {
 		t.Error(err)
