@@ -320,7 +320,7 @@ allPlayersProcessed:
   br %err, throw
 
   // we reward the first player
-  call @rewardWinner(%gameIndex, %previousPlayer, %gameBet)
+  call @rewardAndSendToWallet(%gameIndex, %previousPlayer, %gameBet)
 
 return:
   ret void
