@@ -1,8 +1,14 @@
 package main
 
 import (
+	"math/big"
 	"testing"
 )
+
+// go test -cpuprofile cpu.prof -memprofile mem.prof -bench Factorial32
+func BenchmarkFactorial32(b *testing.B) {
+	benchmarkStaticCall(b, "iele-examples/factorial.iele", "factorial", big.NewInt(32))
+}
 
 func BenchmarkManyErc20SimpleTransfers1(b *testing.B) {
 	benchmarkManyErc20SimpleTransfers(b, 1)

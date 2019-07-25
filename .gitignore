@@ -1,11 +1,11 @@
 
 /vendor
 
-/cmd/*/trace_*/
-/cmd/*.prof
+*.prof
+*.test
 
+/cmd/*/trace_*/
 /cmd/iele-benchmark/iele-benchmark*
-/cmd/iele-benchmark/*.prof
 
 /cmd/iele-node/iele-node
 /cmd/iele-original-node/iele-original-node

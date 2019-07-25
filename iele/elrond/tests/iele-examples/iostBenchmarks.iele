@@ -1,0 +1,73 @@
+contract IOSTBenchmarks {
+
+  define public @calculate(%n) {
+    %i = 1
+
+  condition:
+    %cond = cmp gt %i, %n
+    br %cond, after_loop
+
+  loop_body:
+    %pow5   = mul %i, %i
+    %pow5   = mul %pow5, %i
+    %pow5   = mul %pow5, %i
+    %pow5   = mul %pow5, %i
+    %result = add %result, %pow5
+    %i      = add %i, 1
+    br condition
+
+  after_loop:
+    ret %result
+
+  }
+
+  define public @recursiveFactorial(%n) {
+    // ensure that %n is larger than or equal to 0.
+    %lt = cmp lt %n, 0
+    br %lt, throw
+
+    %cond = cmp le %n, 1
+    br %cond, return1
+
+    %n      = sub %n, 1
+    %result = call @recursiveFactorial(%n)
+    %n      = sub %n, 1
+    %fac2   = call @recursiveFactorial(%n)
+    %result = add %result, %fac2
+
+    ret %result
+
+  return1:
+    ret 1
+
+  throw:
+    call @iele.invalid()
+  }
+
+  define public @strConcat(%str, %n) {
+    %strBits  = log2 %str
+    %strBits  = add %strBits, 7 // to achieve rounding up
+    %strBytes = div %strBits, 8
+    %strBits  = mul %strBytes, 8
+
+    %result = 0
+    
+  condition:
+    %cond = cmp le %n, 0
+    br %cond, after_loop
+
+  loop_body:
+    %result = shift %result, %strBits
+    %result = or %result, %str
+    %n      = sub %n, 1
+    br condition
+
+  after_loop:
+    ret %result
+
+  }
+
+  define @init() {}
+}
+
+

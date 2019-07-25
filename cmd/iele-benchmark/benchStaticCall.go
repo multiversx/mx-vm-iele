@@ -14,9 +14,9 @@ import (
 	cryptohook "github.com/ElrondNetwork/elrond-vm/mock-hook-crypto"
 )
 
-func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
+func benchmarkStaticCall(b *testing.B, contract string, functionName string, args ...*big.Int) {
 
-	contractPathFilePath := filepath.Join(elrondTestRoot, "iele-examples/erc20_elrond.iele")
+	contractPathFilePath := filepath.Join(elrondTestRoot, contract)
 
 	compiledBytes := compiler.AssembleIeleCode(contractPathFilePath)
 	decoded, err := hex.DecodeString(string(compiledBytes))
@@ -28,22 +28,16 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 
 	contractAddrHex := "c0879ac700000000000000000000000000000000000000000000000000000000"
 	account1AddrHex := "acc1000000000000000000000000000000000000000000000000000000000000"
-	account2AddrHex := "acc2000000000000000000000000000000000000000000000000000000000000"
 
 	contractAddr, _ := hex.DecodeString(contractAddrHex)
 	account1Addr, _ := hex.DecodeString(account1AddrHex)
-	account2Addr, _ := hex.DecodeString(account2AddrHex)
-
-	constractStorage := make(map[string][]byte)
-	constractStorage[storageKey("01"+account1AddrHex)] = big.NewInt(2000000000).Bytes()
-	constractStorage[storageKey("00")] = big.NewInt(2000000000).Bytes() // total supply
 
 	world.AcctMap.PutAccount(&worldhook.Account{
 		Exists:  true,
 		Address: contractAddr,
 		Nonce:   big.NewInt(0),
 		Balance: big.NewInt(0),
-		Storage: constractStorage,
+		Storage: make(map[string][]byte),
 		Code:    decoded,
 	})
 
@@ -56,23 +50,16 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		Code:    []byte{},
 	})
 
-	world.AcctMap.PutAccount(&worldhook.Account{
-		Exists:  true,
-		Address: account2Addr,
-		Nonce:   big.NewInt(0),
-		Balance: hexToBigInt("e8d4a51000"),
-		Storage: make(map[string][]byte),
-		Code:    []byte{},
-	})
-
 	// create the VM and allocate some memory
 	vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, eiele.ElrondDefault)
 
+	repeats := 1
 	if b != nil { // nil when debugging
 		b.ResetTimer()
+		repeats = b.N
 	}
 
-	for benchMarkRepeat := 0; benchMarkRepeat < 1; benchMarkRepeat++ {
+	for benchMarkRepeat := 0; benchMarkRepeat < repeats; benchMarkRepeat++ {
 		blHeader := &vmi.SCCallHeader{
 			Beneficiary: big.NewInt(0),
 			Number:      big.NewInt(int64(benchMarkRepeat)),
@@ -80,33 +67,30 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 			Timestamp:   big.NewInt(0),
 		}
 
-		for txi := 0; txi < nrTransfers; txi++ {
-			input := &vmi.ContractCallInput{
-				RecipientAddr: contractAddr,
-				Function:      "transfer",
-				VMInput: vmi.VMInput{
-					CallerAddr: account1Addr,
-					Arguments: []*big.Int{
-						hexToBigInt(account2AddrHex),
-						big.NewInt(1),
-					},
-					CallValue:   big.NewInt(0),
-					GasPrice:    big.NewInt(1),
-					GasProvided: hexToBigInt("100000"),
-					Header:      blHeader,
-				},
-			}
-
-			output, err := vm.RunSmartContractCall(input)
-			if err != nil {
-				panic(err)
-			}
-
-			if output.ReturnCode != vmi.Ok {
-				panic(fmt.Sprintf("returned non-zero code: %d", output.ReturnCode))
-			}
-
-			lastReturnCode = output.ReturnCode
+		input := &vmi.ContractCallInput{
+			RecipientAddr: contractAddr,
+			Function:      functionName,
+			VMInput: vmi.VMInput{
+				CallerAddr:  account1Addr,
+				Arguments:   args,
+				CallValue:   big.NewInt(0),
+				GasPrice:    big.NewInt(1),
+				GasProvided: hexToBigInt("100000000000000000000000000000000000000000000000000000000000000000000"),
+				Header:      blHeader,
+			},
 		}
+
+		output, err := vm.RunSmartContractCall(input)
+		if err != nil {
+			panic(err)
+		}
+
+		if output.ReturnCode != vmi.Ok {
+			panic(fmt.Sprintf("returned non-zero code: %d", output.ReturnCode))
+		}
+
+		//fmt.Println("Returned: " + string(output.ReturnData[0].Bytes()))
+
+		lastReturnCode = output.ReturnCode
 	}
 }
