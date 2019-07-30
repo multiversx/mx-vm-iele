@@ -16,7 +16,6 @@ func transfer(from, to *ModelData, ref KReference) KReference {
 		_, _, sortInt, labelInt, index := parseKrefCollection(ref)
 		obj := from.getReferencedObject(index)
 		obj.transferContents(from, to)
-		from.allObjects[index] = nil
 		return to.addCollectionObject(Sort(sortInt), KLabel(labelInt), obj)
 	}
 
