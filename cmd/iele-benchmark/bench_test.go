@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-// go test -cpuprofile cpu.prof -memprofile mem.prof -bench Factorial32
+// go test -bench Factorial32
 func BenchmarkFactorial32(b *testing.B) {
 	benchmarkStaticCall(b, "iele-examples/factorial.iele", "factorial", big.NewInt(32))
 }
@@ -30,6 +30,6 @@ func BenchmarkManyErc20SimpleTransfers1000(b *testing.B) {
 	benchmarkManyErc20SimpleTransfers(b, 1000)
 }
 
-// func BenchmarkManyErc20SimpleTransfers15000(b *testing.B) {
-// 	benchmarkManyErc20SimpleTransfers(b, 15000)
-// }
+func BenchmarkManyErc20SimpleTransfers15000(b *testing.B) {
+	benchmarkManyErc20SimpleTransfers(b, 15000)
+}

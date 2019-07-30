@@ -19,10 +19,14 @@ func main() {
 	//debugElrondTest("auction-solidity/create.iele.json", false)
 	//debugElrondTestnetTest("agar_v2/withdraw_TooMuch.iele.json", true)
 
-	debugElrondTest("agar_v2/endGame_leftover.iele.json", false)
+	//debugElrondTest("agar_v2/endGame_leftover.iele.json", false)
 
-	//debugElrondTest("adder/adder.iele.json", false)
-	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", true)
+	//debugElrondTest("perf-solidity/LoopExpNop1M.json", false)
+	debugOriginalTest("perf-solidity/LoopDivAdd10M.json", false)
+
+	//debugElrondTest("agar_v1/addPlayerToGame.iele.json", false)
+	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false) // trace_good
+	//debugElrondTest("tests/iele-v3/danse/unit/exceptions.iele.json", true)
 	//debugElrondTest("agar_v1/create.iele.json", false)
 	//debugAgarV2()
 

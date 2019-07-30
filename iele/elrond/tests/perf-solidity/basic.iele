@@ -1,0 +1,80 @@
+
+
+contract "basic.sol:BasicPerformanceTester" {
+
+define public @"testNop(int,int,uint)"(%exponent_0, %seed_1, %n_2) {
+entry:
+  %callvalue = call @iele.callvalue()
+  br %callvalue, throw
+  %out.of.range = cmp lt %n_2, 0
+  br %out.of.range, throw
+  %i_4 = 0
+
+for.loop:
+  %tmp = cmp lt %i_4, %n_2
+  %tmp1 = iszero %tmp
+  br %tmp1, for.end
+
+for.inc:
+  %tmp3 = add %i_4, 1
+  %i_4 = %tmp3
+  br for.loop
+
+for.end:
+  %_3 = %seed_1
+  br return
+
+return:
+  ret %_3
+
+throw:
+  revert -1
+}
+
+define public @"testDivAdd(uint,uint,uint,uint)"(%x_5, %y_6, %k_7, %n_8) {
+entry:
+  %callvalue = call @iele.callvalue()
+  br %callvalue, throw
+  %out.of.range = cmp lt %x_5, 0
+  br %out.of.range, throw
+  %out.of.range1 = cmp lt %y_6, 0
+  br %out.of.range1, throw
+  %out.of.range2 = cmp lt %k_7, 0
+  br %out.of.range2, throw
+  %out.of.range3 = cmp lt %n_8, 0
+  br %out.of.range3, throw
+  %r_10 = %x_5
+  %i_11 = 0
+
+for.loop:
+  %tmp = cmp lt %i_11, %n_8
+  %tmp4 = iszero %tmp
+  br %tmp4, for.end
+  %tmp5 = div %r_10, %y_6
+  %r_10 = %tmp5
+  %tmp6 = add %r_10, %k_7
+  %r_10 = %tmp6
+
+for.inc:
+  %tmp8 = add %i_11, 1
+  %i_11 = %tmp8
+  br for.loop
+
+for.end:
+  %_9 = %r_10
+  br return
+
+return:
+  ret %_9
+
+throw:
+  revert -1
+}
+
+define @init() {
+entry:
+  ret void
+}
+
+}
+

@@ -39,7 +39,7 @@ func testAllInDirectory(t *testing.T, mainDirPath string, testGasMode gasMode) {
 				fmt.Print("  skip\n")
 			} else {
 				var testErr error
-				testErr = runTest(testFilePath, testGasMode, false)
+				testErr = runTest(testFilePath, testGasMode, false, nil)
 				if testErr == nil {
 					nrPassed++
 					fmt.Print("  ok\n")

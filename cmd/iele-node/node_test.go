@@ -33,3 +33,7 @@ func TestOriginalIeleTests(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func BenchmarkExceptionsIele(b *testing.B) {
+	debugElrondTest("tests/iele-v3/danse/unit/exceptions.iele.json", false)
+}

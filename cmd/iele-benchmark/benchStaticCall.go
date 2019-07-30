@@ -45,7 +45,7 @@ func benchmarkStaticCall(b *testing.B, contract string, functionName string, arg
 		Exists:  true,
 		Address: account1Addr,
 		Nonce:   big.NewInt(0),
-		Balance: hexToBigInt("e8d4a51000"),
+		Balance: hexToBigInt("100000000"),
 		Storage: make(map[string][]byte),
 		Code:    []byte{},
 	})
@@ -75,7 +75,7 @@ func benchmarkStaticCall(b *testing.B, contract string, functionName string, arg
 				Arguments:   args,
 				CallValue:   big.NewInt(0),
 				GasPrice:    big.NewInt(1),
-				GasProvided: hexToBigInt("100000000000000000000000000000000000000000000000000000000000000000000"),
+				GasProvided: hexToBigInt("100000000"),
 				Header:      blHeader,
 			},
 		}

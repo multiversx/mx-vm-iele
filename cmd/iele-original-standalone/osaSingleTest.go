@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"testing"
 
 	krypto "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/hookadapter/krypto"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestinginterpreter"
@@ -27,8 +28,10 @@ var ieleTestRoot = path.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork
 
 var kryptoAdapter = &krypto.Krypto{Upstream: cryptohook.KryptoHookMockInstance}
 
+var executionError error
+
 // runTest runs one individual *.iele.json test
-func runTest(testFilePath string, testGasMode gasMode, tracePretty bool) error {
+func runTest(testFilePath string, testGasMode gasMode, tracePretty bool, b *testing.B) error {
 	var err error
 	testFilePath, err = filepath.Abs(testFilePath)
 	if err != nil {
@@ -69,10 +72,20 @@ func runTest(testFilePath string, testGasMode gasMode, tracePretty bool) error {
 		kinterpreter.SetTracePretty()
 	}
 
-	// execution itself
-	execErr := kinterpreter.Execute(kastInitMap)
-	if execErr != nil {
-		return execErr
+	repeat := 1
+	if b != nil {
+		// only when running benchmarks
+		b.ResetTimer()
+		repeat = b.N
+	}
+
+	for i := 0; i < repeat; i++ {
+		// execution itself
+		executionError = kinterpreter.Execute(kastInitMap)
+	}
+
+	if executionError != nil {
+		return executionError
 	}
 
 	finalState := kinterpreter.GetState()
