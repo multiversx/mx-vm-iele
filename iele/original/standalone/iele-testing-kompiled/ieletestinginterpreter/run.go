@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:05:41.660
+// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:35:04.814
 
 package ieletestinginterpreter
 
@@ -127,6 +127,10 @@ func (i *Interpreter) TakeStepsNoThread(k m.KReference) error {
 	return nil
 }
 
+// gcFrequencyMask indicates how often we perform garbage collection
+// every 65536 steps in this case.
+const gcFrequencyMask = (1 << 16) - 1
+
 func (i *Interpreter) runSteps(maxSteps int) error {
 	running := true
 	for running {
@@ -135,18 +139,13 @@ func (i *Interpreter) runSteps(maxSteps int) error {
 		}
 		i.traceStepStart()
 
-		// decrease all usages from the previous state
-		previousState := i.state
-		//i.Model.DecreaseUsage(previousState)
+		var err error
+		i.state, err = i.step(i.state)
 
-        var err error
-		i.state, err = i.step(previousState)
-
-		// increase all usages for the current state
-		//i.Model.IncreaseUsage(i.state)
-
-		// recycle everything that didn't show up in the new state
-        //i.Model.RecycleUnused(previousState)
+		// periodically clean up model of old data
+		if i.currentStep&gcFrequencyMask == 0 {
+			i.state = i.Model.Gc(i.state)
+		}
 
 		if err == nil {
 			i.traceStepEnd()

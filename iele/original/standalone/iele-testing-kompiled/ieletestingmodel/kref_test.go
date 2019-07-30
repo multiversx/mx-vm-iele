@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:05:41.660
+// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:35:04.814
 
 package ieletestingmodel
 
@@ -7,20 +7,20 @@ import (
 )
 
 func TestKrefBasic(t *testing.T) {
-	testKrefBasic(t, bottomRef, true, 0)
-	testKrefBasic(t, floatRef, false, 0)
+	testKrefBasic(t, bottomRef, mainDataRef, 0)
+	testKrefBasic(t, floatRef, constDataRef, 0)
 
-	testKrefBasic(t, bottomRef, true, refBasicDataMask)
-	testKrefBasic(t, boolRef, false, refBasicDataMask)
+	testKrefBasic(t, bottomRef, memoDataRef, refBasicDataMask)
+	testKrefBasic(t, boolRef, constDataRef, refBasicDataMask)
 }
 
-func testKrefBasic(t *testing.T, refType kreferenceType, constant bool, rest uint64) {
-	ref := createKrefBasic(refType, constant, rest)
-	decodedType, decodedConstant, decodedRest := parseKrefBasic(ref)
+func testKrefBasic(t *testing.T, refType kreferenceType, dataRef modelDataReference, rest uint64) {
+	ref := createKrefBasic(refType, dataRef, rest)
+	decodedType, decodedDataRef, decodedRest := parseKrefBasic(ref)
 	if decodedType != refType {
 		t.Error("testKrefBasic mismatch")
 	}
-	if decodedConstant != constant {
+	if decodedDataRef != dataRef {
 		t.Error("testKrefBasic mismatch")
 	}
 	if decodedRest != rest {
@@ -29,20 +29,20 @@ func testKrefBasic(t *testing.T, refType kreferenceType, constant bool, rest uin
 }
 
 func TestKrefBigInt(t *testing.T) {
-	testKrefBigInt(t, true, 0, 0)
-	testKrefBigInt(t, false, 0, 0)
+	testKrefBigInt(t, mainDataRef, 0, 0)
+	testKrefBigInt(t, constDataRef, 0, 0)
 
-	testKrefBigInt(t, true, 100, 50)
-	testKrefBigInt(t, false, 1000, 3)
+	testKrefBigInt(t, memoDataRef, 100, 50)
+	testKrefBigInt(t, mainDataRef, 1000, 3)
 }
 
-func testKrefBigInt(t *testing.T, constant bool, recycleCount uint64, index uint64) {
-	ref := createKrefBigInt(constant, recycleCount, index)
-	isBigInt, constantOut, recycleCountOut, indexOut := parseKrefBigInt(ref)
+func testKrefBigInt(t *testing.T, dataRef modelDataReference, recycleCount uint64, index uint64) {
+	ref := createKrefBigInt(dataRef, recycleCount, index)
+	isBigInt, dataRefOut, recycleCountOut, indexOut := parseKrefBigInt(ref)
 	if !isBigInt {
 		t.Error("testKrefBigInt bad refType")
 	}
-	if constantOut != constant {
+	if dataRefOut != dataRef {
 		t.Error("testKrefBigInt mismatch")
 	}
 	if recycleCountOut != recycleCount {
@@ -54,15 +54,18 @@ func testKrefBigInt(t *testing.T, constant bool, recycleCount uint64, index uint
 }
 
 func TestKrefCollection(t *testing.T) {
-	testKrefCollection(t, listRef, 5, 7, 123)
+	testKrefCollection(t, listRef, memoDataRef, 5, 7, 123)
 	testKrefList(t, 2, 4)
 }
 
-func testKrefCollection(t *testing.T, refType kreferenceType, sortInt uint64, labelInt uint64, index uint64) {
-	ref := createKrefCollection(refType, sortInt, labelInt, index)
-	refTypeOut, sortOut, labelOut, indexOut := parseKrefCollection(ref)
+func testKrefCollection(t *testing.T, refType kreferenceType, dataRef modelDataReference, sortInt uint64, labelInt uint64, index uint64) {
+	ref := createKrefCollection(refType, dataRef, sortInt, labelInt, index)
+	refTypeOut, dataRefOut, sortOut, labelOut, indexOut := parseKrefCollection(ref)
 	if refTypeOut != refType {
 		t.Error("testKrefCollection bad refType")
+	}
+	if dataRefOut != dataRef {
+		t.Error("testKrefCollection mismatch")
 	}
 	if sortOut != sortInt {
 		t.Error("testKrefCollection mismatch")
@@ -78,9 +81,12 @@ func testKrefCollection(t *testing.T, refType kreferenceType, sortInt uint64, la
 func testKrefList(t *testing.T, sortInt uint64, labelInt uint64) {
 	ms := NewModel()
 	ref := ms.NewList(Sort(sortInt), KLabel(labelInt), nil)
-	refTypeOut, sortOut, labelOut, _ := parseKrefCollection(ref)
+	refTypeOut, dataRefOut, sortOut, labelOut, _ := parseKrefCollection(ref)
 	if refTypeOut != listRef {
 		t.Error("testKrefList bad refType")
+	}
+	if dataRefOut != mainDataRef {
+		t.Error("testKrefList mismatch")
 	}
 	if sortOut != sortInt {
 		t.Error("testKrefList mismatch")

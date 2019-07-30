@@ -1,14 +1,11 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 14:09:18.513
+// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:33:19.058
 
 package ieletestingmodel
 
 // IncreaseUsage increments all reference counters in tree below given root.
 // It goes recursively through the whole sub-tree.
 func (ms *ModelState) IncreaseUsage(ref KReference) {
-	refType, constant, value := parseKrefBasic(ref)
-	if constant {
-		return
-	}
+	refType, dataRef, value := parseKrefBasic(ref)
 
 	switch refType {
 	case boolRef:
@@ -39,7 +36,7 @@ func (ms *ModelState) IncreaseUsage(ref KReference) {
 		}
 	default:
 		// object types
-		obj := ms.getReferencedObject(value, constant)
+		obj := ms.getData(dataRef).getReferencedObject(value)
 		obj.increaseUsage(ms)
 	}
 }

@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 14:09:18.513
+// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:33:19.058
 
 package ieletestingmodel
 
@@ -12,6 +12,7 @@ type KObject interface {
 	referenceType() kreferenceType
 	equals(ms *ModelState, other KObject) bool
 	deepCopy(ms *ModelState) KObject
+	transferContents(from, to *ModelData)
 	prettyPrint(ms *ModelState, sb *strings.Builder, indent int)
 	kprint(ms *ModelState, sb *strings.Builder)
 	collectionsToK(ms *ModelState) KReference
@@ -29,8 +30,11 @@ const (
 	preserved
 )
 
-// ModelState holds the state of the executor at a certain moment
-type ModelState struct {
+// ModelData holds part of state of the executor at a certain moment.
+type ModelData struct {
+	// reference to self
+	selfRef modelDataReference
+
 	// allKs keeps all K sequence elements into one large structure
 	// all K sequence element references point to this structure
 	allKsElements []ksequenceElem
@@ -52,67 +56,149 @@ type ModelState struct {
 
 	// keeps object types mixed together
 	allObjects []KObject
+}
+
+// ModelState holds the full state of the executor at a certain moment.
+type ModelState struct {
+	// mainData keeps the main data of the running interpreter
+	mainData *ModelData
 
 	// memoTables is a structure containing all memoization maps.
-	// Memoization tables are implemented as maps of maps of maps of ...
+	// Memoization tables are implemented as maps of maps of maps of ... of references
 	memoTables map[MemoTable]interface{}
+
+	// memoData is where the actual data for the memoization tables resides
+	// unlike the mainData, we never flush this one before execution is over
+	memoData *ModelData
+
+	// swapData is a small model used when collecting garbage.
+	// It is needed to keep the current state while the main model is flushed.
+	swapData *ModelData
 }
 
-// constantsModel is another instance of the model, but which only contains a few constants.
-var constantsModel = NewModel()
+// constantsData is the model data object that keeps constants defined statically
+var constantsData = newSmallModelData(constDataRef)
 
-func (ms *ModelState) getReferencedObject(index uint64, constant bool) KObject {
-	if constant {
-		return constantsModel.allObjects[index]
+func (ms *ModelState) getData(dataRef modelDataReference) *ModelData {
+	switch dataRef {
+	case mainDataRef:
+		return ms.mainData
+	case memoDataRef:
+		return ms.memoData
+	case constDataRef:
+		return constantsData
+	default:
+		panic("unknown modelDataReference")
 	}
-	if index >= uint64(len(ms.allObjects)) {
-		panic("trying to reference object beyond allocated objects")
+}
+
+func (md *ModelData) getReferencedObject(index uint64) KObject {
+	if index >= uint64(len(md.allObjects)) {
+		panic("trying to reference an object beyond allocated slice")
 	}
-	return ms.allObjects[index]
+	return md.allObjects[index]
 }
 
-func (ms *ModelState) addObject(obj KObject) KReference {
-	newIndex := len(ms.allObjects)
-	ms.allObjects = append(ms.allObjects, obj)
-	return createKrefBasic(obj.referenceType(), false, uint64(newIndex))
-}
-
-func addConstantObject(obj KObject) KReference {
-	newIndex := len(constantsModel.allObjects)
-	constantsModel.allObjects = append(constantsModel.allObjects, obj)
-	return createKrefBasic(obj.referenceType(), false, uint64(newIndex))
+func (md *ModelData) addObject(obj KObject) KReference {
+	newIndex := len(md.allObjects)
+	md.allObjects = append(md.allObjects, obj)
+	return createKrefBasic(obj.referenceType(), md.selfRef, uint64(newIndex))
 }
 
 // NewModel creates a new blank model.
 func NewModel() *ModelState {
 	ms := &ModelState{}
-	ms.allKsElements = make([]ksequenceElem, 0, 100000)
-	ms.allKApplyArgs = make([]KReference, 0, 1000000)
-	ms.allBytes = make([]byte, 0, 1<<20)
-	ms.allObjects = make([]KObject, 0, 10000)
+	ms.mainData = newMainModelData()
 	ms.memoTables = nil
+	ms.memoData = newSmallModelData(memoDataRef)
 	return ms
+}
+
+// newSmallModel creates a smaller model.
+func newMainModelData() *ModelData {
+	return &ModelData{
+		selfRef:       mainDataRef,
+		allKsElements: make([]ksequenceElem, 0, 100000),
+		allKApplyArgs: make([]KReference, 0, 1000000),
+		allBytes:      make([]byte, 0, 1<<20),
+		allObjects:    make([]KObject, 0, 10000),
+	}
+}
+
+// newSmallModel creates a smaller model.
+func newSmallModelData(selfRef modelDataReference) *ModelData {
+	return &ModelData{
+		selfRef:       selfRef,
+		allKsElements: make([]ksequenceElem, 0, 32),
+		allKApplyArgs: make([]KReference, 0, 32),
+		allBytes:      make([]byte, 0, 1024),
+		allObjects:    make([]KObject, 0, 32),
+	}
+}
+
+// Clear resets the model data as if it were new,
+// but does not free the memory allocated by previous execution.
+func (md *ModelData) Clear() {
+	md.allKsElements = md.allKsElements[:0]
+	md.allKApplyArgs = md.allKApplyArgs[:0]
+	md.allObjects = md.allObjects[:0]
+	md.allBytes = md.allBytes[:0]
+	md.recycleAllInts()
 }
 
 // Clear resets the model as if it were new,
 // but does not free the memory allocated by previous execution.
 func (ms *ModelState) Clear() {
-	ms.allKsElements = ms.allKsElements[:0]
-	ms.allKApplyArgs = ms.allKApplyArgs[:0]
-	ms.allObjects = ms.allObjects[:0]
-	ms.allBytes = ms.allBytes[:0]
-	ms.recycleAllInts()
+	ms.mainData.Clear()
 	ms.memoTables = nil
+	ms.memoData.Clear()
+}
+
+// Gc cleans up the model, but keeps the last state, given as argument.
+// It does so by temporarily copying the last state to another model.
+func (ms *ModelState) Gc(keepState KReference) KReference {
+	if ms.swapData == nil {
+		ms.swapData = newSmallModelData(noDataRef)
+	} else {
+		ms.swapData.Clear()
+	}
+	copiedState := transfer(ms.mainData, ms.swapData, keepState)
+	ms.Clear()
+	newState := transfer(ms.swapData, ms.mainData, copiedState)
+	return newState
 }
 
 // PrintStats simply prints some statistics to the console.
 // Useful for checking the size of the model data.
+func (md *ModelData) PrintStats() {
+	fmt.Printf("\n   KApply args:                           %d (cap: %d)", len(md.allKApplyArgs), cap(md.allKApplyArgs))
+	fmt.Printf("\n   K sequence elements:                   %d (cap: %d)", len(md.allKsElements), cap(md.allKsElements))
+	fmt.Printf("\n   BigInt objects:                        %d (cap: %d)", len(md.bigInts), cap(md.bigInts))
+	fmt.Printf("\n   Bytes (strings, byte arrays, KTokens): %d (cap: %d)", len(md.allBytes), cap(md.allBytes))
+	fmt.Printf("\n   Other objects:                         %d (cap: %d)", len(md.allObjects), cap(md.allObjects))
+	fmt.Printf("\n   Recycle bin - BigInt                   %d (cap: %d)", len(md.bigIntRecycleBin), cap(md.bigIntRecycleBin))
+}
+
+// PrintStats simply prints statistics on the main data container to the console.
+// Useful for checking the size of the model.
 func (ms *ModelState) PrintStats() {
-	fmt.Printf("Nr. BigInt objects: %d\n", len(ms.bigInts))
-	fmt.Printf("Nr. K sequence elements: %d\n", len(ms.allKsElements))
-	fmt.Printf("Nr. KApply args: %d\n", len(ms.allKApplyArgs))
-	fmt.Printf("Nr. bytes (strings, byte arrays, KTokens): %d\n", len(ms.allBytes))
-	fmt.Printf("Nr. other objects: %d\n", len(ms.allObjects))
-	fmt.Printf("Recycle bin\n")
-	fmt.Printf("     BigInt    %d\n", len(ms.bigIntRecycleBin))
+	fmt.Print("\nMain data container:")
+	ms.mainData.PrintStats()
+	fmt.Println()
+}
+
+// PrintAllStats simply prints some statistics to the console.
+// Useful for checking the size of the model.
+func (ms *ModelState) PrintAllStats() {
+	fmt.Print("\nMain data container:")
+	ms.mainData.PrintStats()
+	fmt.Print("\nMemoization data container:")
+	ms.memoData.PrintStats()
+	if ms.swapData != nil {
+		fmt.Print("\nSwap data container:")
+		ms.swapData.PrintStats()
+	}
+	fmt.Print("\nConstants data container:")
+	constantsData.PrintStats()
+	fmt.Println()
 }

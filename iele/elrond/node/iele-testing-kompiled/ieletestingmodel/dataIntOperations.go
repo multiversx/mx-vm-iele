@@ -1,6 +1,7 @@
 package ieletestingmodel
 
 import (
+    "math"
 	"math/big"
 )
 
@@ -155,7 +156,8 @@ func (ms *ModelState) IntLe(ref1 KReference, ref2 KReference) (bool, bool) {
 // IntAdd returns ref1 + ref2, if types ok
 func (ms *ModelState) IntAdd(ref1 KReference, ref2 KReference) (KReference, bool) {
 	small1, small2, smallOk := ms.bothSmall(ref1, ref2)
-	if smallOk {
+	// TODO: overflow handling
+	if smallOk && small1 < math.MaxInt32 && small1 > math.MinInt32 && small2 < math.MaxInt32 && small2 > math.MinInt32 {
 		result := int64(small1) + int64(small2)
 		if fitsInSmallIntReference(result) {
 			return createKrefSmallInt(result), true
@@ -182,7 +184,8 @@ func (ms *ModelState) IntAdd(ref1 KReference, ref2 KReference) (KReference, bool
 // IntSub returns ref1 - ref2, if types ok
 func (ms *ModelState) IntSub(ref1 KReference, ref2 KReference) (KReference, bool) {
 	small1, small2, smallOk := ms.bothSmall(ref1, ref2)
-	if smallOk {
+	// TODO: overflow handling
+    if smallOk && small1 < math.MaxInt32 && small1 > math.MinInt32 && small2 < math.MaxInt32 && small2 > math.MinInt32 {
 		result := int64(small1) - int64(small2)
 		if fitsInSmallIntReference(result) {
 			return createKrefSmallInt(result), true

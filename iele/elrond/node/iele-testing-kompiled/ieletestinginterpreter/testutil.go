@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 14:09:18.513
+// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:33:19.058
 
 package ieletestinginterpreter
 
@@ -23,7 +23,8 @@ func (interpreter *Interpreter) checkImmutable(t *testing.T, args ...m.KReferenc
 		t.Error("Test not set up properly. Should be the same number of parameters as the last backupInput call.")
 	}
 	for i := 0; i < len(args); i++ {
-		if !interpreter.Model.Equals(args[i], inputBackup[i]) {
+		copyAgain := interpreter.Model.DeepCopy(args[i])
+		if !interpreter.Model.Equals(copyAgain, inputBackup[i]) {
 			t.Errorf("Input state changed! Got:%s Want:%s", interpreter.Model.PrettyPrint(args[i]), interpreter.Model.PrettyPrint(inputBackup[i]))
 
 		}
@@ -34,7 +35,7 @@ func (interpreter *Interpreter) checkImmutable(t *testing.T, args ...m.KReferenc
 // does not initialize external hooks, even if they exist in the project
 // do not make public, the only public constructor should be the one in interpreterDef.go
 func newTestInterpreter() *Interpreter {
-	return &Interpreter {
+	return &Interpreter{
 		Model:         m.NewModel(),
 		MaxSteps:      0,
 		currentStep:   -1,

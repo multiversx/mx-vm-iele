@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 14:09:18.513
+// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:33:19.058
 
 package ieletestingmodel
 
@@ -19,8 +19,8 @@ func (ms *ModelState) Equals(ref1 KReference, ref2 KReference) bool {
 		return intEquals
 	}
 
-	refType1, constant1, value1 := parseKrefBasic(ref1)
-	refType2, constant2, value2 := parseKrefBasic(ref2)
+	refType1, dataRef1, value1 := parseKrefBasic(ref1)
+	refType2, dataRef2, value2 := parseKrefBasic(ref2)
 
 	// for non-int types, refTypes should be equal
 	if refType1 != refType2 {
@@ -29,10 +29,10 @@ func (ms *ModelState) Equals(ref1 KReference, ref2 KReference) bool {
 
 	// collection types
 	if isCollectionType(refType1) {
-		_, _, _, index1 := parseKrefCollection(ref1)
-		_, _, _, index2 := parseKrefCollection(ref2)
-		obj1 := ms.getReferencedObject(index1, false)
-		obj2 := ms.getReferencedObject(index2, false)
+		_, _, _, _, index1 := parseKrefCollection(ref1)
+		_, _, _, _, index2 := parseKrefCollection(ref2)
+		obj1 := ms.getData(dataRef1).getReferencedObject(index1)
+		obj2 := ms.getData(dataRef2).getReferencedObject(index2)
 		return obj1.equals(ms, obj2)
 	}
 
@@ -69,30 +69,21 @@ func (ms *ModelState) Equals(ref1 KReference, ref2 KReference) bool {
 		bytes2, _ := ms.GetBytes(ref2)
 		return bytes.Equal(bytes1, bytes2)
 	case ktokenRef:
-		_, const1, sort1, length1, index1 := parseKrefKToken(ref1)
-		_, const2, sort2, length2, index2 := parseKrefKToken(ref2)
+		_, _, sort1, length1, index1 := parseKrefKToken(ref1)
+		_, _, sort2, length2, index2 := parseKrefKToken(ref2)
 		if sort1 != sort2 {
 			return false
 		}
 		if length1 != length2 {
 			return false
 		}
-		var val1, val2 []byte
-		if const1 {
-			val1 = constantsModel.allBytes[index1 : index1+length1]
-		} else {
-			val1 = ms.allBytes[index1 : index1+length1]
-		}
-		if const2 {
-			val2 = constantsModel.allBytes[index2 : index2+length2]
-		} else {
-			val2 = ms.allBytes[index2 : index2+length2]
-		}
+		val1 := ms.getData(dataRef1).allBytes[index1 : index1+length1]
+		val2 := ms.getData(dataRef2).allBytes[index2 : index2+length2]
 		return bytes.Equal(val1, val2)
 	default:
 		// object types
-		obj1 := ms.getReferencedObject(value1, constant1)
-		obj2 := ms.getReferencedObject(value2, constant2)
+		obj1 := ms.getData(dataRef1).getReferencedObject(value1)
+		obj2 := ms.getData(dataRef2).getReferencedObject(value2)
 		return obj1.equals(ms, obj2)
 	}
 }
@@ -205,7 +196,6 @@ func (k *Float) equals(ms *ModelState, arg KObject) bool {
 	return k.Value == other.Value
 }
 
-// Equals ... Pointer comparison only for StringBuffer
 func (k *StringBuffer) equals(ms *ModelState, arg KObject) bool {
 	return k == arg
 }

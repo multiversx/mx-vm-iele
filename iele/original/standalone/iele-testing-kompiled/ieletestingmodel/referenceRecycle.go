@@ -1,14 +1,11 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:05:41.660
+// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:35:04.814
 
 package ieletestingmodel
 
 // RecycleUnused sends to the recycle bin all objects left without references.
 // This goes recursively through the whole sub-tree.
 func (ms *ModelState) RecycleUnused(ref KReference) {
-	refType, constant, value := parseKrefBasic(ref)
-	if constant {
-		return
-	}
+	refType, dataRef, value := parseKrefBasic(ref)
 
 	switch refType {
 	case boolRef:
@@ -20,12 +17,12 @@ func (ms *ModelState) RecycleUnused(ref KReference) {
 	case bytesRef:
 	case ktokenRef:
 	case bigIntRef:
-		obj, _ := ms.getBigIntObject(ref)
+		obj, _ := ms.getData(dataRef).getBigIntObject(ref)
 		if obj.reuseStatus == active && obj.referenceCount < 1 {
 			// recycle
 			obj.referenceCount = 0
 			obj.reuseStatus = inRecycleBin
-			ms.bigIntRecycleBin = append(ms.bigIntRecycleBin, ref)
+			ms.getData(dataRef).bigIntRecycleBin = append(ms.getData(dataRef).bigIntRecycleBin, ref)
 		}
 	case nonEmptyKseqRef:
 		ks := ms.KSequenceToSlice(ref)
@@ -38,7 +35,7 @@ func (ms *ModelState) RecycleUnused(ref KReference) {
 		}
 	default:
 		// object types
-		obj := ms.getReferencedObject(value, constant)
+		obj := ms.getData(dataRef).getReferencedObject(value)
 		obj.recycleUnused(ms)
 	}
 }

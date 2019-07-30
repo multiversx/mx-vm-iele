@@ -1,17 +1,18 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 14:09:18.513
+// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:33:19.058
 
 package ieletestingmodel
 
 // DeepCopy yields a fresh copy of the K item given as argument.
+// The copies end up in the main data container, even if the original objects don't reside there.
 func (ms *ModelState) DeepCopy(ref KReference) KReference {
-	refType, constant, value := parseKrefBasic(ref)
+	refType, dataRef, value := parseKrefBasic(ref)
 
 	// collection types
 	if isCollectionType(refType) {
-		_, _, _, index := parseKrefCollection(ref)
-		obj := ms.getReferencedObject(index, false)
+		_, _, _, _, index := parseKrefCollection(ref)
+		obj := ms.getData(dataRef).getReferencedObject(index)
 		copiedObj := obj.deepCopy(ms)
-		return ms.addObject(copiedObj)
+		return ms.mainData.addObject(copiedObj)
 	}
 
 	switch refType {
@@ -33,8 +34,8 @@ func (ms *ModelState) DeepCopy(ref KReference) KReference {
 	case smallNegativeIntRef:
 		return ref
 	case bigIntRef:
-		obj, _ := ms.getBigIntObject(ref)
-		newRef, newObj := ms.newBigIntObjectNoRecycle()
+		obj, _ := ms.getData(dataRef).getBigIntObject(ref)
+		newRef, newObj := ms.getData(dataRef).newBigIntObjectNoRecycle()
 		newObj.bigValue.Set(obj.bigValue)
 		return newRef
 	case kapplyRef:
@@ -55,14 +56,14 @@ func (ms *ModelState) DeepCopy(ref KReference) KReference {
 		return ms.NewKToken(ktoken.Sort, ktoken.Value)
 	default:
 		// object types
-		obj := ms.getReferencedObject(value, constant)
+		obj := ms.getData(dataRef).getReferencedObject(value)
 		copiedObj := obj.deepCopy(ms)
 		if copiedObj == obj {
 			// if no new instance was created,
 			// it means that the object does not need to be deep copied
 			return ref
 		}
-		return ms.addObject(copiedObj)
+		return ms.mainData.addObject(copiedObj)
 	}
 }
 
