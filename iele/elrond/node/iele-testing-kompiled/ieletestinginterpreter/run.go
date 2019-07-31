@@ -4,11 +4,12 @@ package ieletestinginterpreter
 
 import (
 	"fmt"
-	koreparser "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/koreparser"
 	"log"
-	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 	"math"
 	"os/exec"
+
+	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
+	koreparser "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/koreparser"
 )
 
 func callKast(kdir string, programPath string) []byte {
@@ -83,6 +84,7 @@ func (i *Interpreter) TakeStepsNoThread(k m.KReference) error {
 
 	// start
 	i.currentStep = 0
+	i.checksSinceLastGc = 0
 	i.state = k
 	i.traceInitialState(k)
 
@@ -127,9 +129,13 @@ func (i *Interpreter) TakeStepsNoThread(k m.KReference) error {
 	return nil
 }
 
-// gcFrequencyMask indicates how often we perform garbage collection
-// every 65536 steps in this case.
-const gcFrequencyMask = (1 << 16) - 1
+// gcFrequencyMask indicates how often we check if garbage collection is needed.
+// every 1024 steps in this case.
+const gcFrequencyMask = (1 << 11) - 1
+
+// minChecksBetweenGc makes sure we don't run the Gc too often
+// for performance resons we don't check every step, this is the number of such checks
+const minChecksBetweenGc = 14
 
 func (i *Interpreter) runSteps(maxSteps int) error {
 	running := true
@@ -144,7 +150,13 @@ func (i *Interpreter) runSteps(maxSteps int) error {
 
 		// periodically clean up model of old data
 		if i.currentStep&gcFrequencyMask == 0 {
-			i.state = i.Model.Gc(i.state)
+			if i.checksSinceLastGc > minChecksBetweenGc && i.Model.ShouldRunGc() {
+				//fmt.Printf("clean: %d | %d | [%d of %d] \n", i.checksSinceLastGc, i.currentStep, i.Model.SizeUsed(), i.Model.SizeAllocated())
+				i.state = i.Model.Gc(i.state)
+				i.checksSinceLastGc = 0
+			} else {
+				i.checksSinceLastGc++
+			}
 		}
 
 		if err == nil {

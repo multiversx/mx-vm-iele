@@ -154,6 +154,12 @@ func (ms *ModelState) Clear() {
 	ms.memoData.Clear()
 }
 
+// ShouldRunGc returns true if the model is full enough that it is time to clean up.
+// The trigger is reaching 3/4 of the capacity.
+func (ms *ModelState) ShouldRunGc() bool {
+	return ms.mainData.SizeUsed() >= (ms.mainData.SizeAllocated() * 3 / 4)
+}
+
 // Gc cleans up the model, but keeps the last state, given as argument.
 // It does so by temporarily copying the last state to another model.
 func (ms *ModelState) Gc(keepState KReference) KReference {
@@ -168,6 +174,34 @@ func (ms *ModelState) Gc(keepState KReference) KReference {
 	return newState
 }
 
+// SizeAllocated estimates the allocated size of the model in bytes (no references)
+func (md *ModelData) SizeAllocated() uint64 {
+	return uint64(cap(md.allKApplyArgs))*4 +
+		uint64(cap(md.allKsElements))*8 +
+		uint64(cap(md.allBytes)) +
+		uint64(cap(md.bigInts))*4 +
+		uint64(cap(md.allObjects))*4
+}
+
+// SizeAllocated estimates the allocated size of the model in bytes (no references)
+func (ms *ModelState) SizeAllocated() uint64 {
+	return ms.mainData.SizeAllocated()
+}
+
+// SizeUsed estimates the size of the model that is actually used.
+func (md *ModelData) SizeUsed() uint64 {
+	return uint64(len(md.allKApplyArgs))*4 +
+		uint64(len(md.allKsElements))*8 +
+		uint64(len(md.allBytes)) +
+		uint64(len(md.bigInts))*4 +
+		uint64(len(md.allObjects))*4
+}
+
+// SizeUsed estimates the size of the model that is actually used.
+func (ms *ModelState) SizeUsed() uint64 {
+	return ms.mainData.SizeUsed()
+}
+
 // PrintStats simply prints some statistics to the console.
 // Useful for checking the size of the model data.
 func (md *ModelData) PrintStats() {
@@ -177,6 +211,7 @@ func (md *ModelData) PrintStats() {
 	fmt.Printf("\n   Bytes (strings, byte arrays, KTokens): %d (cap: %d)", len(md.allBytes), cap(md.allBytes))
 	fmt.Printf("\n   Other objects:                         %d (cap: %d)", len(md.allObjects), cap(md.allObjects))
 	fmt.Printf("\n   Recycle bin - BigInt                   %d (cap: %d)", len(md.bigIntRecycleBin), cap(md.bigIntRecycleBin))
+	fmt.Printf("\n   Estimated size                         %d (cap: %d)", md.SizeUsed(), md.SizeAllocated())
 }
 
 // PrintStats simply prints statistics on the main data container to the console.
