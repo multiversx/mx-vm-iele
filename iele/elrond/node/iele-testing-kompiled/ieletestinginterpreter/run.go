@@ -134,7 +134,6 @@ func (i *Interpreter) TakeStepsNoThread(k m.KReference) error {
 const gcFrequencyMask = (1 << 11) - 1
 
 // minChecksBetweenGc makes sure we don't run the Gc too often
-// for performance resons we don't check every step, this is the number of such checks
 const minChecksBetweenGc = 14
 
 func (i *Interpreter) runSteps(maxSteps int) error {
