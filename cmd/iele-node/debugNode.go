@@ -26,27 +26,27 @@ func main() {
 
 	//debugElrondTest("agar_v1/addPlayerToGame.iele.json", false)
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false) // trace_good
-	debugElrondTest("tests/iele-v3/danse/unit/exceptions.iele.json", false)
+	//debugElrondTest("tests/iele-v3/danse/ERC20/approve_Caller-Zero.iele.json", true)
 	//debugElrondTest("agar_v1/create.iele.json", false)
-	//debugAgarV2()
+
+	debugAgarV3()
 
 	//debugIllFormedX()
 }
 
-func debugAgarV2() {
-	debugElrondTest("agar_v2/create.iele.json", false)
-	debugElrondTest("agar_v2/topUp1.iele.json", false)
-	debugElrondTest("agar_v2/balanceOf.iele.json", false)
-	debugElrondTest("agar_v2/withdraw_Ok.iele.json", false)
-	debugElrondTest("agar_v2/withdraw_TooMuch.iele.json", false)
-	debugElrondTest("agar_v2/withdrawAll_Ok.iele.json", false)
-	debugElrondTest("agar_v2/addPlayerToGame.iele.json", false)
-	debugElrondTest("agar_v2/joinGame.iele.json", false)
-	debugElrondTest("agar_v2/rewardWinner.iele.json", false)
-	debugElrondTest("agar_v2/rewardAndSendToWallet.iele.json", false)
-	debugElrondTest("agar_v2/endGame.iele.json", false)
-	debugElrondTest("agar_v2/endGame_leftover.iele.json", false)
-	debugElrondTest("agar_v2/exceptions.iele.json", false)
+func debugAgarV3() {
+	debugElrondTest("agar_v3/create.iele.json", false)
+	debugElrondTest("agar_v3/topUp1.iele.json", false)
+	debugElrondTest("agar_v3/balanceOf.iele.json", false)
+	debugElrondTest("agar_v3/withdraw_Ok.iele.json", false)
+	debugElrondTest("agar_v3/withdraw_TooMuch.iele.json", false)
+	debugElrondTest("agar_v3/withdrawAll_Ok.iele.json", false)
+	debugElrondTest("agar_v3/addPlayerToGame.iele.json", false)
+	debugElrondTest("agar_v3/joinGame.iele.json", false)
+	debugElrondTest("agar_v3/rewardWinner.iele.json", false)
+	debugElrondTest("agar_v3/rewardWinner_Last.iele.json", false)
+	debugElrondTest("agar_v3/rewardAndSendToWallet.iele.json", false)
+	debugElrondTest("agar_v3/exceptions.iele.json", false)
 }
 
 func debugElrondTest(testFile string, tracePretty bool) {
