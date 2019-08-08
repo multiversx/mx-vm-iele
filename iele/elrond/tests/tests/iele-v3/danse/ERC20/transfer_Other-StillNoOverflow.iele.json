@@ -35,7 +35,7 @@
                                     "0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b000000000000000000000000",
                                     "0x02"
                                 ],
-                                "data": "0xf5ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"
+                                "data": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
                             }
                         ],
                         "refund": "0x1d4c"

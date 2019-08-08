@@ -408,14 +408,19 @@ func (vm *ElrondIeleVM) convertKToLog(klog m.KReference) (*vmi.LogEntry, error) 
 	if unparseErr != nil {
 		return nil, unparseErr
 	}
-	strResult, isStr := vm.kinterpreter.Model.GetString(unparseResult)
+	strResult, isStr := vm.kinterpreter.Model.GetString(unparseResult) // Warning! comes as small endian
 	if !isStr {
 		return nil, errors.New("log data unparse error: result is not String")
+	}
+	littleEndianData := []byte(strResult)
+	bigEndianData := make([]byte, len(littleEndianData))
+	for i, ch := range littleEndianData {
+		bigEndianData[len(littleEndianData)-1-i] = ch
 	}
 
 	return &vmi.LogEntry{
 		Address: iAddr.Bytes(),
 		Topics:  topics,
-		Data:    []byte(strResult),
+		Data:    bigEndianData,
 	}, nil
 }

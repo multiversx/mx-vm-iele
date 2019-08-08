@@ -36,7 +36,7 @@
                                     "0x07",
                                     "0x02"
                                 ],
-                                "data": "0xf5ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00"
+                                "data": "0xfffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff5"
                             }
                         ],
                         "refund": "0x3a98"
