@@ -28,9 +28,7 @@ func main() {
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false) // trace_good
 	//debugElrondTest("tests/iele-v3/danse/ERC20/approve_Caller-Zero.iele.json", true)
 
-	debugElrondTest("tests/iele-v3/danse/ERC20/transferFrom_AllDistinct-StillNoOverflow.iele.json", false)
-
-	//debugAgarV4()
+	debugAgarV4()
 
 	//debugIllFormedX()
 }
