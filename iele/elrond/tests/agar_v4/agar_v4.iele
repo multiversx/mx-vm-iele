@@ -1,0 +1,331 @@
+// Agar game
+contract Agar {
+
+  // address length in bits
+  @addressLengthBits = 256
+
+  // we use this to throw an error is any input is a longer address than
+  @maxValidAddress = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
+  // game number length in bits
+  @gameNumberShift = 32
+
+  // The account storage is divided into:
+  @ownerStorageKey = 0
+  @playerBalance = 1
+  @playerStatus = 2
+  @gamePlayers = 3
+  @gameBet = 4
+
+  // player statuses:
+  @playerStatusIdle = 0
+  @playerStatusInGame = 1
+
+  // hashes of event names
+  @joinGameEvent = 0x7134692B230B9E1FFA39098904722134159652B09C5BC41D88D6698779D228FF
+  @rewardEvent   = 0xF099CD8BDE557814842A3121E8DDFD433A539B8C9F14BF31EBF108D12E6196E9
+  @gameEndEvent  = 0xF099CD8BDE557814842A3121E8DDFD433A539B8C9F14BF31EBF108D12E6196E9
+
+  // revert error codes
+  @errNotOwner = 101
+  @errInvalidPlayerAddress = 102
+  @errJoinNotEnoughFunds = 103
+  @errWithdrawTooMuch = 104
+  @errRewardTooMuch = 105
+  @cleaningGameWithNoPlayers = 106
+
+
+// initializes the game contract by storing in the account storage the account
+// number of the creator
+// this is the only account that is allowed to update the state of the game
+define @init() {
+  %parent = call @iele.caller()
+  sstore %parent, @ownerStorageKey
+}
+
+define @playerBalanceKey(%address) {
+  %shifted = shift @playerBalance, @addressLengthBits
+  %ored = or %shifted, %address
+  ret %ored
+}
+
+define @playerStatusKey(%address) {
+  %shifted = shift @playerStatus, @addressLengthBits
+  %ored = or %shifted, %address
+  ret %ored
+}
+
+define @gamePlayersKey(%gameIndex) {
+  %shifted = shift @gamePlayers, @gameNumberShift
+  %ored = or %shifted, %gameIndex
+  ret %ored
+}
+
+define @gameBetKey(%gameIndex) {
+  %shifted = shift @gameBet, @gameNumberShift
+  %ored = or %shifted, %gameIndex
+  ret %ored
+}
+
+define public @balanceOf(%player) {
+
+  // validate player address
+  %err = cmp gt %player, @maxValidAddress
+  br %err, revert.badAddr
+
+  // get the key for the account in the balance region
+  %balanceKey = call @playerBalanceKey(%player)
+
+  // get and return the account's current balance
+  %balance = sload %balanceKey
+  ret %balance
+
+revert.badAddr:
+  revert @errInvalidPlayerAddress
+}
+
+// transfer funds to contract to top up player account
+define public @topUp() {
+  %player = call @iele.caller()
+  %amount = call @iele.callvalue()
+  %balanceKey = call @playerBalanceKey(%player)
+  %balance = sload %balanceKey
+  %balance = add %balance, %amount
+  sstore %balance, %balanceKey
+
+  ret void
+}
+
+// as a player, withdraw tokens from the contract account
+define public @withdraw(%amount) {
+  %player = call @iele.caller()
+
+  call @transferBackToPlayerWallet(%player, %amount)
+
+  ret void
+}
+
+// send from the contract balance to the player wallet
+define public @transferBackToPlayerWallet(%player, %amount) {
+  %balanceKey = call @playerBalanceKey(%player)
+  %balance = sload %balanceKey
+
+  // ensure that the player balance can cover the value to be withdrawn
+  %lt = cmp lt %balance, %amount
+  br %lt, revert.withdrawTooMuch
+
+  %balance = sub %balance, %amount
+  sstore %balance, %balanceKey
+
+  // return funds by calling deposit at the player account
+  %gas = call @iele.gas()
+  %status = call @deposit at %player () send %amount , gaslimit %gas
+  br %status, revert.depositFailed // contract call failed
+  ret void
+
+revert.depositFailed:
+  revert %status
+
+revert.withdrawTooMuch:
+  revert @errWithdrawTooMuch
+
+}
+
+// as a player, withdraw all owned funds from the contract account
+define public @withdrawAll() {
+  %player = call @iele.caller()
+  %balanceKey = call @playerBalanceKey(%player)
+  %balance = sload %balanceKey
+
+  %isBalanceZero = cmp eq %balance, 0
+  br %isBalanceZero, return
+
+  sstore 0, %balanceKey
+
+  // return funds by calling deposit at the player account
+  %gas = call @iele.gas()
+  %status = call @deposit at %player () send %balance , gaslimit %gas
+  br %status, revert.depositFailed // contract call failed
+
+return:
+  ret void
+
+revert.depositFailed:
+  revert %status
+}
+
+// owner adds player to game
+define public @addPlayerToGame(%gameId, %player, %bet) {
+
+  // check that call comes from owner
+  %caller = call @iele.caller()
+  %owner = sload @ownerStorageKey
+  %err = cmp ne %caller, %owner
+  br %err, revert.notOwner
+
+  call @addPlayerToGameStateChange(%gameId, %player, %bet)
+
+  ret void
+
+revert.notOwner:
+  revert @errNotOwner
+}
+
+// player joins a game
+define public @joinGame(%gameId) {
+
+  %player = call @iele.caller()
+  %bet = call @iele.callvalue()
+
+  call @topUp()
+
+  call @addPlayerToGameStateChange(%gameId, %player, %bet)
+
+  ret void
+}
+
+define @addPlayerToGameStateChange(%gameId, %player, %bet) {
+  // validate player address
+  %err = cmp gt %player, @maxValidAddress
+  br %err, revert.badAddr
+
+  // change status idle -> in game
+  %statusKey = call @playerStatusKey(%player)
+  %status = sload %statusKey
+  sstore @playerStatusInGame, %statusKey
+
+  // subtract game entry fee (if enough funds are present)
+  %balanceKey = call @playerBalanceKey(%player)
+  %balance = sload %balanceKey
+  %lt = cmp lt %balance, %bet
+  br %lt, revert.notEnoughFundsToJoin
+  %balance = sub %balance, %bet
+  sstore %balance, %balanceKey
+
+  // load game players
+  %gamePlayersKey = call @gamePlayersKey(%gameId)
+  %gamePlayers = sload %gamePlayersKey
+
+  // add player to game
+  %gamePlayers = shift %gamePlayers, @addressLengthBits
+  %gamePlayers = or %gamePlayers, %player
+
+  // save game players
+  %gamePlayersKey = call @gamePlayersKey(%gameId)
+  sstore %gamePlayers, %gamePlayersKey
+
+  // increment game bet
+  %gameBetKey = call @gameBetKey(%gameId)
+  %gameBet = sload %gameBetKey
+  %gameBet = add %gameBet, %bet
+  sstore %gameBet, %gameBetKey
+
+  ret void
+
+revert.badAddr:
+  revert @errInvalidPlayerAddress
+
+revert.notEnoughFundsToJoin:
+  revert @errJoinNotEnoughFunds
+}
+
+// owner transfers prize into winner SC account
+define public @rewardWinner(%gameIndex, %winner, %prize) {
+
+  // check that call comes from owner
+  %caller = call @iele.caller()
+  %owner = sload @ownerStorageKey
+  %err = cmp ne %caller, %owner
+  br %err, revert.notOwner
+
+  // validate player address
+  %err = cmp gt %winner, @maxValidAddress
+  br %err, revert.invalidWinnerAddress
+
+  // load game bet
+  %gameBetKey = call @gameBetKey(%gameIndex)
+  %gameBet = sload %gameBetKey
+
+  // check that game bet was not already distributed
+  %err = cmp lt %gameBet, %prize
+  br %err, revert.rewardTooMuch
+
+  // subtract prize from game bet and save
+  %gameBet = sub %gameBet, %prize
+  sstore %gameBet, %gameBetKey
+
+  // update winner balance
+  %balanceKey = call @playerBalanceKey(%winner)
+  %balance = sload %balanceKey
+  %balance = add %balance, %prize
+  sstore %balance, %balanceKey
+
+  // if there is no more bet remaining in game, game ends and clean up game
+  %done = cmp gt %gameBet, 0
+  br %done, return
+
+  call @cleanupGame(%gameIndex)
+
+return:
+  ret void
+
+revert.notOwner:
+  revert 101
+
+revert.invalidWinnerAddress:
+  revert 102
+
+revert.rewardTooMuch:
+  revert 103
+}
+
+// owner transfers prize into winner SC account, then transfers funds to player wallet
+define public @rewardAndSendToWallet(%gameIndex, %winner, %prize) {
+  call @rewardWinner(%gameIndex, %winner, %prize)
+
+  call @transferBackToPlayerWallet(%winner, %prize)
+
+  ret void
+}
+
+// sets all player states to idle
+define @cleanupGame(%gameIndex) {
+
+  // load game player list
+  %gamePlayersKey = call @gamePlayersKey(%gameIndex)
+  %gamePlayers = sload %gamePlayersKey
+  %err = cmp eq %gamePlayers, 0
+  br %err, revert.cleaningGameWithNoPlayers
+  
+  // set all game player states to 0 (idle)
+  %addressMask = shift 1, @addressLengthBits
+  %addressMask = sub %addressMask, 1
+  %shiftRight = sub 0, @addressLengthBits
+  
+playerStatusLoop:
+  %player = and %gamePlayers, %addressMask
+  %isZero = cmp eq %player, 0
+  br %isZero, allPlayersProcessed
+
+  // save player status as idle
+  %statusKey = call @playerStatusKey(%player)
+  sstore @playerStatusIdle, %statusKey
+
+  %gamePlayers = shift %gamePlayers, %shiftRight
+  %previousPlayer = %player
+
+  br 1, playerStatusLoop
+
+allPlayersProcessed:
+
+  // clear game data in storage
+  sstore 0, %gamePlayersKey
+
+return:
+  ret void
+
+revert.cleaningGameWithNoPlayers:
+  revert @cleaningGameWithNoPlayers
+}
+
+}
