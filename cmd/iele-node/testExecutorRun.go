@@ -168,7 +168,7 @@ func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Blockcha
 								ij.LogToString(testLog), ij.LogToString(convertLogToTestFormat(outLog)))
 						}
 					}
-					if !bytes.Equal(outLog.Data, testLog.Data) {
+					if big.NewInt(0).SetBytes(outLog.Data).Cmp(big.NewInt(0).SetBytes(testLog.Data)) != 0 {
 						return fmt.Errorf("bad log data. Want:\n%s\nGot:\n%s",
 							ij.LogToString(testLog), ij.LogToString(convertLogToTestFormat(outLog)))
 					}

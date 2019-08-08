@@ -27,9 +27,10 @@ func main() {
 	//debugElrondTest("agar_v1/addPlayerToGame.iele.json", false)
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false) // trace_good
 	//debugElrondTest("tests/iele-v3/danse/ERC20/approve_Caller-Zero.iele.json", true)
-	//debugElrondTest("agar_v1/create.iele.json", false)
 
-	debugAgarV4()
+	debugElrondTest("tests/iele-v3/danse/ERC20/transferFrom_AllDistinct-StillNoOverflow.iele.json", false)
+
+	//debugAgarV4()
 
 	//debugIllFormedX()
 }
@@ -40,7 +41,6 @@ func debugAgarV4() {
 	debugElrondTest("agar_v4/balanceOf.iele.json", false)
 	debugElrondTest("agar_v4/withdraw_Ok.iele.json", false)
 	debugElrondTest("agar_v4/withdraw_TooMuch.iele.json", false)
-	debugElrondTest("agar_v4/withdrawAll_Ok.iele.json", false)
 	debugElrondTest("agar_v4/addPlayerToGame.iele.json", false)
 	debugElrondTest("agar_v4/joinGame.iele.json", false)
 	debugElrondTest("agar_v4/rewardWinner.iele.json", false)
