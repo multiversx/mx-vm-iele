@@ -29,7 +29,7 @@ func (vm *ElrondIeleVM) logCallInput(input *vmi.ContractCallInput) {
 		return
 	}
 
-	fmt.Printf("\nContract create started:")
+	fmt.Printf("\nContract call started:")
 	fmt.Printf("\n  Caller (sender):      %s", hex.EncodeToString(input.CallerAddr))
 	fmt.Printf("\n  Recipient (receiver): %s", hex.EncodeToString(input.RecipientAddr))
 	fmt.Printf("\n  Function: %s", input.Function)

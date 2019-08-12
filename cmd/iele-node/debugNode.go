@@ -35,7 +35,8 @@ func main() {
 
 func debugAgarV4() {
 	debugElrondTest("agar_v4/create.iele.json", false)
-	debugElrondTest("agar_v4/topUp1.iele.json", false)
+	debugElrondTest("agar_v4/topUp_ok.iele.json", false)
+	debugElrondTest("agar_v4/topUp_outOfFunds.iele.json", false)
 	debugElrondTest("agar_v4/topUp_withdraw.iele.json", false)
 	debugElrondTest("agar_v4/balanceOf.iele.json", false)
 	debugElrondTest("agar_v4/withdraw_Ok.iele.json", false)
