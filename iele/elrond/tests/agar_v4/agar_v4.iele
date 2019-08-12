@@ -262,13 +262,13 @@ return:
   ret void
 
 revert.notOwner:
-  revert 101
+  revert @errNotOwner
 
 revert.invalidWinnerAddress:
-  revert 102
+  revert @errInvalidPlayerAddress
 
 revert.rewardTooMuch:
-  revert 103
+  revert @errWithdrawTooMuch
 }
 
 // owner transfers prize into winner SC account, then transfers funds to player wallet

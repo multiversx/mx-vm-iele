@@ -9,7 +9,7 @@ import (
 func TestAuctionSolidity(t *testing.T) {
 	err := controller.RunAllIeleTestsInDirectory(
 		elrondTestRoot,
-		"agar_v1",
+		"auction-solidity",
 		nil,
 		newElrondIeleTestExecutor())
 
