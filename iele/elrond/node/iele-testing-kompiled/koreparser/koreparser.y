@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:33:19.058
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:10:37.856
 
 // This is the source for the generation of the kore parser.
 // To build it:

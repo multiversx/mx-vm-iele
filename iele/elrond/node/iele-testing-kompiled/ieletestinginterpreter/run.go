@@ -1,15 +1,14 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:33:19.058
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:10:37.856
 
 package ieletestinginterpreter
 
 import (
 	"fmt"
+	koreparser "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/koreparser"
 	"log"
+	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 	"math"
 	"os/exec"
-
-	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
-	koreparser "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/koreparser"
 )
 
 func callKast(kdir string, programPath string) []byte {

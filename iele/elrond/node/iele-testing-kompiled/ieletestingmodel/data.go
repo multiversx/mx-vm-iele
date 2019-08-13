@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:33:19.058
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:10:37.856
 
 package ieletestingmodel
 
@@ -211,7 +211,7 @@ func (md *ModelData) PrintStats() {
 	fmt.Printf("\n   Bytes (strings, byte arrays, KTokens): %d (cap: %d)", len(md.allBytes), cap(md.allBytes))
 	fmt.Printf("\n   Other objects:                         %d (cap: %d)", len(md.allObjects), cap(md.allObjects))
 	fmt.Printf("\n   Recycle bin - BigInt                   %d (cap: %d)", len(md.bigIntRecycleBin), cap(md.bigIntRecycleBin))
-	fmt.Printf("\n   Estimated size                         %d (cap: %d)", md.SizeUsed(), md.SizeAllocated())
+	fmt.Printf("\n   Estimated size (in bytes)              %d (cap: %d)", md.SizeUsed(), md.SizeAllocated())
 }
 
 // PrintStats simply prints statistics on the main data container to the console.
