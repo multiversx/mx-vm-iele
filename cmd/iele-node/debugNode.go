@@ -28,26 +28,25 @@ func main() {
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false) // trace_good
 	//debugElrondTest("tests/iele-v3/danse/ERC20/approve_Caller-Zero.iele.json", true)
 
-	debugAgarV4()
+	debugAgarMin()
 
 	//debugIllFormedX()
 }
 
-func debugAgarV4() {
-	debugElrondTest("agar_v4/create.iele.json", false)
-	debugElrondTest("agar_v4/topUp_ok.iele.json", false)
-	debugElrondTest("agar_v4/topUp_outOfFunds.iele.json", false)
-	debugElrondTest("agar_v4/topUp_withdraw.iele.json", false)
-	debugElrondTest("agar_v4/balanceOf.iele.json", false)
-	debugElrondTest("agar_v4/withdraw_Ok.iele.json", false)
-	debugElrondTest("agar_v4/withdraw_TooMuch.iele.json", false)
-	debugElrondTest("agar_v4/addPlayerToGame.iele.json", false)
-	debugElrondTest("agar_v4/joinGame.iele.json", false)
-	debugElrondTest("agar_v4/rewardWinner.iele.json", false)
-	debugElrondTest("agar_v4/rewardWinner_Last.iele.json", false)
-	debugElrondTest("agar_v4/rewardWinner_TooMuch.iele.json", false)
-	debugElrondTest("agar_v4/rewardAndSendToWallet.iele.json", false)
-	debugElrondTest("agar_v4/exceptions.iele.json", false)
+func debugAgarMin() {
+	debugElrondTest("agar_min_v1/joinGame.iele.json", false)
+
+	debugElrondTest("agar_min_v1/create.iele.json", false)
+	debugElrondTest("agar_min_v1/topUp_ok.iele.json", false)
+	debugElrondTest("agar_min_v1/topUp_outOfFunds.iele.json", false)
+	debugElrondTest("agar_min_v1/topUp_withdraw.iele.json", false)
+	debugElrondTest("agar_min_v1/balanceOf.iele.json", false)
+	debugElrondTest("agar_min_v1/withdraw_Ok.iele.json", false)
+	debugElrondTest("agar_min_v1/withdraw_TooMuch.iele.json", false)
+	debugElrondTest("agar_min_v1/rewardWinner.iele.json", false)
+	debugElrondTest("agar_min_v1/rewardWinner_Last.iele.json", false)
+	debugElrondTest("agar_min_v1/rewardAndSendToWallet.iele.json", false)
+	debugElrondTest("agar_min_v1/exceptions.iele.json", false)
 }
 
 func debugElrondTest(testFile string, tracePretty bool) {

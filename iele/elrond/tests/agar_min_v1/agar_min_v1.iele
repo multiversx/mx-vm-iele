@@ -1,0 +1,243 @@
+// Agar game
+contract Agar {
+
+  // address length in bits
+  @addressLengthBits = 256
+
+  // we use this to throw an error is any input is a longer address than
+  @maxValidAddress = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff
+
+  // game number length in bits
+  @gameNumberShift = 32
+
+  // The account storage is divided into:
+  @ownerStorageKey = 0
+  @playerBalance = 1
+
+  // hashes of event names
+  @topUpEvent    = 0x1000000000000000000000000000000000000000000000000000000000000001
+  @withdrawEvent = 0x1000000000000000000000000000000000000000000000000000000000000002
+  @joinGameEvent = 0x1000000000000000000000000000000000000000000000000000000000000003
+  @rewardEvent   = 0x1000000000000000000000000000000000000000000000000000000000000004
+
+  // revert error codes
+  @errNotOwner = 101 // a function that should only be called by the owner is called by someone else
+  @errInvalidPlayerAddress = 102 // an invalid address was provided as argument
+  @errJoinNotEnoughFunds = 103 // cannot join game with given bet, because player does not have enough funds in the game 
+  @errWithdrawTooMuch = 104 // trying to withdraw more than the funds the player owns in game
+  @errRewardTooMuch = 105 // trying to reward more that the bet remaining in game
+  @cleaningGameWithNoPlayers = 106 // when cleaning up a game, the game has no players
+
+
+// initializes the game contract by storing in the account storage the account
+// number of the creator
+// this is the only account that is allowed to update the state of the game
+define @init() {
+  %parent = call @iele.caller()
+  sstore %parent, @ownerStorageKey
+}
+
+define @playerBalanceKey(%address) {
+  %shifted = shift @playerBalance, @addressLengthBits
+  %ored = or %shifted, %address
+  ret %ored
+}
+
+define public @balanceOf(%player) {
+
+  // validate player address
+  %err = cmp gt %player, @maxValidAddress
+  br %err, revert.badAddr
+
+  // get the key for the account in the balance region
+  %balanceKey = call @playerBalanceKey(%player)
+
+  // get and return the account's current balance
+  %balance = sload %balanceKey
+  ret %balance
+
+revert.badAddr:
+  revert @errInvalidPlayerAddress
+}
+
+// transfer funds to contract to top up player account
+define public @topUp() {
+  %player = call @iele.caller()
+  %amount = call @iele.callvalue()
+  %balanceKey = call @playerBalanceKey(%player)
+  %balance = sload %balanceKey
+  %balance = add %balance, %amount
+  sstore %balance, %balanceKey
+
+  // log
+  call @log.topUp(%player, %amount)
+
+  ret void
+}
+
+// as a player, withdraw tokens from the contract account
+define public @withdraw(%amount) {
+  %player = call @iele.caller()
+
+  call @transferBackToPlayerWallet(%player, %amount)
+
+  ret void
+}
+
+// send from the contract balance to the player wallet
+define public @transferBackToPlayerWallet(%player, %amount) {
+  %balanceKey = call @playerBalanceKey(%player)
+  %balance = sload %balanceKey
+
+  // ensure that the player balance can cover the value to be withdrawn
+  %lt = cmp lt %balance, %amount
+  br %lt, revert.withdrawTooMuch
+
+  %balance = sub %balance, %amount
+  sstore %balance, %balanceKey
+
+  // return funds by calling deposit at the player account
+  %gas = call @iele.gas()
+  %status = call @deposit at %player () send %amount , gaslimit %gas
+  br %status, revert.depositFailed // contract call failed
+
+  // log
+  call @log.withdraw(%player, %amount)
+
+  ret void
+
+revert.depositFailed:
+  revert %status
+
+revert.withdrawTooMuch:
+  revert @errWithdrawTooMuch
+
+}
+
+// player joins a game
+define public @joinGame(%gameId) {
+
+  %player = call @iele.caller()
+  %bet = call @iele.callvalue()
+
+  call @topUp()
+
+  call @addPlayerToGameStateChange(%gameId, %player, %bet)
+
+  ret void
+}
+
+define @addPlayerToGameStateChange(%gameId, %player, %bet) {
+  // validate player address
+  %err = cmp gt %player, @maxValidAddress
+  br %err, revert.badAddr
+
+  // subtract game entry fee (if enough funds are present)
+  %balanceKey = call @playerBalanceKey(%player)
+  %balance = sload %balanceKey
+  %lt = cmp lt %balance, %bet
+  br %lt, revert.notEnoughFundsToJoin
+  %balance = sub %balance, %bet
+  sstore %balance, %balanceKey
+
+  // log 
+  call @log.playerJoinsGame(%gameId, %player, %bet)
+
+  ret void
+
+revert.badAddr:
+  revert @errInvalidPlayerAddress
+
+revert.notEnoughFundsToJoin:
+  revert @errJoinNotEnoughFunds
+}
+
+// owner transfers prize into winner SC account
+define public @rewardWinner(%gameIndex, %winner, %prize) {
+
+  // check that call comes from owner
+  %caller = call @iele.caller()
+  %owner = sload @ownerStorageKey
+  %err = cmp ne %caller, %owner
+  br %err, revert.notOwner
+
+  // validate player address
+  %err = cmp gt %winner, @maxValidAddress
+  br %err, revert.invalidWinnerAddress
+
+  // update winner balance
+  %balanceKey = call @playerBalanceKey(%winner)
+  %balance = sload %balanceKey
+  %balance = add %balance, %prize
+  sstore %balance, %balanceKey
+
+  // log
+  call @log.rewardWinner(%gameIndex, %winner, %prize)
+
+return:
+  ret void
+
+revert.notOwner:
+  revert @errNotOwner
+
+revert.invalidWinnerAddress:
+  revert @errInvalidPlayerAddress
+
+revert.rewardTooMuch:
+  revert @errWithdrawTooMuch
+}
+
+// owner transfers prize into winner SC account, then transfers funds to player wallet
+define public @rewardAndSendToWallet(%gameIndex, %winner, %prize) {
+  call @rewardWinner(%gameIndex, %winner, %prize)
+
+  call @transferBackToPlayerWallet(%winner, %prize)
+
+  ret void
+}
+
+// logs that a player tops up her account
+define @log.topUp(%player, %amount) {
+  // use the amount as value
+  %logCell = 0
+  store %amount, %logCell
+
+  // log 
+  log %logCell, @topUpEvent, %player
+  ret void
+}
+
+// logs that a player withdraws from her account
+define @log.withdraw(%player, %amount) {
+  // use the bet amount as value
+  %logCell = 0
+  store %amount, %logCell
+
+  // log 
+  log %logCell, @withdrawEvent, %player
+  ret void
+}
+
+// logs that a player joins a game, with a given bet
+define @log.playerJoinsGame(%gameId, %player, %bet) {
+  // use the bet amount as value
+  %logCell = 0
+  store %bet, %logCell
+
+  // log 
+  log %logCell, @joinGameEvent, %gameId, %player
+  ret void
+}
+
+// logs that a player is rewarded a prize
+define @log.rewardWinner(%gameIndex, %winner, %prize) {
+  // use the prize as value
+  %logCell = 0
+  store %prize, %logCell
+
+  // log 
+  log %logCell, @rewardEvent, %gameIndex, %winner
+  ret void
+}
+
+}

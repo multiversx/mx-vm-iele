@@ -6,6 +6,18 @@ import (
 	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
 )
 
+func TestAgarMinV1(t *testing.T) {
+	err := controller.RunAllIeleTestsInDirectory(
+		elrondTestRoot,
+		"agar_min_v1",
+		nil,
+		newElrondIeleTestExecutor())
+
+	if err != nil {
+		t.Error(err)
+	}
+}
+
 func TestAgarV1(t *testing.T) {
 	err := controller.RunAllIeleTestsInDirectory(
 		elrondTestRoot,
