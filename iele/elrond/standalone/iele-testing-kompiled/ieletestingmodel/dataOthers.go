@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:11:08.386
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:25:08.138
 
 package ieletestingmodel
 
@@ -7,7 +7,7 @@ import (
 )
 
 // InternedBottom is usually used as a dummy object
-var InternedBottom = createKrefBasic(bottomRef, true, 0)
+var InternedBottom = createKrefBasic(bottomRef, noDataRef, 0)
 
 // NoResult is the result when a function returns an error
 var NoResult = InternedBottom
@@ -29,11 +29,11 @@ func (*Float) referenceType() kreferenceType {
 
 // GetFloatObject yields the cast object for a KApply reference, if possible.
 func (ms *ModelState) GetFloatObject(ref KReference) (*Float, bool) {
-	refType, _, index := parseKrefBasic(ref)
+	refType, dataRef, index := parseKrefBasic(ref)
 	if refType != floatRef {
 		return nil, false
 	}
-	obj := ms.getReferencedObject(index, false)
+	obj := ms.getData(dataRef).getReferencedObject(index)
 	castObj, typeOk := obj.(*Float)
 	if !typeOk {
 		panic("wrong object type for reference")
@@ -73,7 +73,7 @@ func (*InjectedKLabel) referenceType() kreferenceType {
 
 // NewInjectedKLabel creates a new InjectedKLabel object and returns the reference.
 func (ms *ModelState) NewInjectedKLabel(label KLabel) KReference {
-	return ms.addObject(&InjectedKLabel{Label: label})
+	return ms.mainData.addObject(&InjectedKLabel{Label: label})
 }
 
 // StringBuffer is a KObject that contains a string buffer
@@ -93,11 +93,11 @@ func IsStringBuffer(ref KReference) bool {
 
 // GetStringBufferObject yields the cast object for a StringBuffer reference, if possible.
 func (ms *ModelState) GetStringBufferObject(ref KReference) (*StringBuffer, bool) {
-	refType, _, index := parseKrefBasic(ref)
+	refType, dataRef, index := parseKrefBasic(ref)
 	if refType != stringBufferRef {
 		return nil, false
 	}
-	obj := ms.getReferencedObject(index, false)
+	obj := ms.getData(dataRef).getReferencedObject(index)
 	castObj, typeOk := obj.(*StringBuffer)
 	if !typeOk {
 		panic("wrong object type for reference")
@@ -107,5 +107,5 @@ func (ms *ModelState) GetStringBufferObject(ref KReference) (*StringBuffer, bool
 
 // NewStringBuffer creates a new object and returns the reference.
 func (ms *ModelState) NewStringBuffer() KReference {
-	return ms.addObject(&StringBuffer{Value: strings.Builder{}})
+	return ms.mainData.addObject(&StringBuffer{Value: strings.Builder{}})
 }

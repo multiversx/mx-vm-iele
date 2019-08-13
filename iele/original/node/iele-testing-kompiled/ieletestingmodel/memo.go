@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:03:30.337
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:16:45.638
 
 package ieletestingmodel
 
@@ -35,10 +35,11 @@ func (ms *ModelState) GetMemoizedValue(memoTable MemoTable, keys ...KMapKey) (KR
 // SetMemoizedValue inserts a value into the memo table structure, for a variable number of keys.
 // It extends the tree up to where it is required.
 func (ms *ModelState) SetMemoizedValue(memoized KReference, memoTable MemoTable, keys ...KMapKey) {
-    // it is very important to prevent memoized values from being recycled
-    ms.Preserve(memoized)
+	// value gets copied to the special memoization data container
+	// from where it never gets flushed
+	memoized = transfer(ms.mainData, ms.memoData, memoized)
 
-    // create necessary structures and insert
+	// create necessary structures and insert
 	if ms.memoTables == nil {
 		ms.memoTables = make(map[MemoTable]interface{})
 	}

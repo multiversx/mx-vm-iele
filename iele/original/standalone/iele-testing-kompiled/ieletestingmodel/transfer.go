@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-30 16:35:04.814
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:19:50.499
 
 package ieletestingmodel
 
@@ -16,7 +16,6 @@ func transfer(from, to *ModelData, ref KReference) KReference {
 		_, _, sortInt, labelInt, index := parseKrefCollection(ref)
 		obj := from.getReferencedObject(index)
 		obj.transferContents(from, to)
-		from.allObjects[index] = nil
 		return to.addCollectionObject(Sort(sortInt), KLabel(labelInt), obj)
 	}
 

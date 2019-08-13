@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:11:08.386
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:25:08.138
 
 package ieletestingmodel
 
@@ -11,8 +11,7 @@ func (*KVariable) referenceType() kreferenceType {
 	return kvariableRef
 }
 
-
 // NewKVariable creates a new object and returns the reference.
 func (ms *ModelState) NewKVariable(name string) KReference {
-	return ms.addObject(&KVariable{Name: name})
+	return ms.mainData.addObject(&KVariable{Name: name})
 }

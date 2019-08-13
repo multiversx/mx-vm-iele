@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:11:08.386
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:25:08.138
 
 package ieletestingmodel
 
@@ -20,8 +20,8 @@ func (ms *ModelState) CollectionsToK(ref KReference) KReference {
 		}
 		return ms.NewKApply(ms.KApplyLabel(ref), newArgs...)
 	} else if isCollectionType(refType) {
-		_, _, _, index := parseKrefCollection(ref)
-		obj := ms.getReferencedObject(index, false)
+		_, dataRef, _, _, index := parseKrefCollection(ref)
+		obj := ms.getData(dataRef).getReferencedObject(index)
 		return obj.collectionsToK(ms)
 	}
 

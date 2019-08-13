@@ -1,12 +1,12 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:11:08.386
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:25:08.138
 
 package ieletestingmodel
 
 // BoolTrue represents a boolean value with value true
-var BoolTrue = createKrefBasic(boolRef, true, 1)
+var BoolTrue = createKrefBasic(boolRef, noDataRef, 1)
 
 // BoolFalse represents a boolean value with value false
-var BoolFalse = createKrefBasic(boolRef, true, 0)
+var BoolFalse = createKrefBasic(boolRef, noDataRef, 0)
 
 // CastToBool converts K Bool to Go bool, if possible.
 func CastToBool(ref KReference) (bool, bool) {

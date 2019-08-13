@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:11:08.386
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:25:08.138
 
 package ieletestingmodel
 
@@ -23,6 +23,10 @@ func (ms *ModelState) IntFromBytes(bytes []byte) KReference {
 
 // ParseInt creates K int from string representation
 func (ms *ModelState) ParseInt(str string) (KReference, error) {
+	return ms.mainData.parseInt(str)
+}
+
+func (md *ModelData) parseInt(str string) (KReference, error) {
 	if str == "0" {
 		return IntZero, nil
 	}
@@ -34,33 +38,41 @@ func (ms *ModelState) ParseInt(str string) (KReference, error) {
 		return createKrefSmallInt(int64(i)), nil
 	}
 
-	b := big.NewInt(0)
-	b.UnmarshalText([]byte(str))
-	if b.Sign() == 0 {
+	ref, obj := md.newBigIntObject()
+	obj.bigValue.UnmarshalText([]byte(str))
+	if obj.bigValue.Sign() == 0 {
 		return IntZero, &parseIntError{parseVal: str}
 	}
-	return ms.FromBigInt(b), nil
+	return ref, nil
 }
 
 // ParseIntFromBase creates K int from string representation in a given base
 func (ms *ModelState) ParseIntFromBase(str string, base int) (KReference, error) {
+	return ms.mainData.parseIntFromBase(str, base)
+}
+
+func (md *ModelData) parseIntFromBase(str string, base int) (KReference, error) {
 	if base == 10 {
-		return ms.ParseInt(str)
+		return md.parseInt(str)
 	}
 	if str == "0" {
 		return IntZero, nil
 	}
-	b := big.NewInt(0)
-	_, ok := b.SetString(str, base)
+	ref, obj := md.newBigIntObject()
+	_, ok := obj.bigValue.SetString(str, base)
 	if !ok {
-		return IntZero, &parseIntError{parseVal: str}
+		return NoResult, &parseIntError{parseVal: str}
 	}
-	return ms.FromBigInt(b), nil
+	return ref, nil
 }
 
 // IntFromString does the same as ParseInt but panics instead of returning an error
 func (ms *ModelState) IntFromString(s string) KReference {
-	i, err := ms.ParseInt(s)
+	return ms.mainData.intFromString(s)
+}
+
+func (md *ModelData) intFromString(s string) KReference {
+	i, err := md.parseInt(s)
 	if err != nil {
 		panic(err)
 	}

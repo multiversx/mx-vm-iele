@@ -1,7 +1,6 @@
 package ielecompiler
 
 import (
-	"fmt"
 	"go/build"
 	"log"
 	"os/exec"
@@ -24,7 +23,7 @@ func AssembleIeleCode(contractPathFilePath string) string {
 	}
 
 	// uncomment this to print in console compiled bytes
-	fmt.Printf("precompiledMap[\"%s\"] = \"%s\"\n", filepath.Base(contractPathFilePath), string(compiledBytes))
+	//fmt.Printf("precompiledMap[\"%s\"] = \"%s\"\n", filepath.Base(contractPathFilePath), string(compiledBytes))
 
 	return string(compiledBytes)
 }

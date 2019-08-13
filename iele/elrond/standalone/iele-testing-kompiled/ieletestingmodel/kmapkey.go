@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:11:08.386
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:25:08.138
 
 package ieletestingmodel
 
@@ -31,12 +31,12 @@ func (ms *ModelState) MapKey(ref KReference) (KMapKey, bool) {
 	if ktoken, t := ms.GetKTokenObject(ref); t {
 		return ktoken, true
 	}
-	if isKApply, label, arity, index := parseKrefKApply(ref); isKApply {
+	if isKApply, dataRef, label, arity, index := parseKrefKApply(ref); isKApply {
 		switch arity {
 		case 0:
 			return kmapKeyKApply0{label: KLabel(label)}, true
 		case 1:
-			argAsKey, argOk := ms.MapKey(ms.allKApplyArgs[index+0]) // first argument
+			argAsKey, argOk := ms.MapKey(ms.getData(dataRef).allKApplyArgs[index+0]) // first argument
 			if !argOk {
 				return kmapBottom{}, false
 			}

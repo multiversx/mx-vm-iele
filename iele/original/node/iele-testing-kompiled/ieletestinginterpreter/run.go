@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:03:30.337
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:16:45.638
 
 package ieletestinginterpreter
 
@@ -83,6 +83,7 @@ func (i *Interpreter) TakeStepsNoThread(k m.KReference) error {
 
 	// start
 	i.currentStep = 0
+	i.checksSinceLastGc = 0
 	i.state = k
 	i.traceInitialState(k)
 
@@ -127,6 +128,13 @@ func (i *Interpreter) TakeStepsNoThread(k m.KReference) error {
 	return nil
 }
 
+// gcFrequencyMask indicates how often we check if garbage collection is needed.
+// every 1024 steps in this case.
+const gcFrequencyMask = (1 << 11) - 1
+
+// minChecksBetweenGc makes sure we don't run the Gc too often
+const minChecksBetweenGc = 14
+
 func (i *Interpreter) runSteps(maxSteps int) error {
 	running := true
 	for running {
@@ -135,18 +143,19 @@ func (i *Interpreter) runSteps(maxSteps int) error {
 		}
 		i.traceStepStart()
 
-		// decrease all usages from the previous state
-		previousState := i.state
-		//i.Model.DecreaseUsage(previousState)
+		var err error
+		i.state, err = i.step(i.state)
 
-        var err error
-		i.state, err = i.step(previousState)
-
-		// increase all usages for the current state
-		//i.Model.IncreaseUsage(i.state)
-
-		// recycle everything that didn't show up in the new state
-        //i.Model.RecycleUnused(previousState)
+		// periodically clean up model of old data
+		if i.currentStep&gcFrequencyMask == 0 {
+			if i.checksSinceLastGc > minChecksBetweenGc && i.Model.ShouldRunGc() {
+				//fmt.Printf("clean: %d | %d | [%d of %d] \n", i.checksSinceLastGc, i.currentStep, i.Model.SizeUsed(), i.Model.SizeAllocated())
+				i.state = i.Model.Gc(i.state)
+				i.checksSinceLastGc = 0
+			} else {
+				i.checksSinceLastGc++
+			}
+		}
 
 		if err == nil {
 			i.traceStepEnd()

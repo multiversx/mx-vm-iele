@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:03:30.337
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:16:45.638
 
 package ieletestinginterpreter
 
@@ -17,7 +17,12 @@ func (i *Interpreter) warn(message string) {
 func doNothing(c m.KReference) {
 }
 
+// tricks the compiler to stop complaining about unused vars/boolVars variable in some cases
+// never gets called
+func doNothingWithVars(varsLen, boolVarLen int) {
+}
+
 // DebugPrint ... prints a K item to console, useful for debugging
 func (i *Interpreter) DebugPrint(info string, c m.KReference) {
-	fmt.Printf("debug %s: %s\n", info, i.Model.PrettyPrint(c))
+	fmt.Printf("debug (step %d) %s: %s\n", i.currentStep, info, i.Model.PrettyPrint(c))
 }

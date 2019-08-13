@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:03:30.337
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:16:45.638
 
 package ieletestingmodel
 
@@ -22,12 +22,12 @@ func (ms *ModelState) kprintToStringBuilder(sb *strings.Builder, ref KReference)
 		return
 	}
 
-	refType, constant, value := parseKrefBasic(ref)
+	refType, dataRef, value := parseKrefBasic(ref)
 
 	// collection types
 	if isCollectionType(refType) {
-		_, _, _, index := parseKrefCollection(ref)
-		obj := ms.getReferencedObject(index, false)
+		_, _, _, _, index := parseKrefCollection(ref)
+		obj := ms.getData(dataRef).getReferencedObject(index)
 		obj.kprint(ms, sb)
 		return
 	}
@@ -66,7 +66,7 @@ func (ms *ModelState) kprintToStringBuilder(sb *strings.Builder, ref KReference)
 		kprintKToken(sb, ktoken.Sort, ktoken.Value, false)
 	default:
 		// object types
-		obj := ms.getReferencedObject(value, constant)
+		obj := ms.getData(dataRef).getReferencedObject(value)
 		obj.kprint(ms, sb)
 	}
 }

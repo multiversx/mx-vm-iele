@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-07-15 13:11:08.386
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:25:08.138
 
 package ieletestingmodel
 
@@ -11,7 +11,7 @@ type KApply struct {
 
 // KApplyMatch returns true if reference is a KApply with correct label and arity
 func KApplyMatch(ref KReference, expectedLabel KLabel, expectedArity uint32) bool {
-	isKApply, label, arity, _ := parseKrefKApply(ref)
+	isKApply, _, label, arity, _ := parseKrefKApply(ref)
 	if !isKApply {
 		return false
 	}
@@ -26,7 +26,7 @@ func KApplyMatch(ref KReference, expectedLabel KLabel, expectedArity uint32) boo
 
 // KApplyLabel returns the label of a KApply item.
 func (ms *ModelState) KApplyLabel(ref KReference) KLabel {
-	isKApply, label, _, _ := parseKrefKApply(ref)
+	isKApply, _, label, _, _ := parseKrefKApply(ref)
 	if !isKApply {
 		panic("KApplyLabel called for reference to item other than KApply")
 	}
@@ -35,7 +35,7 @@ func (ms *ModelState) KApplyLabel(ref KReference) KLabel {
 
 // KApplyArity returns the arity of a KApply item (nr. of arguments)
 func (ms *ModelState) KApplyArity(ref KReference) int {
-	isKApply, _, arity, _ := parseKrefKApply(ref)
+	isKApply, _, _, arity, _ := parseKrefKApply(ref)
 	if !isKApply {
 		panic("KApplyArity called for reference to item other than KApply")
 	}
@@ -44,30 +44,30 @@ func (ms *ModelState) KApplyArity(ref KReference) int {
 
 // KApplyArg returns the nth argument in a KApply
 func (ms *ModelState) KApplyArg(ref KReference, argIndex uint64) KReference {
-	isKApply, _, arity, index := parseKrefKApply(ref)
+	isKApply, dataRef, _, arity, index := parseKrefKApply(ref)
 	if !isKApply {
 		panic("KApplyArg called for reference to item other than KApply")
 	}
 	if argIndex > arity {
 		panic("KApplyArg called for arg index larger than KApply arity")
 	}
-	return ms.allKApplyArgs[index+argIndex]
+	return ms.getData(dataRef).allKApplyArgs[index+argIndex]
 }
 
 func (ms *ModelState) kapplyArgSlice(ref KReference) []KReference {
-	isKApply, _, arity, index := parseKrefKApply(ref)
+	isKApply, dataRef, _, arity, index := parseKrefKApply(ref)
 	if !isKApply {
 		panic("kapplyArgSlice called for reference to item other than KApply")
 	}
 	if arity == 0 {
 		return nil
 	}
-	return ms.allKApplyArgs[index : index+arity]
+	return ms.getData(dataRef).allKApplyArgs[index : index+arity]
 }
 
 // GetKApplyObject yields the cast object for a KApply reference, if possible.
 func (ms *ModelState) GetKApplyObject(ref KReference) (*KApply, bool) {
-	isKApply, label, _, _ := parseKrefKApply(ref)
+	isKApply, _, label, _, _ := parseKrefKApply(ref)
 	if !isKApply {
 		return nil, false
 	}
@@ -77,21 +77,23 @@ func (ms *ModelState) GetKApplyObject(ref KReference) (*KApply, bool) {
 	}, true
 }
 
-// NewKApply creates a new object and returns the reference.
-func (ms *ModelState) NewKApply(label KLabel, arguments ...KReference) KReference {
+func (md *ModelData) newKApply(labelInt uint64, arguments ...KReference) KReference {
 	argStartIndex := 0
 	if len(arguments) > 0 {
-		argStartIndex = len(ms.allKApplyArgs)
-		ms.allKApplyArgs = append(ms.allKApplyArgs, arguments...)
+		argStartIndex = len(md.allKApplyArgs)
+		md.allKApplyArgs = append(md.allKApplyArgs, arguments...)
 	}
 
-	return createKrefKApply(uint64(label), uint64(len(arguments)), uint64(argStartIndex))
+	return createKrefKApply(md.selfRef, labelInt, uint64(len(arguments)), uint64(argStartIndex))
+}
+
+// NewKApply creates a new KApply object and returns the reference.
+func (ms *ModelState) NewKApply(label KLabel, arguments ...KReference) KReference {
+	return ms.mainData.newKApply(uint64(label), arguments...)
 }
 
 // NewKApplyConstant creates a new integer constant, which is saved statically.
 // Do not use for anything other than constants, since these never get cleaned up.
 func NewKApplyConstant(label KLabel, arguments ...KReference) KReference {
-	ref := constantsModel.NewKApply(label, arguments...)
-	ref = setConstantFlag(ref)
-	return ref
+	return constantsData.newKApply(uint64(label), arguments...)
 }
