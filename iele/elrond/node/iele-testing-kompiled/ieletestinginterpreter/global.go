@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:10:37.856
+// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
 
 package ieletestinginterpreter
 
@@ -20,6 +20,10 @@ func doNothing(c m.KReference) {
 // tricks the compiler to stop complaining about unused vars/boolVars variable in some cases
 // never gets called
 func doNothingWithVars(varsLen, boolVarLen int) {
+}
+
+func invalidVariable(varName string) m.KReference {
+    panic("invalid variable: " + varName)
 }
 
 // DebugPrint ... prints a K item to console, useful for debugging
