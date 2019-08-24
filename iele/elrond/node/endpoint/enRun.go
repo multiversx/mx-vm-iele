@@ -116,16 +116,20 @@ func (vm *ElrondIeleVM) runTransaction(kinput m.KReference) (*vmi.VMOutput, erro
 
 	mode := vm.kinterpreter.Model.NewKApply(m.LblNORMAL)
 
-	kConfigMap := make(map[m.KMapKey]m.KReference)
-	kConfigMap[m.KToken{Sort: m.SortKConfigVar, Value: "$PGM"}] = kinput
-	kConfigMap[m.KToken{Sort: m.SortKConfigVar, Value: "$MODE"}] = mode
-	kConfigMap[m.KToken{Sort: m.SortKConfigVar, Value: "$SCHEDULE"}] = vm.scheduleToK(vm.schedule)
+	kConfigMap := vm.kinterpreter.Model.EmptyMap(m.LblXuMapXu, m.SortMap)
+	kConfigMap = vm.kinterpreter.Model.MapUpdate(kConfigMap,
+		vm.kinterpreter.Model.NewKToken(m.SortKConfigVar, "$PGM"),
+		kinput)
+	kConfigMap = vm.kinterpreter.Model.MapUpdate(kConfigMap,
+		vm.kinterpreter.Model.NewKToken(m.SortKConfigVar, "$MODE"),
+		mode)
+	kConfigMap = vm.kinterpreter.Model.MapUpdate(kConfigMap,
+		vm.kinterpreter.Model.NewKToken(m.SortKConfigVar, "$SCHEDULE"),
+		vm.scheduleToK(vm.schedule))
 
 	// init
 	initConfig, initErr := vm.kinterpreter.Eval(
-		vm.kinterpreter.Model.NewKApply(interpreter.TopCellInitializer,
-			vm.kinterpreter.Model.NewMap(m.SortMap, m.LblXuMapXu, kConfigMap),
-		),
+		vm.kinterpreter.Model.NewKApply(interpreter.TopCellInitializer, kConfigMap),
 		m.InternedBottom,
 	)
 	if initErr != nil {
@@ -221,18 +225,24 @@ func (vm *ElrondIeleVM) runTransaction(kinput m.KReference) (*vmi.VMOutput, erro
 	if !kAccountsCellArgsOk {
 		return nil, errors.New("invalid vmResult accounts cell")
 	}
-	kAccountsMapData, kAccountsMapOk := vm.kinterpreter.Model.ExtractMapData(
-		kAccountsCellArgs[0], m.SortAccountCellMap, m.LblXuAccountCellMapXu)
-	if !kAccountsMapOk {
+	vmResultMap := kAccountsCellArgs[0]
+	if !vm.kinterpreter.Model.IsMapWithSortAndLabel(
+		vmResultMap, m.SortAccountCellMap, m.LblXuAccountCellMapXu) {
 		return nil, errors.New("invalid vmResult account map")
 	}
 	var modAccounts []*vmi.OutputAccount
-	for _, kacc := range kAccountsMapData {
-		modAccount, modAccErr := vm.convertKToModifiedAccount(kacc)
+	var modAccErr error
+	vm.kinterpreter.Model.MapForEach(vmResultMap, func(_, kacc m.KReference) bool {
+		var modAccount *vmi.OutputAccount
+		modAccount, modAccErr = vm.convertKToModifiedAccount(kacc)
 		if modAccErr != nil {
-			return nil, modAccErr
+			return true
 		}
 		modAccounts = append(modAccounts, modAccount)
+		return false
+	})
+	if modAccErr != nil {
+		return nil, modAccErr
 	}
 
 	kTouched, kTouchedOk := vm.kinterpreter.Model.ExtractListData(resultKappArgs[7], m.SortList, m.KLabelForList)
@@ -309,29 +319,32 @@ func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.KReference) (*vmi.Outpu
 	if !kappStorageOk {
 		return nil, errors.New("invalid account storage")
 	}
-	storageData, storageDataOk := vm.kinterpreter.Model.ExtractMapData(
-		kappStorage[0], m.SortMap, m.LblXuMapXu)
-	if !storageDataOk {
+	storageMap := kappStorage[0]
+	if !vm.kinterpreter.Model.IsMapWithSortAndLabel(
+		storageMap, m.SortMap, m.LblXuMapXu) {
 		return nil, errors.New("invalid account storage")
 	}
 	var storageUpdates []*vmi.StorageUpdate
-	for kmpkey, kvalue := range storageData {
-		kkey, kkeyErr := vm.kinterpreter.Model.ToKItem(kmpkey)
-		if kkeyErr != nil {
-			return nil, kkeyErr
-		}
+	var suErr error
+	vm.kinterpreter.Model.MapForEach(storageMap, func(kkey, kvalue m.KReference) bool {
 		ikey, ikeyOk := vm.kinterpreter.Model.GetBigInt(kkey)
 		if !ikeyOk {
-			return nil, errors.New("invalid account storage key")
+			suErr = errors.New("invalid account storage key")
+			return true
 		}
 		ivalue, ivalueOk := vm.kinterpreter.Model.GetBigInt(kvalue)
 		if !ivalueOk {
-			return nil, errors.New("invalid account storage value")
+			suErr = errors.New("invalid account storage value")
+			return true
 		}
 		storageUpdates = append(storageUpdates, &vmi.StorageUpdate{
 			Offset: ikey.Bytes(),
 			Data:   ivalue.Bytes(),
 		})
+		return false
+	})
+	if suErr != nil {
+		return nil, suErr
 	}
 
 	// nonce
