@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
 
@@ -9,8 +9,9 @@ func (ms *ModelState) DeepCopy(ref KReference) KReference {
 
 	// collection types
 	if isCollectionType(refType) {
-		_, _, _, _, index := parseKrefCollection(ref)
-		obj := ms.getData(dataRef).getReferencedObject(index)
+		_, _, _, _, index, _ := parseKrefCollection(ref)
+		md := ms.getData(dataRef)
+		obj := md.getReferencedObject(index)
 		copiedObj := obj.deepCopy(ms)
 		return ms.mainData.addObject(copiedObj)
 	}
@@ -34,8 +35,9 @@ func (ms *ModelState) DeepCopy(ref KReference) KReference {
 	case smallNegativeIntRef:
 		return ref
 	case bigIntRef:
-		obj, _ := ms.getData(dataRef).getBigIntObject(ref)
-		newRef, newObj := ms.getData(dataRef).newBigIntObjectNoRecycle()
+		md := ms.getData(dataRef)
+		obj, _ := md.getBigIntObject(ref)
+		newRef, newObj := md.newBigIntObjectNoRecycle()
 		newObj.bigValue.Set(obj.bigValue)
 		return newRef
 	case kapplyRef:
@@ -54,9 +56,35 @@ func (ms *ModelState) DeepCopy(ref KReference) KReference {
 	case ktokenRef:
 		ktoken, _ := ms.GetKTokenObject(ref)
 		return ms.NewKToken(ktoken.Sort, ktoken.Value)
+	case mapRef:
+		_, _, sort, label, index, length := parseKrefCollection(ref)
+		if length == 0 {
+			return ref
+		}
+		md := ms.getData(dataRef)
+		fromIndex := int(index)
+		var toIndex int
+		previousToIndex := -1
+		for fromIndex != -1 {
+			elem := md.allMapElements[fromIndex]
+			toIndex = len(md.allMapElements)
+			md.allMapElements = append(md.allMapElements, mapElementData{
+				key:   ms.DeepCopy(elem.key),
+				value: ms.DeepCopy(elem.value),
+				next:  -1,
+			})
+			if previousToIndex != -1 {
+				md.allMapElements[previousToIndex].next = toIndex
+			}
+
+			previousToIndex = toIndex
+			fromIndex = elem.next
+		}
+		return createKrefCollection(mapRef, dataRef, sort, label, uint64(toIndex), length)
 	default:
 		// object types
-		obj := ms.getData(dataRef).getReferencedObject(value)
+		md := ms.getData(dataRef)
+		obj := md.getReferencedObject(value)
 		copiedObj := obj.deepCopy(ms)
 		if copiedObj == obj {
 			// if no new instance was created,
@@ -73,14 +101,6 @@ func (k *InjectedKLabel) deepCopy(ms *ModelState) KObject {
 
 func (k *KVariable) deepCopy(ms *ModelState) KObject {
 	return &KVariable{Name: k.Name}
-}
-
-func (k *Map) deepCopy(ms *ModelState) KObject {
-	mapCopy := make(map[KMapKey]KReference)
-	for key, val := range k.Data {
-		mapCopy[key] = ms.DeepCopy(val)
-	}
-	return &Map{Data: mapCopy}
 }
 
 func (k *List) deepCopy(ms *ModelState) KObject {

@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
 
@@ -19,8 +19,12 @@ func (ms *ModelState) CollectionsToK(ref KReference) KReference {
 			newArgs[i] = ms.CollectionsToK(child)
 		}
 		return ms.NewKApply(ms.KApplyLabel(ref), newArgs...)
+	} else if refType == mapRef {
+		_, _, _, lbl, _, _ := parseKrefCollection(ref)
+		orderedKVPairs := ms.mapOrderedKeyValuePairs(ref)
+		return ms.mapElementsToK(KLabel(lbl), orderedKVPairs)
 	} else if isCollectionType(refType) {
-		_, dataRef, _, _, index := parseKrefCollection(ref)
+		_, dataRef, _, _, index, _ := parseKrefCollection(ref)
 		obj := ms.getData(dataRef).getReferencedObject(index)
 		return obj.collectionsToK(ms)
 	}
@@ -29,23 +33,15 @@ func (ms *ModelState) CollectionsToK(ref KReference) KReference {
 	return ref
 }
 
-func (k *Map) collectionsToK(ms *ModelState) KReference {
-	if len(k.Data) == 0 {
-		return ms.NewKApply(UnitFor(k.Label))
-	}
-
-	// sort entries
-	orderedKVPairs := ms.MapOrderedKeyValuePairs(k)
-
-	// process
-	elemLabel := ElementFor(k.Label)
+func (ms *ModelState) mapElementsToK(label KLabel, orderedKVPairs []MapKeyValuePair) KReference {
+	elemLabel := ElementFor(label)
 	var result KReference
 	for i, pair := range orderedKVPairs {
 		elemK := ms.NewKApply(elemLabel, pair.Key, ms.CollectionsToK(pair.Value))
 		if i == 0 {
 			result = elemK
 		} else {
-			newResult := ms.NewKApply(k.Label, result, elemK)
+			newResult := ms.NewKApply(label, result, elemK)
 			result = newResult
 		}
 	}

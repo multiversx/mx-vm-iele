@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestinginterpreter
 
@@ -31,17 +31,8 @@ func (kreflectionHooksType) sort(c m.KReference, lbl m.KLabel, sort m.Sort, conf
 	if m.IsBool(c) {
 		return constKReflectionSortBool, nil
 	}
-	if obj, t := interpreter.Model.GetMapObject(c); t {
-		return interpreter.Model.NewString(obj.Sort.Name()), nil
-	}
-	if obj, t := interpreter.Model.GetListObject(c); t {
-		return interpreter.Model.NewString(obj.Sort.Name()), nil
-	}
-	if obj, t := interpreter.Model.GetSetObject(c); t {
-		return interpreter.Model.NewString(obj.Sort.Name()), nil
-	}
-	if obj, t := interpreter.Model.GetArrayObject(c); t {
-		return interpreter.Model.NewString(obj.Sort.Name()), nil
+	if sortName, ok := interpreter.Model.CollectionSortName(c); ok {
+		return interpreter.Model.NewString(sortName), nil
 	}
 
 	return m.NoResult, &hookNotImplementedError{}

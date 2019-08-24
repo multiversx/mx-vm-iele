@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
 
@@ -13,7 +13,7 @@ func transfer(from, to *ModelData, ref KReference) KReference {
 
 	// collection types
 	if isCollectionType(refType) {
-		_, _, sortInt, labelInt, index := parseKrefCollection(ref)
+		_, _, sortInt, labelInt, index, _ := parseKrefCollection(ref)
 		obj := from.getReferencedObject(index)
 		obj.transferContents(from, to)
 		return to.addCollectionObject(Sort(sortInt), KLabel(labelInt), obj)
@@ -74,6 +74,33 @@ func transfer(from, to *ModelData, ref KReference) KReference {
 	case ktokenRef:
 		_, _, sort, length, index := parseKrefKToken(ref)
 		return to.newKToken(sort, from.allBytes[index:index+length])
+	case mapRef:
+		_, _, sort, label, index, length := parseKrefCollection(ref)
+		if length == 0 {
+			return ref
+		}
+		fromIndex := int(index)
+		toIndex := -1
+		previousToIndex := -1
+		for fromIndex != -1 {
+			elem := from.allMapElements[fromIndex]
+			newIndex := len(to.allMapElements)
+			to.allMapElements = append(to.allMapElements, mapElementData{
+				key:   transfer(from, to, elem.key),
+				value: transfer(from, to, elem.value),
+				next:  -1,
+			})
+			if previousToIndex != -1 {
+				to.allMapElements[previousToIndex].next = newIndex
+			}
+			if toIndex == -1 {
+				toIndex = newIndex // to: first index
+			}
+
+			previousToIndex = newIndex
+			fromIndex = elem.next
+		}
+		return createKrefCollection(mapRef, to.selfRef, sort, label, uint64(toIndex), length)
 	default:
 		// object types
 		obj := from.getReferencedObject(value)
@@ -87,12 +114,6 @@ func (k *InjectedKLabel) transferContents(from, to *ModelData) {
 }
 
 func (k *KVariable) transferContents(from, to *ModelData) {
-}
-
-func (k *Map) transferContents(from, to *ModelData) {
-	for key, val := range k.Data {
-		k.Data[key] = transfer(from, to, val)
-	}
 }
 
 func (k *List) transferContents(from, to *ModelData) {

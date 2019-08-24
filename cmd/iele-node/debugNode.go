@@ -28,9 +28,9 @@ func main() {
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false) // trace_good
 	//debugElrondTest("tests/iele-v3/danse/ERC20/approve_Caller-Zero.iele.json", true)
 
-	debugAgarMin()
+	//debugAgarMin()
 
-	//debugIllFormedX()
+	debugElrondTest("agar_v4/topUp_ok.iele.json", false)
 }
 
 func debugAgarMin() {

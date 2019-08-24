@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestinginterpreter
 
@@ -49,17 +49,15 @@ func (i *Interpreter) ExecuteSimple(kdir string, execFile string) {
 
 // Execute interprets the program with the structure
 func (i *Interpreter) Execute(kastMap map[string][]byte) error {
-	kConfigMap := make(map[m.KMapKey]m.KReference)
+	kmap := i.Model.EmptyMap(m.KLabelForMap, m.SortMap)
 	for key, kastValue := range kastMap {
-		ktokenRef := i.Model.NewKToken(m.SortKConfigVar, "$"+key)
-		ktokenKey, _ := i.Model.MapKey(ktokenRef)
+		ktoken := i.Model.NewKToken(m.SortKConfigVar, "$"+key)
 		parsedValue := koreparser.Parse(kastValue)
 		kValue := i.convertParserModelToKModel(parsedValue)
-		kConfigMap[ktokenKey] = kValue
+		kmap = i.Model.MapUpdate(kmap, ktoken, kValue)
 	}
 
 	// top cell initialization
-	kmap := i.Model.NewMap(m.SortMap, m.KLabelForMap, kConfigMap)
 	evalK := i.Model.NewKApply(TopCellInitializer, kmap)
 	kinit, err := i.Eval(evalK, m.InternedBottom)
 	if err != nil {

@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
 
@@ -53,6 +53,9 @@ type ModelData struct {
 
 	// contains all bytes from types String, Bytes and KToken
 	allBytes []byte
+
+	// contains all map elements
+	allMapElements []mapElementData
 
 	// keeps object types mixed together
 	allObjects []KObject
@@ -117,22 +120,24 @@ func NewModel() *ModelState {
 // newSmallModel creates a smaller model.
 func newMainModelData() *ModelData {
 	return &ModelData{
-		selfRef:       mainDataRef,
-		allKsElements: make([]ksequenceElem, 0, 100000),
-		allKApplyArgs: make([]KReference, 0, 1000000),
-		allBytes:      make([]byte, 0, 1<<20),
-		allObjects:    make([]KObject, 0, 10000),
+		selfRef:        mainDataRef,
+		allKsElements:  make([]ksequenceElem, 0, 100000),
+		allKApplyArgs:  make([]KReference, 0, 1000000),
+		allBytes:       make([]byte, 0, 1<<20),
+		allMapElements: make([]mapElementData, 0, 1000000),
+		allObjects:     make([]KObject, 0, 10000),
 	}
 }
 
 // newSmallModel creates a smaller model.
 func newSmallModelData(selfRef modelDataReference) *ModelData {
 	return &ModelData{
-		selfRef:       selfRef,
-		allKsElements: make([]ksequenceElem, 0, 32),
-		allKApplyArgs: make([]KReference, 0, 32),
-		allBytes:      make([]byte, 0, 1024),
-		allObjects:    make([]KObject, 0, 32),
+		selfRef:        selfRef,
+		allKsElements:  make([]ksequenceElem, 0, 32),
+		allKApplyArgs:  make([]KReference, 0, 32),
+		allBytes:       make([]byte, 0, 1024),
+		allMapElements: make([]mapElementData, 0, 64),
+		allObjects:     make([]KObject, 0, 32),
 	}
 }
 
@@ -141,8 +146,9 @@ func newSmallModelData(selfRef modelDataReference) *ModelData {
 func (md *ModelData) Clear() {
 	md.allKsElements = md.allKsElements[:0]
 	md.allKApplyArgs = md.allKApplyArgs[:0]
-	md.allObjects = md.allObjects[:0]
 	md.allBytes = md.allBytes[:0]
+	md.allMapElements = md.allMapElements[:0]
+	md.allObjects = md.allObjects[:0]
 	md.recycleAllInts()
 }
 

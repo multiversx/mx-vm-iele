@@ -1,12 +1,20 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
+
+// MemoKey is a key in a memoization table
+type MemoKey = KReference
 
 // MemoTable is a reference to a memoization table
 type MemoTable int
 
+// GetMemoKey converts a reference to a memo key
+func GetMemoKey(ref KReference) (MemoKey, bool) {
+	return ref, true
+}
+
 // GetMemoizedValue searches for a value in the memo tables structure of the model.
-func (ms *ModelState) GetMemoizedValue(memoTable MemoTable, keys ...KMapKey) (KReference, bool) {
+func (ms *ModelState) GetMemoizedValue(memoTable MemoTable, keys ...MemoKey) (KReference, bool) {
 	if ms.memoTables == nil {
 		return NullReference, false
 	}
@@ -15,9 +23,9 @@ func (ms *ModelState) GetMemoizedValue(memoTable MemoTable, keys ...KMapKey) (KR
 		return NullReference, false
 	}
 	for _, key := range keys {
-		currentMap, isMap := currentObj.(map[KMapKey]interface{})
+		currentMap, isMap := currentObj.(map[MemoKey]interface{})
 		if !isMap {
-			panic("wrong object found: memo tables need a level of map[KMapKey]interface{} for each key")
+			panic("wrong object found: memo tables need a level of map[MemoKey]interface{} for each key")
 		}
 		objectForKey, isKeyPresent := currentMap[key]
 		if !isKeyPresent {
@@ -34,7 +42,7 @@ func (ms *ModelState) GetMemoizedValue(memoTable MemoTable, keys ...KMapKey) (KR
 
 // SetMemoizedValue inserts a value into the memo table structure, for a variable number of keys.
 // It extends the tree up to where it is required.
-func (ms *ModelState) SetMemoizedValue(memoized KReference, memoTable MemoTable, keys ...KMapKey) {
+func (ms *ModelState) SetMemoizedValue(memoized KReference, memoTable MemoTable, keys ...MemoKey) {
 	// value gets copied to the special memoization data container
 	// from where it never gets flushed
 	memoized = transfer(ms.mainData, ms.memoData, memoized)
@@ -51,18 +59,18 @@ func (ms *ModelState) SetMemoizedValue(memoized KReference, memoTable MemoTable,
 
 	currentMapObj, tableFound := ms.memoTables[memoTable]
 	if !tableFound {
-		currentMapObj = make(map[KMapKey]interface{})
+		currentMapObj = make(map[MemoKey]interface{})
 		ms.memoTables[memoTable] = currentMapObj
 	}
 	for i, key := range keys {
-		currentMap, isMap := currentMapObj.(map[KMapKey]interface{})
+		currentMap, isMap := currentMapObj.(map[MemoKey]interface{})
 		if !isMap {
-			panic("wrong object found: memo tables need a level of map[KMapKey]interface{} for each key")
+			panic("wrong object found: memo tables need a level of map[MemoKey]interface{} for each key")
 		}
 		if i < len(keys)-1 {
 			nextMap, nextMapExists := currentMap[key]
 			if !nextMapExists {
-				nextMap = make(map[KMapKey]interface{})
+				nextMap = make(map[MemoKey]interface{})
 				currentMap[key] = nextMap
 				currentMapObj = nextMap
 			}

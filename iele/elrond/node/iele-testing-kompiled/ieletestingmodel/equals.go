@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
 
@@ -29,8 +29,8 @@ func (ms *ModelState) Equals(ref1 KReference, ref2 KReference) bool {
 
 	// collection types
 	if isCollectionType(refType1) {
-		_, _, _, _, index1 := parseKrefCollection(ref1)
-		_, _, _, _, index2 := parseKrefCollection(ref2)
+		_, _, _, _, index1, _ := parseKrefCollection(ref1)
+		_, _, _, _, index2, _ := parseKrefCollection(ref2)
 		obj1 := ms.getData(dataRef1).getReferencedObject(index1)
 		obj2 := ms.getData(dataRef2).getReferencedObject(index2)
 		return obj1.equals(ms, obj2)
@@ -80,6 +80,33 @@ func (ms *ModelState) Equals(ref1 KReference, ref2 KReference) bool {
 		val1 := ms.getData(dataRef1).allBytes[index1 : index1+length1]
 		val2 := ms.getData(dataRef2).allBytes[index2 : index2+length2]
 		return bytes.Equal(val1, val2)
+	case mapRef:
+		_, _, sort1, label1, index1, length1 := parseKrefCollection(ref1)
+		_, _, sort2, label2, _, length2 := parseKrefCollection(ref2)
+		if sort1 != sort2 {
+			return false
+		}
+		if label1 != label2 {
+			return false
+		}
+		if length1 != length2 {
+			return false
+		}
+		if length1 == 0 {
+			return true
+		}
+
+		currentIndex1 := int(index1)
+		data1 := ms.getData(dataRef1)
+		for currentIndex1 != -1 {
+			elem1 := data1.allMapElements[currentIndex1]
+			value2 := ms.MapGet(ref2, elem1.key, NullReference)
+			if !ms.Equals(elem1.value, value2) {
+				return false
+			}
+			currentIndex1 = elem1.next
+		}
+		return true
 	default:
 		// object types
 		obj1 := ms.getData(dataRef1).getReferencedObject(value1)
@@ -106,26 +133,6 @@ func (k *KVariable) equals(ms *ModelState, arg KObject) bool {
 	}
 	if k.Name != other.Name {
 		return false
-	}
-	return true
-}
-
-func (k *Map) equals(ms *ModelState, arg KObject) bool {
-	other, typeOk := arg.(*Map)
-	if !typeOk {
-		panic("equals between different types should have been handled during reference Equals")
-	}
-	if len(k.Data) != len(other.Data) {
-		return false
-	}
-	for key, val := range k.Data {
-		otherVal, found := other.Data[key]
-		if !found {
-			return false
-		}
-		if !ms.Equals(val, otherVal) {
-			return false
-		}
 	}
 	return true
 }

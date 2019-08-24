@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
 
@@ -46,11 +46,11 @@ func (k *InjectedKLabel) recycleUnused(ms *ModelState) {
 func (k *KVariable) recycleUnused(ms *ModelState) {
 }
 
-func (k *Map) recycleUnused(ms *ModelState) {
-	for _, v := range k.Data {
-		ms.RecycleUnused(v)
-	}
-}
+// func (k *Map) recycleUnused(ms *ModelState) {
+// 	for _, v := range k.Data {
+// 		ms.RecycleUnused(v)
+// 	}
+// }
 
 func (k *List) recycleUnused(ms *ModelState) {
 	for _, item := range k.Data {

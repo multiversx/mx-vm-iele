@@ -1,8 +1,9 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
 
 import (
+	"fmt"
 	"sort"
 )
 
@@ -31,16 +32,16 @@ func (ms *ModelState) ExtractListData(subject KReference, expectedSort Sort, exp
 }
 
 // ExtractMapData ... checks that a K item is a map and returns its contents if so
-func (ms *ModelState) ExtractMapData(subject KReference, expectedSort Sort, expectedLabel KLabel) (map[KMapKey]KReference, bool) {
-	kmap, isMap := ms.GetMapObject(subject)
-	if !isMap {
-		return nil, false
-	}
-	if kmap.Sort != expectedSort || kmap.Label != expectedLabel {
-		return nil, false
-	}
-	return kmap.Data, true
-}
+// func (ms *ModelState) ExtractMapData(subject KReference, expectedSort Sort, expectedLabel KLabel) (map[KMapKey]KReference, bool) {
+// 	kmap, isMap := ms.GetMapObject(subject)
+// 	if !isMap {
+// 		return nil, false
+// 	}
+// 	if kmap.Sort != expectedSort || kmap.Label != expectedLabel {
+// 		return nil, false
+// 	}
+// 	return kmap.Data, true
+// }
 
 // MapKeyValuePair ... just a pair of key and value that was stored in a map
 type MapKeyValuePair struct {
@@ -49,27 +50,35 @@ type MapKeyValuePair struct {
 	Value       KReference
 }
 
-// MapOrderedKeyValuePairs yields a list of key-value pairs,
+// mapOrderedKeyValuePairs yields a list of key-value pairs,
 // ordered by the pretty print representation of the keys.
-func (ms *ModelState) MapOrderedKeyValuePairs(k *Map) []MapKeyValuePair {
-	result := make([]MapKeyValuePair, len(k.Data))
-
-	var keysAsString []string
-	stringKeysToPair := make(map[string]MapKeyValuePair)
-	for key, val := range k.Data {
-		keyAsString := key.String()
-		keysAsString = append(keysAsString, keyAsString)
-		keyItem, err := ms.ToKItem(key)
-		if err != nil {
-			panic(err)
-		}
-		pair := MapKeyValuePair{KeyAsString: keyAsString, Key: keyItem, Value: val}
-		stringKeysToPair[keyAsString] = pair
+func (ms *ModelState) mapOrderedKeyValuePairs(ref KReference) []MapKeyValuePair {
+	refType, _, _, _, _, length := parseKrefCollection(ref)
+	if refType != mapRef {
+		panic("mapOrderedKeyValuePairs argument not a map")
 	}
-	sort.Strings(keysAsString)
-	for i, keyAsString := range keysAsString {
-		pair, _ := stringKeysToPair[keyAsString]
-		result[i] = pair
+
+	result := make([]MapKeyValuePair, 0, int(length))
+	if length > 0 {
+		var keysAsString []string
+		stringKeysToPair := make(map[string]MapKeyValuePair)
+		ms.MapForEach(ref, func(k KReference, v KReference) bool {
+			keyAsString := ms.PrettyPrint(k)
+			keysAsString = append(keysAsString, keyAsString)
+			pair := MapKeyValuePair{KeyAsString: keyAsString, Key: k, Value: v}
+			stringKeysToPair[keyAsString] = pair
+			return false
+		})
+		if len(keysAsString) != int(length) {
+			panic(fmt.Sprintf("map length mismatch. Reference length: %d. Data length: %d",
+				length,
+				len(keysAsString)))
+		}
+		sort.Strings(keysAsString)
+		for _, keyAsString := range keysAsString {
+			pair, _ := stringKeysToPair[keyAsString]
+			result = append(result, pair)
+		}
 	}
 
 	return result

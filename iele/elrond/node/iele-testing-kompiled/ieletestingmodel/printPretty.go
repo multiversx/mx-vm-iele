@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestingmodel
 
@@ -28,13 +28,15 @@ func (ms *ModelState) prettyPrintToStringBuilder(sb *strings.Builder, ref KRefer
 
 	// collection types
 	if isCollectionType(refType) {
-		_, _, _, _, index := parseKrefCollection(ref)
+		_, _, _, _, index, _ := parseKrefCollection(ref)
 		obj := ms.getData(dataRef).getReferencedObject(index)
 		obj.prettyPrint(ms, sb, indent)
 		return
 	}
 
 	switch refType {
+	case nullRef:
+		sb.WriteString("NULL")
 	case boolRef:
 		sb.WriteString(fmt.Sprintf("Bool (%t)", IsTrue(ref)))
 	case bottomRef:
@@ -84,6 +86,28 @@ func (ms *ModelState) prettyPrintToStringBuilder(sb *strings.Builder, ref KRefer
 	case ktokenRef:
 		ktoken, _ := ms.GetKTokenObject(ref)
 		sb.WriteString(fmt.Sprintf("%s: %s", ktoken.Sort.Name(), ktoken.Value))
+	case mapRef:
+		_, _, sort, label, _, length := parseKrefCollection(ref)
+		sb.WriteString("Map Sort:")
+		sb.WriteString(Sort(sort).Name())
+		sb.WriteString(", Label:")
+		sb.WriteString(KLabel(label).Name())
+		if length == 0 {
+			sb.WriteString(" <empty>")
+		} else {
+			sb.WriteString(", Data: (")
+			orderedKVPairs := ms.mapOrderedKeyValuePairs(ref)
+			for _, pair := range orderedKVPairs {
+				sb.WriteString("\n")
+				addIndent(sb, indent+1)
+				ms.prettyPrintToStringBuilder(sb, pair.Key, indent+1)
+				sb.WriteString(" => ")
+				ms.prettyPrintToStringBuilder(sb, pair.Value, indent+1)
+			}
+			sb.WriteRune('\n')
+			addIndent(sb, indent)
+			sb.WriteRune(')')
+		}
 	default:
 		// object types
 		obj := ms.getData(dataRef).getReferencedObject(value)
@@ -150,29 +174,6 @@ func (k *InjectedKLabel) prettyPrint(ms *ModelState, sb *strings.Builder, indent
 
 func (k *KVariable) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 	sb.WriteString(fmt.Sprintf("var %s", k.Name))
-}
-
-func (k *Map) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
-	sb.WriteString("Map Sort:")
-	sb.WriteString(k.Sort.Name())
-	sb.WriteString(", Label:")
-	sb.WriteString(k.Label.Name())
-	if len(k.Data) == 0 {
-		sb.WriteString(" <empty>")
-	} else {
-		sb.WriteString(", Data: (")
-		orderedKVPairs := ms.MapOrderedKeyValuePairs(k)
-		for _, pair := range orderedKVPairs {
-			sb.WriteString("\n")
-			addIndent(sb, indent+1)
-			ms.prettyPrintToStringBuilder(sb, pair.Key, indent+1)
-			sb.WriteString(" => ")
-			ms.prettyPrintToStringBuilder(sb, pair.Value, indent+1)
-		}
-		sb.WriteRune('\n')
-		addIndent(sb, indent)
-		sb.WriteRune(')')
-	}
 }
 
 func (k *List) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {

@@ -2,7 +2,6 @@ package main
 
 import (
 	"go/build"
-	"math/big"
 	"path"
 )
 
@@ -15,6 +14,6 @@ var elrondTestRoot = path.Join(build.Default.GOPATH, "src/github.com/ElrondNetwo
 // go tool pprof -http=localhost:4444 mem.prof
 
 func main() {
-	//benchmarkManyErc20SimpleTransfers(nil, 1)
-	benchmarkStaticCall(nil, "iele-examples/factorial.iele", "factorial", big.NewInt(32))
+	benchmarkManyErc20SimpleTransfers(nil, 1)
+	//benchmarkStaticCall(nil, "iele-examples/factorial.iele", "factorial", big.NewInt(32))
 }

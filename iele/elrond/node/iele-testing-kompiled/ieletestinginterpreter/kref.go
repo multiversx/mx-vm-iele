@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-13 18:53:01.019
+// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
 
 package ieletestinginterpreter
 
@@ -43,8 +43,7 @@ const (
 )
 
 func isCollectionType(refType kreferenceType) bool {
-	return refType == mapRef ||
-		refType == listRef ||
+	return refType == listRef ||
 		refType == setRef ||
 		refType == arrayRef
 }
@@ -193,10 +192,12 @@ const refCollectionSortShift = 12
 const refCollectionSortMask = (1 << refCollectionSortShift) - 1
 const refCollectionLabelShift = 13
 const refCollectionLabelMask = (1 << refCollectionLabelShift) - 1
-const refCollectionIndexShift = 32
+const refCollectionIndexShift = 16
 const refCollectionIndexMask = (1 << refCollectionIndexShift) - 1
+const refCollectionLengthShift = 16
+const refCollectionLengthMask = (1 << refCollectionLengthShift) - 1
 
-func createKrefCollection(refType kreferenceType, dataRef modelDataReference, sortInt uint64, labelInt uint64, index uint64) KReference {
+func createKrefCollection(refType kreferenceType, dataRef modelDataReference, sortInt, labelInt, index, length uint64) KReference {
 	refRaw := uint64(refType)
 	refRaw <<= refModelShift
 	refRaw |= uint64(dataRef)
@@ -206,11 +207,15 @@ func createKrefCollection(refType kreferenceType, dataRef modelDataReference, so
 	refRaw |= labelInt
 	refRaw <<= refCollectionIndexShift
 	refRaw |= index
+	refRaw <<= refCollectionLengthShift
+	refRaw |= length
 	return KReference(refRaw)
 }
 
-func parseKrefCollection(ref KReference) (refType kreferenceType, dataRef modelDataReference, sortInt uint64, labelInt uint64, index uint64) {
+func parseKrefCollection(ref KReference) (refType kreferenceType, dataRef modelDataReference, sortInt, labelInt, index, length uint64) {
 	refRaw := uint64(ref)
+	length = refRaw & refCollectionLengthMask
+	refRaw >>= refCollectionLengthShift
 	index = refRaw & refCollectionIndexMask
 	refRaw >>= refCollectionIndexShift
 	labelInt = refRaw & refCollectionLabelMask
