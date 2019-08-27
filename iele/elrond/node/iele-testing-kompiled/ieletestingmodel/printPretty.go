@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
+// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
 
 package ieletestingmodel
 
@@ -86,6 +86,27 @@ func (ms *ModelState) prettyPrintToStringBuilder(sb *strings.Builder, ref KRefer
 	case ktokenRef:
 		ktoken, _ := ms.GetKTokenObject(ref)
 		sb.WriteString(fmt.Sprintf("%s: %s", ktoken.Sort.Name(), ktoken.Value))
+	case setRef:
+		_, _, sort, label, _, length := parseKrefCollection(ref)
+		sb.WriteString("Set Sort:")
+		sb.WriteString(Sort(sort).Name())
+		sb.WriteString(", Label:")
+		sb.WriteString(KLabel(label).Name())
+		if length == 0 {
+			sb.WriteString(" <empty>")
+		} else {
+			sb.WriteString(", Data: {")
+			orderedElems := ms.setOrderedElements(ref)
+			for _, elem := range orderedElems {
+				sb.WriteString("\n")
+				addIndent(sb, indent+1)
+				ms.prettyPrintToStringBuilder(sb, elem, indent+1)
+			}
+
+			sb.WriteRune('\n')
+			addIndent(sb, indent)
+			sb.WriteRune('}')
+		}
 	case mapRef:
 		_, _, sort, label, _, length := parseKrefCollection(ref)
 		sb.WriteString("Map Sort:")
@@ -197,28 +218,6 @@ func (k *List) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
 		sb.WriteRune('\n')
 		addIndent(sb, indent)
 		sb.WriteRune(']')
-	}
-}
-
-func (k *Set) prettyPrint(ms *ModelState, sb *strings.Builder, indent int) {
-	sb.WriteString("Set Sort:")
-	sb.WriteString(k.Sort.Name())
-	sb.WriteString(", Label:")
-	sb.WriteString(k.Label.Name())
-	if len(k.Data) == 0 {
-		sb.WriteString(" <empty>")
-	} else {
-		sb.WriteString(", Data: {")
-		orderedElems := ms.SetOrderedElements(k)
-		for _, elem := range orderedElems {
-			sb.WriteString("\n")
-			addIndent(sb, indent+1)
-			ms.prettyPrintToStringBuilder(sb, elem, indent+1)
-		}
-
-		sb.WriteRune('\n')
-		addIndent(sb, indent)
-		sb.WriteRune('}')
 	}
 }
 

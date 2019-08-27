@@ -1,17 +1,6 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
+// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
 
 package ieletestingmodel
-
-// Set is a KObject representing a set in K
-type Set struct {
-	Sort  Sort
-	Label KLabel
-	Data  map[KMapKey]bool
-}
-
-func (*Set) referenceType() kreferenceType {
-	return setRef
-}
 
 // List is a KObject representing a list in K
 type List struct {
@@ -44,17 +33,6 @@ func (ms *ModelState) CollectionSortName(ref KReference) (string, bool) {
 		return Sort(sort).Name(), true
 	}
 	return "", false
-}
-
-// IsSet returns true if reference points to a set
-func (ms *ModelState) IsSet(ref KReference) bool {
-	return getRefType(ref) == setRef
-}
-
-// IsSet returns true if reference points to a set with given sort
-func (ms *ModelState) IsSetWithSort(ref KReference, expectedSort Sort) bool {
-	refType, _, sort, _, _, _ := parseKrefCollection(ref)
-	return refType == setRef && sort == uint64(expectedSort)
 }
 
 // IsList returns true if reference points to a list with given sort
@@ -119,18 +97,18 @@ func (ms *ModelState) ListSplitHeadTail(ref KReference, expectedSort Sort, expec
 }
 
 // GetSetObject yields the cast object for a Set reference, if possible.
-func (ms *ModelState) GetSetObject(ref KReference) (*Set, bool) {
-	refType, dataRef, _, _, index, _ := parseKrefCollection(ref)
-	if refType != setRef {
-		return nil, false
-	}
-	obj := ms.getData(dataRef).getReferencedObject(index)
-	castObj, typeOk := obj.(*Set)
-	if !typeOk {
-		panic("wrong object type for reference")
-	}
-	return castObj, true
-}
+// func (ms *ModelState) GetSetObject(ref KReference) (*Set, bool) {
+// 	refType, dataRef, _, _, index, _ := parseKrefCollection(ref)
+// 	if refType != setRef {
+// 		return nil, false
+// 	}
+// 	obj := ms.getData(dataRef).getReferencedObject(index)
+// 	castObj, typeOk := obj.(*Set)
+// 	if !typeOk {
+// 		panic("wrong object type for reference")
+// 	}
+// 	return castObj, true
+// }
 
 // GetArrayObject yields the cast object for an Array reference, if possible.
 func (ms *ModelState) GetArrayObject(ref KReference) (*Array, bool) {
@@ -159,11 +137,6 @@ func (ms *ModelState) addCollectionObject(sort Sort, label KLabel, obj KObject) 
 // NewList creates a new object and returns the reference.
 func (ms *ModelState) NewList(sort Sort, label KLabel, value []KReference) KReference {
 	return ms.addCollectionObject(sort, label, &List{Sort: sort, Label: label, Data: value})
-}
-
-// NewSet creates a new object and returns the reference.
-func (ms *ModelState) NewSet(sort Sort, label KLabel, value map[KMapKey]bool) KReference {
-	return ms.addCollectionObject(sort, label, &Set{Sort: sort, Label: label, Data: value})
 }
 
 // NewArray creates a new object and returns the reference.

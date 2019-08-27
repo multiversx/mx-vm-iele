@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
+// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
 
 package ieletestingmodel
 
@@ -50,9 +50,6 @@ func (k *List) preserve(ms *ModelState) {
 	for _, item := range k.Data {
 		ms.Preserve(item)
 	}
-}
-
-func (k *Set) preserve(ms *ModelState) {
 }
 
 func (k *Array) preserve(ms *ModelState) {

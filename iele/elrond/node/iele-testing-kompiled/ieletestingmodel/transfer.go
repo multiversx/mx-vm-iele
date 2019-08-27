@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
+// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
 
 package ieletestingmodel
 
@@ -74,6 +74,8 @@ func transfer(from, to *ModelData, ref KReference) KReference {
 	case ktokenRef:
 		_, _, sort, length, index := parseKrefKToken(ref)
 		return to.newKToken(sort, from.allBytes[index:index+length])
+	case setRef:
+		fallthrough
 	case mapRef:
 		_, _, sort, label, index, length := parseKrefCollection(ref)
 		if length == 0 {
@@ -84,10 +86,13 @@ func transfer(from, to *ModelData, ref KReference) KReference {
 		previousToIndex := -1
 		for fromIndex != -1 {
 			elem := from.allMapElements[fromIndex]
+			transferredKey := transfer(from, to, elem.key)
+			transferredValue := transfer(from, to, elem.value)
+			// careful: newIndex+append should be atomic, transfer of key/value must not happen between the two
 			newIndex := len(to.allMapElements)
 			to.allMapElements = append(to.allMapElements, mapElementData{
-				key:   transfer(from, to, elem.key),
-				value: transfer(from, to, elem.value),
+				key:   transferredKey,
+				value: transferredValue,
 				next:  -1,
 			})
 			if previousToIndex != -1 {
@@ -100,7 +105,7 @@ func transfer(from, to *ModelData, ref KReference) KReference {
 			previousToIndex = newIndex
 			fromIndex = elem.next
 		}
-		return createKrefCollection(mapRef, to.selfRef, sort, label, uint64(toIndex), length)
+		return createKrefCollection(refType, to.selfRef, sort, label, uint64(toIndex), length)
 	default:
 		// object types
 		obj := from.getReferencedObject(value)
@@ -120,9 +125,6 @@ func (k *List) transferContents(from, to *ModelData) {
 	for i, elem := range k.Data {
 		k.Data[i] = transfer(from, to, elem)
 	}
-}
-
-func (k *Set) transferContents(from, to *ModelData) {
 }
 
 func (k *Array) transferContents(from, to *ModelData) {

@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
+// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
 
 package ieletestingmodel
 
@@ -23,6 +23,10 @@ func (ms *ModelState) CollectionsToK(ref KReference) KReference {
 		_, _, _, lbl, _, _ := parseKrefCollection(ref)
 		orderedKVPairs := ms.mapOrderedKeyValuePairs(ref)
 		return ms.mapElementsToK(KLabel(lbl), orderedKVPairs)
+	} else if refType == setRef {
+		_, _, _, lbl, _, _ := parseKrefCollection(ref)
+		orderedElems := ms.setOrderedElements(ref)
+		return ms.setElementsToK(KLabel(lbl), orderedElems)
 	} else if isCollectionType(refType) {
 		_, dataRef, _, _, index, _ := parseKrefCollection(ref)
 		obj := ms.getData(dataRef).getReferencedObject(index)
@@ -49,6 +53,23 @@ func (ms *ModelState) mapElementsToK(label KLabel, orderedKVPairs []MapKeyValueP
 	return result
 }
 
+func (ms *ModelState) setElementsToK(label KLabel, orderedElems []KReference) KReference {
+	// process
+	elemLabel := ElementFor(label)
+	var result KReference
+	for i, key := range orderedElems {
+		elemK := ms.NewKApply(elemLabel, key)
+		if i == 0 {
+			result = elemK
+		} else {
+			newResult := ms.NewKApply(label, result, elemK)
+			result = newResult
+		}
+	}
+
+	return result
+}
+
 func (k *List) collectionsToK(ms *ModelState) KReference {
 	if len(k.Data) == 0 {
 		return ms.NewKApply(UnitFor(k.Label))
@@ -58,30 +79,6 @@ func (k *List) collectionsToK(ms *ModelState) KReference {
 	var result KReference
 	for i, elem := range k.Data {
 		elemK := ms.NewKApply(elemLabel, elem)
-		if i == 0 {
-			result = elemK
-		} else {
-			newResult := ms.NewKApply(k.Label, result, elemK)
-			result = newResult
-		}
-	}
-
-	return result
-}
-
-func (k *Set) collectionsToK(ms *ModelState) KReference {
-	if len(k.Data) == 0 {
-		return ms.NewKApply(UnitFor(k.Label))
-	}
-
-	// sort keys
-	sortedKeys := ms.SetOrderedElements(k)
-
-	// process
-	elemLabel := ElementFor(k.Label)
-	var result KReference
-	for i, key := range sortedKeys {
-		elemK := ms.NewKApply(elemLabel, key)
 		if i == 0 {
 			result = elemK
 		} else {

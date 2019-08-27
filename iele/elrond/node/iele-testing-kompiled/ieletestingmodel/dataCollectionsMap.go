@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
+// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
 
 package ieletestingmodel
 
@@ -36,26 +36,21 @@ func (ms *ModelState) EmptyMap(label KLabel, sort Sort) KReference {
 }
 
 // newMapSingleton creates a map with 1 key-value pair.
-func (md *ModelData) newMapSingleton(label KLabel, sort Sort, key KReference, value KReference) KReference {
+func (md *ModelData) newMapSingleton(collectionType kreferenceType, label KLabel, sort Sort, key KReference, value KReference) KReference {
 	newIndex := len(md.allMapElements)
 	md.allMapElements = append(md.allMapElements, mapElementData{
 		key:   key,
 		value: value,
 		next:  -1,
 	})
-	return createKrefCollection(mapRef, md.selfRef, uint64(sort), uint64(label), uint64(newIndex), 1)
-}
-
-// NewMapSingleton creates a map with 1 key-value pair.
-func (ms *ModelState) NewMapSingleton(label KLabel, sort Sort, key KReference, value KReference) KReference {
-	return ms.mainData.newMapSingleton(label, sort, key, value)
+	return createKrefCollection(collectionType, md.selfRef, uint64(sort), uint64(label), uint64(newIndex), 1)
 }
 
 // MapSize yields the size of the map.
 func (ms *ModelState) MapSize(mp KReference) int {
 	refType, _, _, _, _, length := parseKrefCollection(mp)
 	if refType != mapRef {
-		panic("MapSize argument is not a map")
+		panic("MapSize argument has wrong collection type")
 	}
 	return int(length)
 }
@@ -67,7 +62,7 @@ type MapForEachCallback func(key KReference, value KReference) (shouldBreak bool
 func (ms *ModelState) MapForEach(mp KReference, f MapForEachCallback) {
 	refType, dataRef, _, _, index, length := parseKrefCollection(mp)
 	if refType != mapRef {
-		panic("argument is not a map")
+		panic("argument has wrong collection type")
 	}
 	if length > 0 {
 		data := ms.getData(dataRef)
@@ -108,16 +103,18 @@ func (ms *ModelState) MapContainsKey(mp KReference, key KReference) bool {
 	return found
 }
 
-// MapUpdate inserts or updates value for key
+// MapUpdate inserts or updates value for key.
 func (ms *ModelState) MapUpdate(mp KReference, key KReference, newValue KReference) KReference {
+	return ms.mapUpdate(mapRef, mp, key, newValue)
+}
+
+func (ms *ModelState) mapUpdate(collectionType kreferenceType, mp KReference, key KReference, newValue KReference) KReference {
 	refType, dataRef, sort, label, index, length := parseKrefCollection(mp)
-	if refType != mapRef {
-		panic("MapUpdate argument is not a map")
+	if refType != collectionType {
+		panic("MapUpdate argument has wrong collection type")
 	}
 	if length == 0 {
-		// the empty map doesn't have storage, so dataRef is irrelevant here
-		// just create in mainData
-		return ms.NewMapSingleton(KLabel(label), Sort(sort), key, newValue)
+		return ms.mainData.newMapSingleton(collectionType, KLabel(label), Sort(sort), key, newValue)
 	}
 	if !ms.MapContainsKey(mp, key) {
 		// simply prepend new element
@@ -169,14 +166,18 @@ func (ms *ModelState) MapUpdate(mp KReference, key KReference, newValue KReferen
 			resultIndex = newIndex
 		}
 	}
-	return createKrefCollection(mapRef, dataRef, sort, label, uint64(resultIndex), length)
+	return createKrefCollection(collectionType, dataRef, sort, label, uint64(resultIndex), length)
 }
 
 // MapRemove removes a key from a map
-func (ms *ModelState) MapRemove(mp KReference, key KReference) KReference {
+func (ms *ModelState) MapRemove(mp KReference, elem KReference) KReference {
+	return ms.mapRemove(mapRef, mp, elem)
+}
+
+func (ms *ModelState) mapRemove(collectionType kreferenceType, mp KReference, key KReference) KReference {
 	refType, dataRef, sort, label, index, length := parseKrefCollection(mp)
-	if refType != mapRef {
-		panic("MapRemove argument is not a map")
+	if refType != collectionType {
+		panic("MapRemove argument has wrong collection type")
 	}
 	if !ms.MapContainsKey(mp, key) {
 		return mp // nothing to remove
@@ -226,14 +227,18 @@ func (ms *ModelState) MapRemove(mp KReference, key KReference) KReference {
 			resultIndex = newIndex
 		}
 	}
-	return createKrefCollection(mapRef, dataRef, sort, label, uint64(resultIndex), length-1)
+	return createKrefCollection(collectionType, dataRef, sort, label, uint64(resultIndex), length-1)
 }
 
 // MapConcatNoUpdate concatenates 2 maps. The maps cannot have different values for the same key.
 func (ms *ModelState) MapConcatNoUpdate(mp1, mp2 KReference) (KReference, bool) {
+	return ms.mapConcatNoUpdate(mapRef, mp1, mp2)
+}
+
+func (ms *ModelState) mapConcatNoUpdate(collectionType kreferenceType, mp1, mp2 KReference) (KReference, bool) {
 	refType1, dataRef1, sort1, label1, index1, length1 := parseKrefCollection(mp1)
 	refType2, dataRef2, _, label2, index2, length2 := parseKrefCollection(mp2)
-	if refType1 != mapRef || refType2 != mapRef {
+	if refType1 != collectionType || refType2 != collectionType {
 		return NoResult, false
 	}
 	if label1 != label2 {
@@ -266,12 +271,19 @@ func (ms *ModelState) MapConcatNoUpdate(mp1, mp2 KReference) (KReference, bool) 
 	copyLength := uint64(0)
 	for fromIndex != -1 {
 		elem := md.allMapElements[fromIndex]
-		mp2Value := ms.MapGet(mp2, elem.key, NullReference)
-		if mp2Value != NullReference && !ms.Equals(mp2Value, elem.value) {
-			// if key appears in both, values should also match
-			return NoResult, false
+		var keyFound bool
+		if collectionType == mapRef {
+			mp2Value := ms.MapGet(mp2, elem.key, NullReference)
+			if mp2Value != NullReference && !ms.Equals(mp2Value, elem.value) {
+				// if key appears in both, values should also match
+				return NoResult, false
+			}
+			keyFound = mp2Value != NullReference
+		} else if collectionType == setRef {
+			keyFound = ms.SetContains(mp2, elem.key)
 		}
-		if mp2Value == NullReference {
+
+		if keyFound {
 			newIndex := len(md.allMapElements)
 			md.allMapElements = append(md.allMapElements, mapElementData{
 				key:   elem.key,
@@ -298,7 +310,7 @@ func (ms *ModelState) MapConcatNoUpdate(mp1, mp2 KReference) (KReference, bool) 
 	// chain mp1 copy -> mp2
 	md.allMapElements[lastIndex].next = int(index2)
 
-	return createKrefCollection(mapRef, dataRef1, sort1, label1, uint64(firstIndex), copyLength+length2), true
+	return createKrefCollection(collectionType, dataRef1, sort1, label1, uint64(firstIndex), copyLength+length2), true
 }
 
 // MapDifference yields a map that has all keys from the first that are not present in the second.
@@ -359,20 +371,12 @@ func (ms *ModelState) MapKeySet(mp KReference) (KReference, bool) {
 	if refType != mapRef {
 		return NoResult, false
 	}
-	keySet := make(map[KMapKey]bool)
-	ok := true
+	result := ms.EmptySet(KLabel(label), SortSet)
 	ms.MapForEach(mp, func(k, _ KReference) bool {
-		kkey, ok := ms.MapKey(k)
-		if !ok {
-			return true
-		}
-		keySet[kkey] = true
+		result = ms.SetAdd(result, k)
 		return false
 	})
-	if !ok {
-		return NoResult, false
-	}
-	return ms.NewSet(SortSet, KLabel(label), keySet), true
+	return result, true
 }
 
 // MapKeyList yields a list containing all keys.
@@ -405,8 +409,12 @@ func (ms *ModelState) MapValueList(mp KReference) (KReference, bool) {
 
 // MapKeyChoice yields a key (any key) from the map.
 func (ms *ModelState) MapKeyChoice(mp KReference) (KReference, bool) {
+	return ms.mapKeyChoice(mapRef, mp)
+}
+
+func (ms *ModelState) mapKeyChoice(collectionType kreferenceType, mp KReference) (KReference, bool) {
 	refType, dataRef, _, _, index, length := parseKrefCollection(mp)
-	if refType != mapRef {
+	if refType != collectionType {
 		return NoResult, false
 	}
 	if refType != mapRef {

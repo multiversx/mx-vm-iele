@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
+// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
 
 package ieletestingmodel
 
@@ -43,7 +43,7 @@ func (ms *ModelState) ExtractListData(subject KReference, expectedSort Sort, exp
 // 	return kmap.Data, true
 // }
 
-// MapKeyValuePair ... just a pair of key and value that was stored in a map
+// MapKeyValuePair is just a pair of key and value that was stored in a map
 type MapKeyValuePair struct {
 	KeyAsString string
 	Key         KReference
@@ -59,51 +59,55 @@ func (ms *ModelState) mapOrderedKeyValuePairs(ref KReference) []MapKeyValuePair 
 	}
 
 	result := make([]MapKeyValuePair, 0, int(length))
-	if length > 0 {
-		var keysAsString []string
-		stringKeysToPair := make(map[string]MapKeyValuePair)
-		ms.MapForEach(ref, func(k KReference, v KReference) bool {
-			keyAsString := ms.PrettyPrint(k)
-			keysAsString = append(keysAsString, keyAsString)
-			pair := MapKeyValuePair{KeyAsString: keyAsString, Key: k, Value: v}
-			stringKeysToPair[keyAsString] = pair
-			return false
-		})
-		if len(keysAsString) != int(length) {
-			panic(fmt.Sprintf("map length mismatch. Reference length: %d. Data length: %d",
-				length,
-				len(keysAsString)))
-		}
-		sort.Strings(keysAsString)
-		for _, keyAsString := range keysAsString {
-			pair, _ := stringKeysToPair[keyAsString]
-			result = append(result, pair)
-		}
+	var keysAsString []string
+	stringKeysToPair := make(map[string]MapKeyValuePair)
+	ms.MapForEach(ref, func(k KReference, v KReference) bool {
+		keyAsString := ms.PrettyPrint(k)
+		keysAsString = append(keysAsString, keyAsString)
+		pair := MapKeyValuePair{KeyAsString: keyAsString, Key: k, Value: v}
+		stringKeysToPair[keyAsString] = pair
+		return false
+	})
+	if len(keysAsString) != int(length) {
+		panic(fmt.Sprintf("map length mismatch. Reference length: %d. Data length: %d",
+			length,
+			len(keysAsString)))
+	}
+	sort.Strings(keysAsString)
+	for _, keyAsString := range keysAsString {
+		pair, _ := stringKeysToPair[keyAsString]
+		result = append(result, pair)
 	}
 
 	return result
 }
 
-// SetOrderedElements yields a list of the items in the set,
+// setOrderedElements yields a list of the items in the set,
 // ordered by the pretty print representation of the elements
-func (ms *ModelState) SetOrderedElements(k *Set) []KReference {
-	result := make([]KReference, len(k.Data))
+func (ms *ModelState) setOrderedElements(ref KReference) []KReference {
+	refType, _, _, _, _, length := parseKrefCollection(ref)
+	if refType != setRef {
+		panic("setOrderedElements argument not a set")
+	}
 
+	result := make([]KReference, 0, int(length))
 	var keysAsString []string
 	stringKeysToElem := make(map[string]KReference)
-	for key := range k.Data {
-		keyAsString := key.String()
+	ms.SetForEach(ref, func(elem KReference) bool {
+		keyAsString := ms.PrettyPrint(elem)
 		keysAsString = append(keysAsString, keyAsString)
-		keyItem, err := ms.ToKItem(key)
-		if err != nil {
-			panic(err)
-		}
-		stringKeysToElem[keyAsString] = keyItem
+		stringKeysToElem[keyAsString] = elem
+		return false
+	})
+	if len(keysAsString) != int(length) {
+		panic(fmt.Sprintf("set length mismatch. Reference length: %d. Data length: %d",
+			length,
+			len(keysAsString)))
 	}
 	sort.Strings(keysAsString)
-	for i, keyAsString := range keysAsString {
+	for _, keyAsString := range keysAsString {
 		elem, _ := stringKeysToElem[keyAsString]
-		result[i] = elem
+		result = append(result, elem)
 	}
 
 	return result

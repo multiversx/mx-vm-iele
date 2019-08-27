@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-24 18:56:17.501
+// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
 
 package ieletestinginterpreter
 
@@ -17,7 +17,8 @@ func (mapHooksType) unit(lbl m.KLabel, sort m.Sort, config m.KReference, interpr
 
 // returns a map with 1 key to value mapping
 func (mapHooksType) element(key m.KReference, val m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return interpreter.Model.NewMapSingleton(m.CollectionFor(lbl), sort, key, val), nil
+	empty := interpreter.Model.EmptyMap(m.CollectionFor(lbl), sort)
+	return interpreter.Model.MapUpdate(empty, key, val), nil
 }
 
 func (mh mapHooksType) lookup(kmap m.KReference, key m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -124,7 +125,7 @@ func (mapHooksType) inclusion(kmap1 m.KReference, kmap2 m.KReference, lbl m.KLab
 
 func (mapHooksType) updateAll(kmap1 m.KReference, kmap2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	// TODO: test
-    // m1, isMap1 := interpreter.Model.GetMapObject(kmap1)
+	// m1, isMap1 := interpreter.Model.GetMapObject(kmap1)
 	// m2, isMap2 := interpreter.Model.GetMapObject(kmap2)
 	// if !isMap1 || !isMap2 {
 	// 	return invalidArgsResult()
@@ -145,7 +146,7 @@ func (mapHooksType) updateAll(kmap1 m.KReference, kmap2 m.KReference, lbl m.KLab
 
 func (mapHooksType) removeAll(kmap m.KReference, kset m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
 	// TODO: test
-    // mp, isMap := interpreter.Model.GetMapObject(kmap)
+	// mp, isMap := interpreter.Model.GetMapObject(kmap)
 	// s, isSet := interpreter.Model.GetSetObject(kset)
 	// if !isMap || !isSet {
 	// 	return invalidArgsResult()
