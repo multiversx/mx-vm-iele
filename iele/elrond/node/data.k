@@ -386,7 +386,7 @@ module IELE-DATA
 
 
 
-    syntax Int ::= #newAddr ( Int , Int ) [function]
+    syntax Int ::= #newAddr ( Int , Int ) [function, hook(BLOCKCHAIN.newAddress)]
  // ------------------------------------------------
     rule #newAddr(ACCT, NONCE) => 
       (#parseHexWord(Keccak256(
