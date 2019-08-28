@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
 
 package ieletestingmodel
 
@@ -32,8 +32,8 @@ func (ms *ModelState) EmptySet(label KLabel, sort Sort) KReference {
 // SetSize yields the size of the set.
 func (ms *ModelState) SetSize(mp KReference) int {
 	refType, _, _, _, _, length := parseKrefCollection(mp)
-	if refType != mapRef {
-		panic("MapSize argument is not a map")
+	if refType != setRef {
+		panic("SetSize argument is not a set")
 	}
 	return int(length)
 }
@@ -76,11 +76,6 @@ func (ms *ModelState) SetContains(mp KReference, element KReference) bool {
 // SetAdd inserts an element in a set.
 func (ms *ModelState) SetAdd(mp KReference, elem KReference) KReference {
 	return ms.mapUpdate(setRef, mp, elem, BoolTrue)
-}
-
-// SetRemove removes an element from a set.
-func (ms *ModelState) SetRemove(mp KReference, elem KReference) KReference {
-	return ms.mapRemove(setRef, mp, elem)
 }
 
 // SetConcat concatenates 2 sets.

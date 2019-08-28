@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
 
 package ieletestinginterpreter
 
@@ -37,54 +37,55 @@ func (setHooksType) concat(kset1 m.KReference, kset2 m.KReference, lbl m.KLabel,
 }
 
 func (setHooksType) difference(kset1 m.KReference, kset2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	// s1, isSet1 := interpreter.Model.GetSetObject(kset1)
-	// s2, isSet2 := interpreter.Model.GetSetObject(kset2)
-	// if !isSet1 || !isSet2 {
-	// 	return invalidArgsResult()
-	// }
-	// data := make(map[m.KMapKey]bool)
-	// for e1 := range s1.Data {
-	// 	_, existsInS2 := s2.Data[e1]
-	// 	if !existsInS2 {
-	// 		data[e1] = true
-	// 	}
-	// }
-	// return interpreter.Model.NewSet(sort, lbl, data), nil
-	return m.NoResult, &hookNotImplementedError{}
+	if !interpreter.Model.IsSet(kset1) {
+		return invalidArgsResult()
+	}
+	if !interpreter.Model.IsSet(kset2) {
+		return invalidArgsResult()
+	}
+	result := interpreter.Model.EmptySet(lbl, sort)
+	interpreter.Model.SetForEach(kset1, func(elem1 KReference) bool {
+		if !interpreter.Model.SetContains(kset2, elem1) {
+			result = interpreter.Model.SetAdd(result, elem1)
+		}
+		return false
+	})
+	return result, nil
 }
 
 // tests if kset1 is a subset of kset2
 func (setHooksType) inclusion(kset1 m.KReference, kset2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	// s1, isSet1 := interpreter.Model.GetSetObject(kset1)
-	// s2, isSet2 := interpreter.Model.GetSetObject(kset2)
-	// if !isSet1 || !isSet2 {
-	// 	return invalidArgsResult()
-	// }
-	// for e1 := range s1.Data {
-	// 	_, existsInS2 := s2.Data[e1]
-	// 	if !existsInS2 {
-	// 		return m.BoolFalse, nil
-	// 	}
-	// }
-	// return m.BoolTrue, nil
-	return m.NoResult, &hookNotImplementedError{}
+	if !interpreter.Model.IsSet(kset1) {
+		return invalidArgsResult()
+	}
+	if !interpreter.Model.IsSet(kset2) {
+		return invalidArgsResult()
+	}
+	result := true
+	interpreter.Model.SetForEach(kset1, func(elem1 KReference) bool {
+		if !interpreter.Model.SetContains(kset2, elem1) {
+			result = false
+		}
+		return true
+	})
+	return m.ToKBool(result), nil
 }
 
 func (setHooksType) intersection(kset1 m.KReference, kset2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	// s1, isSet1 := interpreter.Model.GetSetObject(kset1)
-	// s2, isSet2 := interpreter.Model.GetSetObject(kset2)
-	// if !isSet1 || !isSet2 {
-	// 	return invalidArgsResult()
-	// }
-	// data := make(map[m.KMapKey]bool)
-	// for e1 := range s1.Data {
-	// 	data[e1] = true
-	// }
-	// for e2 := range s2.Data {
-	// 	data[e2] = true
-	// }
-	// return interpreter.Model.NewSet(sort, lbl, data), nil
-	return m.NoResult, &hookNotImplementedError{}
+	if !interpreter.Model.IsSet(kset1) {
+		return invalidArgsResult()
+	}
+	if !interpreter.Model.IsSet(kset2) {
+		return invalidArgsResult()
+	}
+	result := interpreter.Model.EmptySet(lbl, sort)
+	interpreter.Model.SetForEach(kset1, func(elem1 KReference) bool {
+		if interpreter.Model.SetContains(kset2, elem1) {
+			result = interpreter.Model.SetAdd(result, elem1)
+		}
+		return false
+	})
+	return result, nil
 }
 
 func (setHooksType) choice(kset m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {

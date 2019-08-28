@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
 
 package ieletestingmodel
 
@@ -111,4 +111,39 @@ func (ms *ModelState) setOrderedElements(ref KReference) []KReference {
 	}
 
 	return result
+}
+
+// checks that the real length matches the declared length, only use for debugging
+// returns input, fon convenience
+func (ms *ModelState) checkCollectionSize(mp KReference) KReference {
+	if !ms.collectionSizeOk(mp) {
+		panic("collection real length doesn't match declared length")
+	}
+	return mp
+}
+
+func (ms *ModelState) collectionSizeOk(mp KReference) bool {
+	refType, _, _, _, _, length := parseKrefCollection(mp)
+	if refType == mapRef {
+		realLength := uint64(0)
+		ms.MapForEach(mp, func(_, _ KReference) bool {
+			realLength++
+			return false
+		})
+		if realLength != length {
+			return false
+		}
+	}
+	if refType == setRef {
+		realLength := uint64(0)
+		ms.SetForEach(mp, func(_ KReference) bool {
+			realLength++
+			return false
+		})
+		if realLength != length {
+			return false
+		}
+	}
+
+	return true
 }

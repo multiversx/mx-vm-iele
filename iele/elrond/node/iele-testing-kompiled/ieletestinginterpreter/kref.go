@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-27 09:22:42.803
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
 
 package ieletestinginterpreter
 
@@ -185,15 +185,16 @@ func parseKrefBigInt(ref KReference) (isBigInt bool, dataRef modelDataReference,
 // - 2 bits: model data identifier
 // - 12 bits: Sort
 // - 13 bits: Label
-// - 32 bits: object index
+// - 20 bits: collection start index
+// - 12 bits: collection length
 
-const refCollectionSortShift = 12
+const refCollectionSortShift = 10
 const refCollectionSortMask = (1 << refCollectionSortShift) - 1
-const refCollectionLabelShift = 13
+const refCollectionLabelShift = 12
 const refCollectionLabelMask = (1 << refCollectionLabelShift) - 1
-const refCollectionIndexShift = 16
+const refCollectionIndexShift = 24 // <- this is a stretch, the tests barely pass
 const refCollectionIndexMask = (1 << refCollectionIndexShift) - 1
-const refCollectionLengthShift = 16
+const refCollectionLengthShift = 11 // <- this is a stretch, the tests barely pass
 const refCollectionLengthMask = (1 << refCollectionLengthShift) - 1
 
 func createKrefCollection(refType kreferenceType, dataRef modelDataReference, sortInt, labelInt, index, length uint64) KReference {
@@ -205,8 +206,14 @@ func createKrefCollection(refType kreferenceType, dataRef modelDataReference, so
 	refRaw <<= refCollectionLabelShift
 	refRaw |= labelInt
 	refRaw <<= refCollectionIndexShift
+	if index > refCollectionIndexMask {
+		panic("cannot encode collection reference: index too large")
+	}
 	refRaw |= index
 	refRaw <<= refCollectionLengthShift
+	if length > refCollectionLengthMask {
+		panic("cannot encode collection reference: length too large")
+	}
 	refRaw |= length
 	return KReference(refRaw)
 }
