@@ -352,7 +352,7 @@ func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.KReference) (*vmi.Outpu
 	if !kappNonceOk {
 		return nil, errors.New("invalid account nonce")
 	}
-	inonce, inonceOk := vm.kinterpreter.Model.GetBigInt(kappNonce[0])
+	inonce, inonceOk := vm.kinterpreter.Model.GetUint64(kappNonce[0])
 	if !inonceOk {
 		return nil, errors.New("invalid account nonce")
 	}

@@ -198,7 +198,7 @@ func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Blockcha
 			return fmt.Errorf("bad account address %s", hex.EncodeToString(matchingAcct.Address))
 		}
 
-		if matchingAcct.Nonce.Cmp(postAcct.Nonce) != 0 {
+		if matchingAcct.Nonce != postAcct.Nonce {
 			return fmt.Errorf("bad account nonce. Account: %s. Want: %d. Have: %d",
 				hex.EncodeToString(matchingAcct.Address), postAcct.Nonce, matchingAcct.Nonce)
 		}
@@ -265,7 +265,7 @@ func convertAccount(testAcct *ij.Account) *worldhook.Account {
 	return &worldhook.Account{
 		Exists:  true,
 		Address: testAcct.Address,
-		Nonce:   big.NewInt(0).Set(testAcct.Nonce),
+		Nonce:   testAcct.Nonce.Uint64(),
 		Balance: big.NewInt(0).Set(testAcct.Balance),
 		Storage: storage,
 		Code:    []byte(testAcct.Code),

@@ -1,6 +1,7 @@
 package blockchainadapter
 
 import (
+	"encoding/hex"
 	"fmt"
 	"math/big"
 
@@ -15,6 +16,16 @@ func (b *Blockchain) GetInputAccounts() []*vmi.OutputAccount {
 		result = append(result, v)
 	}
 	return result
+}
+
+func (b *Blockchain) logNewAddress(creatorAddress []byte, creatorNonce uint64, result []byte) {
+	if !b.LogToConsole {
+		return
+	}
+	fmt.Printf("\n#newAddr(%s, %d) => %s",
+		hex.EncodeToString(creatorAddress),
+		creatorNonce,
+		hex.EncodeToString(result))
 }
 
 func (b *Blockchain) logBalance(address []byte, balance *big.Int) {
@@ -35,7 +46,7 @@ func (b *Blockchain) logBalance(address []byte, balance *big.Int) {
 	acc.Balance = balance
 }
 
-func (b *Blockchain) logNonce(address []byte, nonce *big.Int) {
+func (b *Blockchain) logNonce(address []byte, nonce uint64) {
 	if !b.LogToConsole {
 		return
 	}
@@ -46,9 +57,6 @@ func (b *Blockchain) logNonce(address []byte, nonce *big.Int) {
 	if !found {
 		acc = &vmi.OutputAccount{Address: address}
 		b.inputAccounts[string(address)] = acc
-	}
-	if acc.Nonce != nil {
-		fmt.Printf("\ngetNonce called twice")
 	}
 	acc.Nonce = nonce
 }

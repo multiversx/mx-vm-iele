@@ -49,6 +49,42 @@ func (b *Blockchain) ConvertKIntToAddress(addrAsK m.KReference, ms *m.ModelState
 	return result, true
 }
 
+// AccountExists adapts between K model and elrond function
+func (b *Blockchain) AccountExists(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	acctAddr, isAddr := b.ConvertKIntToAddress(c, ms)
+	if !isAddr {
+		return m.NoResult, errors.New("invalid account address provided to blockchain hook AccountExists")
+	}
+	result, err := b.Upstream.AccountExists(acctAddr)
+	if err != nil {
+		return m.NoResult, err
+	}
+	return m.ToKBool(result), nil
+}
+
+// NewAddress adapts between K model and elrond function
+func (b *Blockchain) NewAddress(kaddr, knonce m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
+	creatorAddr, isAddr := b.ConvertKIntToAddress(kaddr, ms)
+	if !isAddr {
+		return m.NoResult, errors.New("invalid creator address provided to blockchain hook NewAddress")
+	}
+	creatorNonce, nonceOk := ms.GetUint64(knonce)
+	if !nonceOk {
+		return m.NoResult, errors.New("invalid creator nonce provided to blockchain hook NewAddress")
+	}
+	newAddr, err := b.Upstream.NewAddress(creatorAddr, creatorNonce)
+	if err != nil {
+		return m.NoResult, err
+	}
+	b.logNewAddress(creatorAddr, creatorNonce, newAddr)
+
+	if len(newAddr) == 0 {
+		// signal the interpreter that the alternate K implementation should be used
+		return m.NoResult, m.GetHookNotImplementedError()
+	}
+	return ms.IntFromBytes(newAddr), nil
+}
+
 // GetBalance adapts between K model and elrond function
 func (b *Blockchain) GetBalance(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
 	acctAddr, isAddr := b.ConvertKIntToAddress(c, ms)
@@ -74,7 +110,7 @@ func (b *Blockchain) GetNonce(c m.KReference, lbl m.KLabel, sort m.Sort, config 
 		return m.NoResult, err
 	}
 	b.logNonce(acctAddr, result)
-	return ms.FromBigInt(result), nil
+	return ms.FromUint64(result), nil
 }
 
 // IsCodeEmpty adapts between K model and elrond function
@@ -84,19 +120,6 @@ func (b *Blockchain) IsCodeEmpty(c m.KReference, lbl m.KLabel, sort m.Sort, conf
 		return m.NoResult, errors.New("invalid account address provided to blockchain hook IsCodeEmpty")
 	}
 	result, err := b.Upstream.IsCodeEmpty(acctAddr)
-	if err != nil {
-		return m.NoResult, err
-	}
-	return m.ToKBool(result), nil
-}
-
-// AccountExists adapts between K model and elrond function
-func (b *Blockchain) AccountExists(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
-	acctAddr, isAddr := b.ConvertKIntToAddress(c, ms)
-	if !isAddr {
-		return m.NoResult, errors.New("invalid account address provided to blockchain hook AccountExists")
-	}
-	result, err := b.Upstream.AccountExists(acctAddr)
 	if err != nil {
 		return m.NoResult, err
 	}
