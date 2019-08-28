@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 22:25:14.706
 
 package ieletestinginterpreter
 
@@ -76,7 +76,7 @@ func (arrayHooksType) updateAll(karr m.KReference, kidx m.KReference, klist m.KR
 			return m.NoResult, err
 		}
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (arrayHooksType) fill(karr m.KReference, kfrom m.KReference, kto m.KReference, elt m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {

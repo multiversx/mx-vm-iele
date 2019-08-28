@@ -11,7 +11,7 @@ func defaultAccount(address []byte) *Account {
 	return &Account{
 		Exists:  false,
 		Address: address,
-		Nonce:   zero,
+		Nonce:   0,
 		Balance: zero,
 		Storage: make(map[string][]byte),
 		Code:    nil,
@@ -38,7 +38,7 @@ func (b *BlockchainHookMock) UpdateWorldStateBefore(
 	if acct == nil {
 		return errors.New("method UpdateBalance expects an existing address")
 	}
-	acct.Nonce.Add(acct.Nonce, big.NewInt(1))
+	acct.Nonce++
 	gasPayment := big.NewInt(0).Mul(gasLimit, gasPrice)
 	if acct.Balance.Cmp(gasPayment) < 0 {
 		return errors.New("not enough balance to pay gas upfront")

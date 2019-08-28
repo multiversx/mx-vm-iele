@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 22:25:14.706
 
 package ieletestinginterpreter
 
@@ -16,7 +16,7 @@ func (boolHooksType) and(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.
 	if ok1 && ok2 {
 		return m.ToKBool(b1 && b2), nil
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (h boolHooksType) andThen(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -29,7 +29,7 @@ func (boolHooksType) or(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.S
 	if ok1 && ok2 {
 		return m.ToKBool(b1 || b2), nil
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (h boolHooksType) orElse(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -41,7 +41,7 @@ func (boolHooksType) not(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KRe
 	if ok {
 		return m.ToKBool(!b), nil
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (boolHooksType) implies(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -50,7 +50,7 @@ func (boolHooksType) implies(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sor
 	if ok1 && ok2 {
 		return m.ToKBool((!b1) || b2), nil
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (boolHooksType) ne(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -59,7 +59,7 @@ func (boolHooksType) ne(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.S
 	if ok1 && ok2 {
 		return m.ToKBool(b1 != b2), nil
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (boolHooksType) eq(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -68,7 +68,7 @@ func (boolHooksType) eq(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.S
 	if ok1 && ok2 {
 		return m.ToKBool(b1 == b2), nil
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (boolHooksType) xor(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -77,5 +77,5 @@ func (boolHooksType) xor(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.
 	if ok1 && ok2 {
 		return m.ToKBool(b1 != b2), nil
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }

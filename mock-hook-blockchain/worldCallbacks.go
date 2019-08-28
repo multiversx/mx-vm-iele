@@ -16,6 +16,12 @@ func (b *BlockchainHookMock) AccountExists(address []byte) (bool, error) {
 	return acct.Exists, nil
 }
 
+// NewAddress adapts between K model and elrond function
+func (b *BlockchainHookMock) NewAddress(creatorAddress []byte, creatorNonce uint64) ([]byte, error) {
+	// empty byte array signals not implemented, fallback to default
+	return []byte{}, nil
+}
+
 // GetBalance should retrieve the balance of an account
 func (b *BlockchainHookMock) GetBalance(address []byte) (*big.Int, error) {
 	acct := b.AcctMap.GetAccount(address)
@@ -26,10 +32,10 @@ func (b *BlockchainHookMock) GetBalance(address []byte) (*big.Int, error) {
 }
 
 // GetNonce should retrieve the nonce of an account
-func (b *BlockchainHookMock) GetNonce(address []byte) (*big.Int, error) {
+func (b *BlockchainHookMock) GetNonce(address []byte) (uint64, error) {
 	acct := b.AcctMap.GetAccount(address)
 	if acct == nil {
-		return zero, nil
+		return 0, nil
 	}
 	return acct.Nonce, nil
 }

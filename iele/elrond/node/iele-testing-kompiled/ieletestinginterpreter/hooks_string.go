@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 22:25:14.706
 
 package ieletestinginterpreter
 
@@ -161,7 +161,7 @@ func (stringHooksType) int2string(c m.KReference, lbl m.KLabel, sort m.Sort, con
 }
 
 func (stringHooksType) string2int(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) string2base(kstr m.KReference, kbase m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -217,26 +217,26 @@ func (stringHooksType) token2string(c m.KReference, lbl m.KLabel, sort m.Sort, c
 		return interpreter.Model.NewString(kIntStr), nil
 	}
 	if _, typeOk := interpreter.Model.GetFloatObject(c); typeOk {
-		return m.NoResult, &hookNotImplementedError{}
+		return m.NoResult, m.GetHookNotImplementedError()
 	}
 
 	return invalidArgsResult()
 }
 
 func (stringHooksType) float2string(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) uuid(lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) floatFormat(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) string2float(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) replace(argS m.KReference, argToReplace m.KReference, argReplacement m.KReference, argCount m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -278,7 +278,7 @@ func (stringHooksType) replaceAll(argS m.KReference, argToReplace m.KReference, 
 }
 
 func (stringHooksType) replaceFirst(c1 m.KReference, c2 m.KReference, c3 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) countAllOccurrences(argS m.KReference, argToCount m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -293,17 +293,17 @@ func (stringHooksType) countAllOccurrences(argS m.KReference, argToCount m.KRefe
 }
 
 func (stringHooksType) category(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) directionality(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) findChar(c1 m.KReference, c2 m.KReference, c3 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (stringHooksType) rfindChar(c1 m.KReference, c2 m.KReference, c3 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }

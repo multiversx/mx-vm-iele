@@ -64,7 +64,7 @@ func (b *Blockchain) GetNonce(c m.KReference, lbl m.KLabel, sort m.Sort, config 
 	if err != nil {
 		return m.NoResult, err
 	}
-	return ms.FromBigInt(result), nil
+	return ms.FromUint64(result), nil
 }
 
 // IsCodeEmpty adapts between K model and elrond function

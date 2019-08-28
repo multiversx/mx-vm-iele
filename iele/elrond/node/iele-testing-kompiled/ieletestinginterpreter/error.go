@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 22:25:14.706
 
 package ieletestinginterpreter
 
@@ -44,13 +44,6 @@ func (e *evalArityViolatedError) Error() string {
 	return fmt.Sprintf(
 		"Eval function arity violated. Function name: %s. Expected arity: %d. Actual arity: %d.",
 		e.funcName, e.expectedArity, e.actualArity)
-}
-
-type hookNotImplementedError struct {
-}
-
-func (e *hookNotImplementedError) Error() string {
-	return "Hook not implemented."
 }
 
 type hookInvalidArgsError struct {

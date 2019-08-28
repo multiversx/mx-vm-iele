@@ -1,4 +1,4 @@
-// File provided by the K Framework Go backend. Timestamp: 2019-08-28 14:13:50.189
+// File provided by the K Framework Go backend. Timestamp: 2019-08-28 22:25:14.706
 
 package ieletestinginterpreter
 
@@ -35,7 +35,7 @@ func (kreflectionHooksType) sort(c m.KReference, lbl m.KLabel, sort m.Sort, conf
 		return interpreter.Model.NewString(sortName), nil
 	}
 
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 
 }
 
@@ -62,7 +62,7 @@ func (kreflectionHooksType) fresh(c m.KReference, lbl m.KLabel, sort m.Sort, con
 		freshCounter++
 		return result, nil
 	}
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (kreflectionHooksType) isConcrete(c1 m.KReference, c2 m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
@@ -70,9 +70,9 @@ func (kreflectionHooksType) isConcrete(c1 m.KReference, c2 m.KReference, lbl m.K
 }
 
 func (kreflectionHooksType) getenv(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
 
 func (kreflectionHooksType) argv(lbl m.KLabel, sort m.Sort, config m.KReference, interpreter *Interpreter) (m.KReference, error) {
-	return m.NoResult, &hookNotImplementedError{}
+	return m.NoResult, m.GetHookNotImplementedError()
 }
