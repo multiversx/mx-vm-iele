@@ -35,7 +35,7 @@ func benchmarkStaticCall(b *testing.B, contract string, functionName string, arg
 	world.AcctMap.PutAccount(&worldhook.Account{
 		Exists:  true,
 		Address: contractAddr,
-		Nonce:   big.NewInt(0),
+		Nonce:   0,
 		Balance: big.NewInt(0),
 		Storage: make(map[string][]byte),
 		Code:    decoded,
@@ -44,7 +44,7 @@ func benchmarkStaticCall(b *testing.B, contract string, functionName string, arg
 	world.AcctMap.PutAccount(&worldhook.Account{
 		Exists:  true,
 		Address: account1Addr,
-		Nonce:   big.NewInt(0),
+		Nonce:   0,
 		Balance: hexToBigInt("100000000"),
 		Storage: make(map[string][]byte),
 		Code:    []byte{},
