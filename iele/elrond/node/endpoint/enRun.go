@@ -27,6 +27,7 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 	// so the same memory can be reused on the next execution
 	vm.kinterpreter.Model.Clear()
 	vm.blockchainAdapter.InitAdapter()
+	vm.blockchainAdapter.InitNewAddress(input.NewContractAddress, input.CallerAddr)
 
 	// subtract initial gas (G0)
 	g0, g0Err := vm.G0Create(input)

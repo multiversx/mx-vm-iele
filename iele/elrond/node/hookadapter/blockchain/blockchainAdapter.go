@@ -1,6 +1,7 @@
 package blockchainadapter
 
 import (
+	"bytes"
 	"errors"
 	"math/big"
 
@@ -21,6 +22,11 @@ type Blockchain struct {
 	// It acts as a cache. It is also used to compute balance delta.
 	InitialBalances map[string]*big.Int
 
+	// needed to give the new contract address to the hook directly,
+	// without calling the upstream NewAddress hook
+	newContractAddress []byte
+	senderAddress      []byte
+
 	// LogToConsole when set to true causes the adapter to also print all operations to console
 	LogToConsole bool
 
@@ -33,6 +39,12 @@ type Blockchain struct {
 // InitAdapter should be called before each SC execution.
 func (b *Blockchain) InitAdapter() {
 	b.InitialBalances = make(map[string]*big.Int)
+}
+
+// InitNewAddress should be called before each SC execution.
+func (b *Blockchain) InitNewAddress(newContractAddress []byte, senderAddress []byte) {
+	b.newContractAddress = newContractAddress
+	b.senderAddress = senderAddress
 }
 
 // ConvertKIntToAddress takes a K Int and converts it to an address with the correct number of bytes,
@@ -82,10 +94,18 @@ func (b *Blockchain) NewAddress(kaddr, knonce m.KReference, lbl m.KLabel, sort m
 	if !nonceOk {
 		return m.NoResult, errors.New("invalid creator nonce provided to blockchain hook NewAddress")
 	}
-	newAddr, err := b.Upstream.NewAddress(creatorAddr, creatorNonce)
-	if err != nil {
-		return m.NoResult, err
+	var newAddr []byte
+	if bytes.Equal(creatorAddr, b.senderAddress) {
+		newAddr = b.newContractAddress
 	}
+	if len(newAddr) == 0 {
+		var err error
+		newAddr, err = b.Upstream.NewAddress(creatorAddr, creatorNonce)
+		if err != nil {
+			return m.NoResult, err
+		}
+	}
+
 	b.logNewAddress(creatorAddr, creatorNonce, newAddr)
 
 	if len(newAddr) == 0 {
