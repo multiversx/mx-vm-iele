@@ -7,12 +7,13 @@ type AccountMap map[string]*Account
 
 // Account holds the account info
 type Account struct {
-	Exists  bool
-	Address []byte
-	Nonce   uint64
-	Balance *big.Int
-	Storage map[string][]byte
-	Code    []byte
+	Exists       bool
+	Address      []byte
+	Nonce        uint64
+	Balance      *big.Int
+	BalanceDelta *big.Int
+	Storage      map[string][]byte
+	Code         []byte
 }
 
 var storageDefaultValue = []byte{}

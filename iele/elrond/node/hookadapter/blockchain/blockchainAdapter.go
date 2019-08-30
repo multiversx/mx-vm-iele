@@ -2,6 +2,7 @@ package blockchainadapter
 
 import (
 	"errors"
+	"math/big"
 
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
@@ -16,6 +17,10 @@ type Blockchain struct {
 	// AddressLength is the expected length of an address, in bytes
 	AddressLength int
 
+	// InitialBalances stores the balances of accounts as hook GetBalance is called.
+	// It acts as a cache. It is also used to compute balance delta.
+	InitialBalances map[string]*big.Int
+
 	// LogToConsole when set to true causes the adapter to also print all operations to console
 	LogToConsole bool
 
@@ -23,6 +28,11 @@ type Blockchain struct {
 	// if logging is enabled.
 	// Used for logging only.
 	inputAccounts map[string]*vmi.OutputAccount
+}
+
+// InitAdapter should be called before each SC execution.
+func (b *Blockchain) InitAdapter() {
+	b.InitialBalances = make(map[string]*big.Int)
 }
 
 // ConvertKIntToAddress takes a K Int and converts it to an address with the correct number of bytes,
@@ -91,10 +101,14 @@ func (b *Blockchain) GetBalance(c m.KReference, lbl m.KLabel, sort m.Sort, confi
 	if !isAddr {
 		return m.NoResult, errors.New("invalid account address provided to blockchain hook GetBalance")
 	}
+	if initialBalance, balLoaded := b.InitialBalances[string(acctAddr)]; balLoaded {
+		return ms.FromBigInt(initialBalance), nil
+	}
 	result, err := b.Upstream.GetBalance(acctAddr)
 	if err != nil {
 		return m.NoResult, err
 	}
+	b.InitialBalances[string(acctAddr)] = result
 	b.logBalance(acctAddr, result)
 	return ms.FromBigInt(result), nil
 }

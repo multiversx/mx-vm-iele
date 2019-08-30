@@ -26,6 +26,7 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 	// reset the VM state without freeing up the memory,
 	// so the same memory can be reused on the next execution
 	vm.kinterpreter.Model.Clear()
+	vm.blockchainAdapter.InitAdapter()
 
 	// subtract initial gas (G0)
 	g0, g0Err := vm.G0Create(input)
@@ -74,6 +75,7 @@ func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi
 	// reset the VM state without freeing up the memory,
 	// so the same memory can be reused on the next execution
 	vm.kinterpreter.Model.Clear()
+	vm.blockchainAdapter.InitAdapter()
 
 	// subtract initial gas (G0)
 	g0, g0Err := vm.G0Call(input)
@@ -293,7 +295,7 @@ func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.KReference) (*vmi.Outpu
 		return nil, errors.New("invalid account address")
 	}
 
-	// balance
+	// balance delta
 	kappBalance, kappBalanceOk := vm.kinterpreter.Model.ExtractKApplyArgs(kappAcc[1], m.LblXltbalanceXgt, 1)
 	if !kappBalanceOk {
 		return nil, errors.New("invalid account balance")
@@ -302,6 +304,11 @@ func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.KReference) (*vmi.Outpu
 	if !ibalanceOk {
 		return nil, errors.New("invalid account balance")
 	}
+	initialBalance, initialBalanceExists := vm.blockchainAdapter.InitialBalances[string(iaddr)]
+	if !initialBalanceExists {
+		return nil, errors.New("output account balance does not have a corresponding input balance")
+	}
+	balanceDelta := big.NewInt(0).Sub(ibalance, initialBalance)
 
 	// code
 	kappCode, kappCodeOk := vm.kinterpreter.Model.ExtractKApplyArgs(kappAcc[2], m.LblXltcodeXgt, 1)
@@ -369,6 +376,7 @@ func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.KReference) (*vmi.Outpu
 	return &vmi.OutputAccount{
 		Address:        iaddr,
 		Balance:        ibalance,
+		BalanceDelta:   balanceDelta,
 		Nonce:          inonce,
 		StorageUpdates: storageUpdates,
 		Code:           []byte(codeStr),

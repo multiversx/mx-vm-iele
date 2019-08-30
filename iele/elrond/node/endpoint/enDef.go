@@ -23,9 +23,10 @@ type ElrondIeleVM struct {
 // NewElrondIeleVM creates new Elrond Iele VM instance
 func NewElrondIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHook, schedule Schedule) *ElrondIeleVM {
 	blockchainAdapter := &blockchain.Blockchain{
-		Upstream:      blockchainHook,
-		AddressLength: AddressLength,
-		LogToConsole:  false,
+		Upstream:        blockchainHook,
+		AddressLength:   AddressLength,
+		InitialBalances: nil,
+		LogToConsole:    false,
 	}
 	kryptoAdapter := &krypto.Krypto{Upstream: cryptoHook}
 	kinterpreter := interpreter.NewInterpreter(blockchainAdapter, kryptoAdapter)

@@ -56,7 +56,11 @@ func (b *BlockchainHookMock) UpdateAccounts(modifiedAccounts []*vmi.OutputAccoun
 			b.AcctMap.PutAccount(acct)
 		}
 		acct.Exists = true
-		acct.Balance = modAcct.Balance
+		if modAcct.BalanceDelta != nil {
+			acct.Balance = big.NewInt(0).Add(acct.Balance, modAcct.BalanceDelta)
+		} else {
+			acct.Balance = modAcct.Balance
+		}
 		acct.Nonce = modAcct.Nonce
 		acct.Code = modAcct.Code
 
