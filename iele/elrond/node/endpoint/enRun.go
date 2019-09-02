@@ -27,7 +27,6 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 	// so the same memory can be reused on the next execution
 	vm.kinterpreter.Model.Clear()
 	vm.blockchainAdapter.InitAdapter()
-	vm.blockchainAdapter.InitNewAddress(input.NewContractAddress, input.CallerAddr)
 
 	// subtract initial gas (G0)
 	g0, g0Err := vm.G0Create(input)
@@ -47,7 +46,6 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 		vm.kinterpreter.Model.FromBigInt(input.GasPrice),
 		vm.kinterpreter.Model.FromBigInt(gasProvided),
 		vm.kinterpreter.Model.FromBigInt(input.Header.Beneficiary),
-
 		m.IntZero, // difficulty
 		vm.kinterpreter.Model.FromBigInt(input.Header.Number),
 		vm.kinterpreter.Model.FromBigInt(input.Header.GasLimit),
