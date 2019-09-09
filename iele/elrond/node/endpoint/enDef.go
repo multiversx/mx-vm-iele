@@ -10,6 +10,9 @@ import (
 // AddressLength is the account address length expected by the VM.
 const AddressLength = 32
 
+// TestVMType is the VM type argument we use in tests.
+var TestVMType = []byte{0, 0}
+
 // ElrondIeleVM defines an object containing the state of the Iele VM.
 // This is the Elrond version.
 type ElrondIeleVM struct {
@@ -21,9 +24,15 @@ type ElrondIeleVM struct {
 }
 
 // NewElrondIeleVM creates new Elrond Iele VM instance
-func NewElrondIeleVM(blockchainHook vmi.BlockchainHook, cryptoHook vmi.CryptoHook, schedule Schedule) *ElrondIeleVM {
+func NewElrondIeleVM(
+	vmType []byte,
+	schedule Schedule,
+	blockchainHook vmi.BlockchainHook,
+	cryptoHook vmi.CryptoHook) *ElrondIeleVM {
+
 	blockchainAdapter := &blockchain.Blockchain{
 		Upstream:        blockchainHook,
+		VMType:          vmType,
 		AddressLength:   AddressLength,
 		InitialBalances: nil,
 		LogToConsole:    false,

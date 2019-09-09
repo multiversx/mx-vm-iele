@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
-	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
 	worldhook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-blockchain"
 	cryptohook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-crypto"
+	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
+	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
 )
 
 func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
@@ -66,7 +66,9 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 	})
 
 	// create the VM and allocate some memory
-	vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, eiele.ElrondDefault)
+	vm := eiele.NewElrondIeleVM(
+		eiele.TestVMType, eiele.ElrondDefault,
+		world, cryptohook.KryptoHookMockInstance)
 
 	if b != nil { // nil when debugging
 		b.ResetTimer()

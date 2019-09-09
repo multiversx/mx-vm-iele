@@ -30,7 +30,9 @@ func (te *elrondTestnetIeleTestExecutor) ProcessCode(testPath string, value stri
 // Run executes an individual Iele test.
 func (te *elrondTestnetIeleTestExecutor) Run(test *ij.Test) error {
 	if te.vm == nil {
-		te.vm = eiele.NewElrondIeleVM(te.world, cryptohook.KryptoHookMockInstance, eiele.ElrondTestnet)
+		te.vm = eiele.NewElrondIeleVM(
+			eiele.TestVMType, eiele.ElrondDefault,
+			te.world, cryptohook.KryptoHookMockInstance)
 		if te.tracePretty {
 			te.vm.SetTracePretty()
 		}

@@ -1,7 +1,9 @@
 github.com/ElrondNetwork/elrond-vm-common v0.0.7 h1:a6ZIPE4c1ofDZOJNOawCnsTFZbg1aDmX1xf011ShviU=
 github.com/ElrondNetwork/elrond-vm-common v0.0.7/go.mod h1:VqCCN0cX0e4D/KDc7MGNV9ElrOsfnjuJnGvcODVjzbk=
-github.com/ElrondNetwork/elrond-vm-util v0.0.1 h1:wMpsob+wthnSDaFM/PPHOfh63Cd+SLTGuTmed0qIlO4=
-github.com/ElrondNetwork/elrond-vm-util v0.0.1/go.mod h1:vMhhI1CALrb89Nb/In75EBLCoYIRMFHhvjI7rLrM+ko=
+github.com/ElrondNetwork/elrond-vm-common v0.0.8 h1:YyJ55gYeCL3e2v+06ZLJrwzkOXPvuSvLm7pBL1qD0Rk=
+github.com/ElrondNetwork/elrond-vm-common v0.0.8/go.mod h1:VqCCN0cX0e4D/KDc7MGNV9ElrOsfnjuJnGvcODVjzbk=
+github.com/ElrondNetwork/elrond-vm-util v0.0.2 h1:QnlUb2RHBfnaqRE/YMo7+c20QaKTGZDKKUE7WRd/TwM=
+github.com/ElrondNetwork/elrond-vm-util v0.0.2/go.mod h1:vMhhI1CALrb89Nb/In75EBLCoYIRMFHhvjI7rLrM+ko=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472 h1:Gv7RPwsi3eZ2Fgewe3CBsuOebPwO27PoXzRpJPsvSSM=
 golang.org/x/crypto v0.0.0-20190829043050-9756ffdc2472/go.mod h1:yigFU9vqHzYiE8UmvKecakEJjdnWj3jj499lnFckfCI=

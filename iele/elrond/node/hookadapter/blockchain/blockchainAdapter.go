@@ -14,6 +14,9 @@ type Blockchain struct {
 	// Upstream is the world state callback, which is common to all VMs
 	Upstream vmi.BlockchainHook
 
+	// VMType is a VM indentifier used for generating new addresses.
+	VMType []byte
+
 	// AddressLength is the expected length of an address, in bytes
 	AddressLength int
 
@@ -83,7 +86,7 @@ func (b *Blockchain) NewAddress(kaddr, knonce m.KReference, lbl m.KLabel, sort m
 		return m.NoResult, errors.New("invalid creator nonce provided to blockchain hook NewAddress")
 	}
 
-	newAddr, err := b.Upstream.NewAddress(creatorAddr, creatorNonce)
+	newAddr, err := b.Upstream.NewAddress(creatorAddr, creatorNonce, b.VMType)
 	if err != nil {
 		return m.NoResult, err
 	}

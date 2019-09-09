@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
-	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
 	worldhook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-blockchain"
 	cryptohook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-crypto"
+	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
+	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
 )
 
 func benchmarkStaticCall(b *testing.B, contract string, functionName string, args ...*big.Int) {
@@ -51,7 +51,9 @@ func benchmarkStaticCall(b *testing.B, contract string, functionName string, arg
 	})
 
 	// create the VM and allocate some memory
-	vm := eiele.NewElrondIeleVM(world, cryptohook.KryptoHookMockInstance, eiele.ElrondDefault)
+	vm := eiele.NewElrondIeleVM(
+		eiele.TestVMType, eiele.ElrondDefault,
+		world, cryptohook.KryptoHookMockInstance)
 
 	repeats := 1
 	if b != nil { // nil when debugging
