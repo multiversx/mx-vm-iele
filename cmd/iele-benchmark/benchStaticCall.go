@@ -10,8 +10,8 @@ import (
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
 	compiler "github.com/ElrondNetwork/elrond-vm/iele/compiler"
 	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
-	worldhook "github.com/ElrondNetwork/elrond-vm/mock-hook-blockchain"
-	cryptohook "github.com/ElrondNetwork/elrond-vm/mock-hook-crypto"
+	worldhook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-blockchain"
+	cryptohook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-crypto"
 )
 
 func benchmarkStaticCall(b *testing.B, contract string, functionName string, args ...*big.Int) {

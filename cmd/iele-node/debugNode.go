@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
+	controller "github.com/ElrondNetwork/elrond-vm-util/test-util/testcontroller"
 )
 
 func main() {

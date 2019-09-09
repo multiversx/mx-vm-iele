@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	controller "github.com/ElrondNetwork/elrond-vm/iele/test-util/testcontroller"
+	controller "github.com/ElrondNetwork/elrond-vm-util/test-util/testcontroller"
 )
 
 func TestAuctionSolidity(t *testing.T) {

@@ -3,7 +3,7 @@ package main
 import (
 	"strings"
 
-	oj "github.com/ElrondNetwork/elrond-vm/iele/test-util/orderedjson"
+	oj "github.com/ElrondNetwork/elrond-vm-util/test-util/orderedjson"
 )
 
 func modifyJSON(jobj oj.OJsonObject) error {

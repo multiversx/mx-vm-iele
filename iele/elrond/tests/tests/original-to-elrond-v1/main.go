@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	oj "github.com/ElrondNetwork/elrond-vm/iele/test-util/orderedjson"
+	oj "github.com/ElrondNetwork/elrond-vm-util/test-util/orderedjson"
 )
 
 var ielePath = path.Join(build.Default.GOPATH, "src/github.com/ElrondNetwork/elrond-vm/iele/")

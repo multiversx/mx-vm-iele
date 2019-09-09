@@ -2,11 +2,11 @@ package main
 
 import (
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	worldhook "github.com/ElrondNetwork/elrond-vm/mock-hook-blockchain"
-	cryptohook "github.com/ElrondNetwork/elrond-vm/mock-hook-crypto"
+	worldhook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-blockchain"
+	cryptohook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-crypto"
 
+	ij "github.com/ElrondNetwork/elrond-vm-util/test-util/ielejson"
 	eiele "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/endpoint"
-	ij "github.com/ElrondNetwork/elrond-vm/iele/test-util/ielejson"
 )
 
 type elrondIeleTestExecutor struct {
@@ -35,6 +35,11 @@ func (te *elrondIeleTestExecutor) SetTracePretty(tracePretty bool) *elrondIeleTe
 func (te *elrondIeleTestExecutor) SetLogIO() *elrondIeleTestExecutor {
 	te.logIO = true
 	return te
+}
+
+// ProcessCode takes the iele file path, assembles it and yields the bytecode.
+func (te *elrondIeleTestExecutor) ProcessCode(testPath string, value string) (string, error) {
+	return assembleIeleCode(testPath, value)
 }
 
 // Run executes an individual Iele test.

@@ -9,10 +9,10 @@ import (
 	"os"
 	"path/filepath"
 
-	worldhook "github.com/ElrondNetwork/elrond-vm/mock-hook-blockchain"
+	worldhook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-blockchain"
 
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	ij "github.com/ElrondNetwork/elrond-vm/iele/test-util/ielejson"
+	ij "github.com/ElrondNetwork/elrond-vm-util/test-util/ielejson"
 )
 
 func runTest(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.BlockchainHookMock) error {

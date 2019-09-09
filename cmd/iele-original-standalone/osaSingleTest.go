@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"testing"
 
+	cryptohook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-crypto"
+	oj2k "github.com/ElrondNetwork/elrond-vm-util/test-util/orderedjson2kast"
 	krypto "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/hookadapter/krypto"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele/original/standalone/iele-testing-kompiled/ieletestingmodel"
-	oj2k "github.com/ElrondNetwork/elrond-vm/iele/test-util/orderedjson2kast"
-	cryptohook "github.com/ElrondNetwork/elrond-vm/mock-hook-crypto"
 )
 
 type gasMode string
@@ -54,7 +54,7 @@ func runTest(testFilePath string, testGasMode gasMode, tracePretty bool, b *test
 		return err
 	}
 
-	kast, err := oj2k.ConvertOrderedJSONToKast(byteValue, testFilePath)
+	kast, err := oj2k.ConvertOrderedJSONToKast(byteValue, testFilePath, assembleIeleCode)
 	if err != nil {
 		return err
 	}
