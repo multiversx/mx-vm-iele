@@ -56,8 +56,11 @@ func (vm *ElrondIeleVM) printAccountData(accounts []*vmi.OutputAccount) {
 	for _, addr := range addresses {
 		acc := accMap[addr]
 		fmt.Printf("\n    %s", hex.EncodeToString(acc.Address))
-		fmt.Printf("\n           balance: %d (0x%x)", acc.Balance, acc.Balance)
-		fmt.Printf("\n           nonce:   %d (0x%x)", acc.Nonce, acc.Nonce)
+		fmt.Printf("\n           balance:       %d (0x%x)", acc.Balance, acc.Balance)
+		if acc.BalanceDelta != nil {
+			fmt.Printf("\n           balance delta: %d (0x%x)", acc.BalanceDelta, acc.BalanceDelta)
+		}
+		fmt.Printf("\n           nonce:         %d (0x%x)", acc.Nonce, acc.Nonce)
 		if len(acc.StorageUpdates) > 0 {
 			fmt.Print("\n           storage:")
 			var stKeys []string

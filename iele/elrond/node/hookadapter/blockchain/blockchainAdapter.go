@@ -21,9 +21,9 @@ type Blockchain struct {
 	// AddressLength is the expected length of an address, in bytes
 	AddressLength int
 
-	// InitialBalances stores the balances of accounts as hook GetBalance is called.
+	// initialBalances stores the balances of accounts as hook GetBalance is called.
 	// It acts as a cache. It is also used to compute balance delta.
-	InitialBalances map[string]*big.Int
+	initialBalances map[string]*big.Int
 
 	// the sender gets the call value added to the initial balance,
 	// which then gets subtracted by the VM
@@ -41,7 +41,7 @@ type Blockchain struct {
 
 // InitAdapter should be called before each SC execution.
 func (b *Blockchain) InitAdapter(senderAddress []byte, callValue *big.Int) {
-	b.InitialBalances = make(map[string]*big.Int)
+	b.initialBalances = make(map[string]*big.Int)
 	b.senderAddress = senderAddress
 	b.callValue = callValue
 }
@@ -114,19 +114,31 @@ func (b *Blockchain) GetBalance(c m.KReference, lbl m.KLabel, sort m.Sort, confi
 	if !isAddr {
 		return m.NoResult, errors.New("invalid account address provided to blockchain hook GetBalance")
 	}
-	if initialBalance, balLoaded := b.InitialBalances[string(acctAddr)]; balLoaded {
+	if initialBalance, balLoaded := b.initialBalances[string(acctAddr)]; balLoaded {
 		return ms.FromBigInt(initialBalance), nil
 	}
 	result, err := b.Upstream.GetBalance(acctAddr)
 	if err != nil {
 		return m.NoResult, err
 	}
-	if bytes.Equal(acctAddr, b.senderAddress) {
-		result = big.NewInt(0).Add(result, b.callValue)
-	}
-	b.InitialBalances[string(acctAddr)] = result
+	b.initialBalances[string(acctAddr)] = result
 	b.logBalance(acctAddr, result)
 	return ms.FromBigInt(result), nil
+}
+
+// ComputeDelta computes the delta from a final balance of an account
+func (b *Blockchain) ComputeDelta(acctAddr []byte, finalBalance *big.Int) (*big.Int, error) {
+	initialBalance, initialBalanceExists := b.initialBalances[string(acctAddr)]
+	if !initialBalanceExists {
+		return nil, errors.New("output account balance does not have a corresponding input balance")
+	}
+	balanceDelta := big.NewInt(0).Sub(finalBalance, initialBalance)
+	if bytes.Equal(acctAddr, b.senderAddress) {
+		// discard call value subtraction from balance delta
+		// by performing the opposite operation (add)
+		balanceDelta = balanceDelta.Add(balanceDelta, b.callValue)
+	}
+	return balanceDelta, nil
 }
 
 // GetNonce adapts between K model and elrond function

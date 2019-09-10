@@ -33,66 +33,65 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 
 			var output *vmi.VMOutput
 
-			senderBalance, _ := world.GetBalance(tx.From)
-			if tx.Value.Cmp(senderBalance) > 0 {
-				// insufficient funds, treated by the protocol
-				output = &vmi.VMOutput{
-					ReturnData:      nil,
-					GasRemaining:    big.NewInt(0),
-					GasRefund:       big.NewInt(0),
-					ReturnCode:      vmi.OutOfFunds,
-					DeletedAccounts: nil,
-					TouchedAccounts: nil,
-					OutputAccounts:  nil,
-					Logs:            nil,
+			if tx.IsCreate {
+				input := &vmi.ContractCreateInput{
+					ContractCode: []byte(tx.AssembledCode),
+					VMInput: vmi.VMInput{
+						CallerAddr:  tx.From,
+						Arguments:   tx.Arguments,
+						CallValue:   tx.Value,
+						GasPrice:    tx.GasPrice,
+						GasProvided: tx.GasLimit,
+						Header:      convertBlockHeader(block.BlockHeader),
+					},
+				}
+
+				var err error
+				output, err = vm.RunSmartContractCreate(input)
+				if err != nil {
+					return err
 				}
 			} else {
-				if tx.IsCreate {
-					input := &vmi.ContractCreateInput{
-						ContractCode: []byte(tx.AssembledCode),
-						VMInput: vmi.VMInput{
-							CallerAddr:  tx.From,
-							Arguments:   tx.Arguments,
-							CallValue:   tx.Value,
-							GasPrice:    tx.GasPrice,
-							GasProvided: tx.GasLimit,
-							Header:      convertBlockHeader(block.BlockHeader),
-						},
-					}
-
-					var err error
-					output, err = vm.RunSmartContractCreate(input)
-					if err != nil {
-						return err
-					}
-				} else {
-					input := &vmi.ContractCallInput{
-						RecipientAddr: tx.To,
-						Function:      tx.Function,
-						VMInput: vmi.VMInput{
-							CallerAddr:  tx.From,
-							Arguments:   tx.Arguments,
-							CallValue:   tx.Value,
-							GasPrice:    tx.GasPrice,
-							GasProvided: tx.GasLimit,
-							Header:      convertBlockHeader(block.BlockHeader),
-						},
-					}
-
-					var err error
-					output, err = vm.RunSmartContractCall(input)
-					if err != nil {
-						return err
-					}
+				input := &vmi.ContractCallInput{
+					RecipientAddr: tx.To,
+					Function:      tx.Function,
+					VMInput: vmi.VMInput{
+						CallerAddr:  tx.From,
+						Arguments:   tx.Arguments,
+						CallValue:   tx.Value,
+						GasPrice:    tx.GasPrice,
+						GasProvided: tx.GasLimit,
+						Header:      convertBlockHeader(block.BlockHeader),
+					},
 				}
 
-				updErr := world.UpdateAccounts(output.OutputAccounts, output.DeletedAccounts)
-				if updErr != nil {
-					return updErr
+				var err error
+				output, err = vm.RunSmartContractCall(input)
+				if err != nil {
+					return err
 				}
 			}
 
+			// subtract call value from sender (this is not reflected in the delta)
+			world.UpdateBalanceWithDelta(tx.From, big.NewInt(0).Neg(tx.Value))
+
+			// update accounts based on deltas
+			updErr := world.UpdateAccounts(output.OutputAccounts, output.DeletedAccounts)
+			if updErr != nil {
+				return updErr
+			}
+
 			blResult := block.Results[txIndex]
+
+			// sum of all balance deltas should equal call value
+			sumOfBalanceDeltas := big.NewInt(0)
+			for _, oa := range output.OutputAccounts {
+				sumOfBalanceDeltas = sumOfBalanceDeltas.Add(sumOfBalanceDeltas, oa.BalanceDelta)
+			}
+			if sumOfBalanceDeltas.Cmp(tx.Value) != 0 {
+				return fmt.Errorf("sum of balance deltas should equal call value. Sum of balance deltas: %d (0x%x). Call value: %d (0x%x)",
+					sumOfBalanceDeltas, sumOfBalanceDeltas, tx.Value, tx.Value)
+			}
 
 			// check return code
 			expectedStatus := 0

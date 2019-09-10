@@ -303,11 +303,10 @@ func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.KReference) (*vmi.Outpu
 	if !ibalanceOk {
 		return nil, errors.New("invalid account balance")
 	}
-	initialBalance, initialBalanceExists := vm.blockchainAdapter.InitialBalances[string(iaddr)]
-	if !initialBalanceExists {
-		return nil, errors.New("output account balance does not have a corresponding input balance")
+	balanceDelta, balanceDeltaError := vm.blockchainAdapter.ComputeDelta(iaddr, ibalance)
+	if balanceDeltaError != nil {
+		return nil, balanceDeltaError
 	}
-	balanceDelta := big.NewInt(0).Sub(ibalance, initialBalance)
 
 	// code
 	kappCode, kappCodeOk := vm.kinterpreter.Model.ExtractKApplyArgs(kappAcc[2], m.LblXltcodeXgt, 1)

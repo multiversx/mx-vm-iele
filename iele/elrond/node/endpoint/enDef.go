@@ -31,11 +31,10 @@ func NewElrondIeleVM(
 	cryptoHook vmi.CryptoHook) *ElrondIeleVM {
 
 	blockchainAdapter := &blockchain.Blockchain{
-		Upstream:        blockchainHook,
-		VMType:          vmType,
-		AddressLength:   AddressLength,
-		InitialBalances: nil,
-		LogToConsole:    false,
+		Upstream:      blockchainHook,
+		VMType:        vmType,
+		AddressLength: AddressLength,
+		LogToConsole:  false,
 	}
 	kryptoAdapter := &krypto.Krypto{Upstream: cryptoHook}
 	kinterpreter := interpreter.NewInterpreter(blockchainAdapter, kryptoAdapter)
