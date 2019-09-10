@@ -1,6 +1,6 @@
 module github.com/ElrondNetwork/elrond-vm
 
-go 1.12
+go 1.13
 
 require (
 	github.com/ElrondNetwork/elrond-vm-common v0.0.8
