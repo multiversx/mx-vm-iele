@@ -64,6 +64,6 @@ func (te *elrondIeleTestExecutor) Run(test *ij.Test) error {
 		te.scheduleVMs[scheduleName] = vm
 	}
 
-	err := runTest(test, vm, te.world)
+	err := runTestElrond(test, vm, te.world)
 	return err
 }

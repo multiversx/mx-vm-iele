@@ -38,6 +38,6 @@ func (te *elrondTestnetIeleTestExecutor) Run(test *ij.Test) error {
 		}
 	}
 
-	err := runTest(test, te.vm, te.world)
+	err := runTestElrond(test, te.vm, te.world)
 	return err
 }

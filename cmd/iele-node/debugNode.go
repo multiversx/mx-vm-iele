@@ -30,9 +30,10 @@ func main() {
 
 	//debugAgarMin()
 
-	//debugElrondTest("agar_v4/topUp_ok.iele.json", false)
+	debugElrondTest("agar_v4/topUp_outOfFunds.iele.json", false)
+	//debugElrondTest("agar_v4/topUp_withdraw.iele.json", false)
 	//debugElrondTest("tests/iele-v3/danse/unit/exceptions.iele.json", false)
-	debugElrondTest("agar_min_v1/create.iele.json", false)
+	//debugElrondTest("agar_min_v1/create.iele.json", false)
 
 }
 

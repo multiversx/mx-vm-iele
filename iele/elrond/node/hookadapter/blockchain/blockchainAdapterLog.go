@@ -28,6 +28,8 @@ func (b *Blockchain) logNewAddress(creatorAddress []byte, creatorNonce uint64, r
 		hex.EncodeToString(result))
 }
 
+var balanceZero = big.NewInt(0)
+
 func (b *Blockchain) logBalance(address []byte, balance *big.Int) {
 	if !b.LogToConsole {
 		return
@@ -39,9 +41,6 @@ func (b *Blockchain) logBalance(address []byte, balance *big.Int) {
 	if !found {
 		acc = &vmi.OutputAccount{Address: address}
 		b.inputAccounts[string(address)] = acc
-	}
-	if acc.Balance != nil {
-		fmt.Printf("\ngetBalance called twice")
 	}
 	acc.Balance = balance
 }

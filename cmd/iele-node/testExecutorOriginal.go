@@ -45,6 +45,6 @@ func (te *originalIeleTestExecutor) Run(test *ij.Test) error {
 		te.scheduleVMs[scheduleName] = vm
 	}
 
-	err := runTest(test, vm, te.world)
+	err := runTestOriginal(test, vm, te.world)
 	return err
 }

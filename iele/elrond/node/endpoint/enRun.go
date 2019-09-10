@@ -26,7 +26,7 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 	// reset the VM state without freeing up the memory,
 	// so the same memory can be reused on the next execution
 	vm.kinterpreter.Model.Clear()
-	vm.blockchainAdapter.InitAdapter()
+	vm.blockchainAdapter.InitAdapter(input.CallerAddr, input.CallValue)
 
 	// subtract initial gas (G0)
 	g0, g0Err := vm.G0Create(input)
@@ -74,7 +74,7 @@ func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi
 	// reset the VM state without freeing up the memory,
 	// so the same memory can be reused on the next execution
 	vm.kinterpreter.Model.Clear()
-	vm.blockchainAdapter.InitAdapter()
+	vm.blockchainAdapter.InitAdapter(input.CallerAddr, input.CallValue)
 
 	// subtract initial gas (G0)
 	g0, g0Err := vm.G0Call(input)

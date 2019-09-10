@@ -1,6 +1,7 @@
 package blockchainadapter
 
 import (
+	"bytes"
 	"errors"
 	"math/big"
 
@@ -24,6 +25,11 @@ type Blockchain struct {
 	// It acts as a cache. It is also used to compute balance delta.
 	InitialBalances map[string]*big.Int
 
+	// the sender gets the call value added to the initial balance,
+	// which then gets subtracted by the VM
+	senderAddress []byte
+	callValue     *big.Int
+
 	// LogToConsole when set to true causes the adapter to also print all operations to console
 	LogToConsole bool
 
@@ -34,8 +40,10 @@ type Blockchain struct {
 }
 
 // InitAdapter should be called before each SC execution.
-func (b *Blockchain) InitAdapter() {
+func (b *Blockchain) InitAdapter(senderAddress []byte, callValue *big.Int) {
 	b.InitialBalances = make(map[string]*big.Int)
+	b.senderAddress = senderAddress
+	b.callValue = callValue
 }
 
 // ConvertKIntToAddress takes a K Int and converts it to an address with the correct number of bytes,
@@ -112,6 +120,9 @@ func (b *Blockchain) GetBalance(c m.KReference, lbl m.KLabel, sort m.Sort, confi
 	result, err := b.Upstream.GetBalance(acctAddr)
 	if err != nil {
 		return m.NoResult, err
+	}
+	if bytes.Equal(acctAddr, b.senderAddress) {
+		result = big.NewInt(0).Add(result, b.callValue)
 	}
 	b.InitialBalances[string(acctAddr)] = result
 	b.logBalance(acctAddr, result)
