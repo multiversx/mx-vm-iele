@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -31,8 +32,8 @@ func convertAccount(testAcct *ij.Account) *worldhook.Account {
 		if stkvp.Value == nil {
 			panic("why?")
 		}
-		key := string(stkvp.Key.Bytes())
-		storage[key] = stkvp.Value.Bytes()
+		key := normalizeStorageKey(string(stkvp.Key))
+		storage[key] = stkvp.Value
 	}
 
 	return &worldhook.Account{
@@ -91,4 +92,22 @@ func saveModifiedTest(toPath string, top []*ij.Test) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func normalizeStorageKey(key string) string {
+	return string(big.NewInt(0).SetBytes([]byte(key)).Bytes())
+	// trimmed := strings.TrimLeft(key, "0")
+	// if len(trimmed)%2 == 1 {
+	// 	trimmed = "0" + trimmed
+	// }
+	// return trimmed
+}
+
+func storageValuesEqual(value1, value2 []byte) bool {
+	if bytes.Equal(value1, value2) {
+		return true
+	}
+	bi1 := big.NewInt(0).SetBytes(value1)
+	bi2 := big.NewInt(0).SetBytes(value2)
+	return bi1.Cmp(bi2) == 0
 }

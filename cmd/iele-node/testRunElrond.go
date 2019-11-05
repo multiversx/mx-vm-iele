@@ -227,16 +227,16 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 		// compare storages
 		allKeys := make(map[string]bool)
 		for k := range postAcct.Storage {
-			allKeys[k] = true
+			allKeys[normalizeStorageKey(k)] = true
 		}
 		for k := range matchingAcct.Storage {
-			allKeys[k] = true
+			allKeys[normalizeStorageKey(k)] = true
 		}
 		storageError := ""
 		for k := range allKeys {
 			want := postAcct.StorageValue(k)
 			have := matchingAcct.StorageValue(k)
-			if !bytes.Equal(want, have) {
+			if !storageValuesEqual(want, have) {
 				storageError += fmt.Sprintf(
 					"\n  for key %s: Want: 0x%s. Have: 0x%s",
 					hex.EncodeToString([]byte(k)), hex.EncodeToString(want), hex.EncodeToString(have))

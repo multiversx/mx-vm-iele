@@ -14,7 +14,7 @@ func main() {
 	//debugElrondTest("tests/iele-v3/danse/ill-formed/illFormed2.iele.json", false)
 	//debugOriginalTest("tests/iele/danse/ill-formed/illFormed2.iele.json", false)
 	//debugOriginalTest("tests/iele/albe/ill-formed/illFormedX14.iele.json", false)
-	//debugOriginalTest("tests/iele/albe/ERC20/create.iele.json", false)
+	//debugElrondTest("tests/iele-v3/danse/ERC20/create.iele.json", false)
 
 	//debugElrondTest("auction-solidity/create.iele.json", false)
 	//debugElrondTestnetTest("agar_v2/withdraw_TooMuch.iele.json", true)
@@ -33,8 +33,8 @@ func main() {
 	//debugElrondTest("tests/iele-v3/danse/auction/bid_late.iele.json", false)
 	//debugElrondTest("agar_v4/topUp_ok.iele.json", false)
 	//debugElrondTest("agar_v4/topUp_outOfFunds.iele.json", false)
-	debugElrondTest("agar_v4/topUp_withdraw.iele.json", false)
-	//debugElrondTest("tests/iele-v3/danse/unit/exceptions.iele.json", false)
+	//debugElrondTest("agar_v4/topUp_withdraw.iele.json", false)
+	debugElrondTest("agar_min_v1/topUp_outOfFunds.iele.json", false)
 	//debugElrondTest("agar_min_v1/create.iele.json", false)
 
 }
