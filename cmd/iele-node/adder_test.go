@@ -7,9 +7,10 @@ import (
 )
 
 func TestAdder(t *testing.T) {
-	err := controller.RunAllIeleTestsInDirectory(
+	err := controller.RunAllJSONTestsInDirectory(
 		elrondTestRoot,
 		"adder",
+		".iele.json",
 		nil,
 		newElrondIeleTestExecutor())
 

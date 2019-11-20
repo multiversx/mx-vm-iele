@@ -7,9 +7,10 @@ import (
 )
 
 func TestAgarMinV1(t *testing.T) {
-	err := controller.RunAllIeleTestsInDirectory(
+	err := controller.RunAllJSONTestsInDirectory(
 		elrondTestRoot,
 		"agar_min_v1",
+		".iele.json",
 		nil,
 		newElrondIeleTestExecutor())
 
@@ -19,9 +20,10 @@ func TestAgarMinV1(t *testing.T) {
 }
 
 func TestAgarV1(t *testing.T) {
-	err := controller.RunAllIeleTestsInDirectory(
+	err := controller.RunAllJSONTestsInDirectory(
 		elrondTestRoot,
 		"agar_v1",
+		".iele.json",
 		nil,
 		newElrondIeleTestExecutor())
 
@@ -31,9 +33,10 @@ func TestAgarV1(t *testing.T) {
 }
 
 func TestAgarV2(t *testing.T) {
-	err := controller.RunAllIeleTestsInDirectory(
+	err := controller.RunAllJSONTestsInDirectory(
 		elrondTestRoot,
 		"agar_v2",
+		".iele.json",
 		nil,
 		newElrondIeleTestExecutor())
 
@@ -43,9 +46,10 @@ func TestAgarV2(t *testing.T) {
 }
 
 func TestAgarV3(t *testing.T) {
-	err := controller.RunAllIeleTestsInDirectory(
+	err := controller.RunAllJSONTestsInDirectory(
 		elrondTestRoot,
 		"agar_v3",
+		".iele.json",
 		nil,
 		newElrondIeleTestExecutor())
 
@@ -55,9 +59,10 @@ func TestAgarV3(t *testing.T) {
 }
 
 func TestAgarV4(t *testing.T) {
-	err := controller.RunAllIeleTestsInDirectory(
+	err := controller.RunAllJSONTestsInDirectory(
 		elrondTestRoot,
 		"agar_v4",
+		".iele.json",
 		nil,
 		newElrondIeleTestExecutor())
 
@@ -67,9 +72,10 @@ func TestAgarV4(t *testing.T) {
 }
 
 func TestAgarV4TestnetGas(t *testing.T) {
-	err := controller.RunAllIeleTestsInDirectory(
+	err := controller.RunAllJSONTestsInDirectory(
 		elrondTestRoot,
 		"agar_v4",
+		".iele.json",
 		nil,
 		newElrondTestnetIeleTestExecutor(false))
 

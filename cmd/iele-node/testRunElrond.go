@@ -9,7 +9,7 @@ import (
 	worldhook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-blockchain"
 
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	ij "github.com/ElrondNetwork/elrond-vm-util/test-util/ielejson"
+	ij "github.com/ElrondNetwork/elrond-vm-util/test-util/vmtestjson"
 )
 
 func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.BlockchainHookMock) error {
@@ -24,6 +24,8 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 	//spew.Dump(world.AcctMap)
 
 	for _, block := range test.Blocks {
+		world.CurrentTimestamp = block.BlockHeader.Timestamp
+
 		for txIndex, tx := range block.Transactions {
 			//fmt.Printf("%d\n", txIndex)
 			beforeErr := world.UpdateWorldStateBefore(tx.From, tx.GasLimit, tx.GasPrice)
@@ -42,7 +44,6 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 						CallValue:   tx.Value,
 						GasPrice:    tx.GasPrice,
 						GasProvided: tx.GasLimit,
-						Header:      convertBlockHeader(block.BlockHeader),
 					},
 				}
 
@@ -61,7 +62,6 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 						CallValue:   tx.Value,
 						GasPrice:    tx.GasPrice,
 						GasProvided: tx.GasLimit,
-						Header:      convertBlockHeader(block.BlockHeader),
 					},
 				}
 
@@ -105,12 +105,12 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 			// check result
 			if len(output.ReturnData) != len(blResult.Out) {
 				return fmt.Errorf("result length mismatch. Tx #%d. Want: %s. Have: %s",
-					txIndex, resultAsString(blResult.Out), resultAsString(output.ReturnData))
+					txIndex, ij.ResultAsString(blResult.Out), ij.ResultAsString(output.ReturnData))
 			}
 			for i, expected := range blResult.Out {
-				if expected.Cmp(output.ReturnData[i]) != 0 {
+				if !ij.ResultEqual(expected, output.ReturnData[i]) {
 					return fmt.Errorf("result mismatch. Tx #%d. Want: %s. Have: %s",
-						txIndex, resultAsString(blResult.Out), resultAsString(output.ReturnData))
+						txIndex, ij.ResultAsString(blResult.Out), ij.ResultAsString(output.ReturnData))
 				}
 			}
 

@@ -65,6 +65,8 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 		Code:    []byte{},
 	})
 
+	account2AsArg := hexToArgument(account2AddrHex)
+
 	// create the VM and allocate some memory
 	vm := eiele.NewElrondIeleVM(
 		eiele.TestVMType, eiele.ElrondDefault,
@@ -75,27 +77,19 @@ func benchmarkManyErc20SimpleTransfers(b *testing.B, nrTransfers int) {
 	}
 
 	for benchMarkRepeat := 0; benchMarkRepeat < 1; benchMarkRepeat++ {
-		blHeader := &vmi.SCCallHeader{
-			Beneficiary: big.NewInt(0),
-			Number:      big.NewInt(int64(benchMarkRepeat)),
-			GasLimit:    hexToBigInt("174876e800"),
-			Timestamp:   big.NewInt(0),
-		}
-
 		for txi := 0; txi < nrTransfers; txi++ {
 			input := &vmi.ContractCallInput{
 				RecipientAddr: contractAddr,
 				Function:      "transfer",
 				VMInput: vmi.VMInput{
 					CallerAddr: account1Addr,
-					Arguments: []*big.Int{
-						hexToBigInt(account2AddrHex),
-						big.NewInt(1),
+					Arguments: [][]byte{
+						account2AsArg,
+						[]byte{1},
 					},
 					CallValue:   big.NewInt(0),
-					GasPrice:    big.NewInt(1),
-					GasProvided: hexToBigInt("100000"),
-					Header:      blHeader,
+					GasPrice:    1,
+					GasProvided: 100000,
 				},
 			}
 

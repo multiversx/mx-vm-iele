@@ -26,7 +26,8 @@ func main() {
 
 	//debugElrondTest("agar_v1/addPlayerToGame.iele.json", false)
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false) // trace_good
-	//debugElrondTest("tests/iele-v3/danse/ERC20/approve_Caller-Zero.iele.json", true)
+
+	debugElrondTest("tests/iele-v3/danse/unit/shift.iele.json", true)
 
 	//debugAgarMin()
 
@@ -34,7 +35,7 @@ func main() {
 	//debugElrondTest("agar_v4/topUp_ok.iele.json", false)
 	//debugElrondTest("agar_v4/topUp_outOfFunds.iele.json", false)
 	//debugElrondTest("agar_v4/topUp_withdraw.iele.json", false)
-	debugElrondTest("agar_min_v1/topUp_outOfFunds.iele.json", false)
+	//debugElrondTest("agar_min_v1/balanceOf.iele.json", false)
 	//debugElrondTest("agar_min_v1/create.iele.json", false)
 
 }
@@ -56,7 +57,7 @@ func debugAgarMin() {
 }
 
 func debugElrondTest(testFile string, tracePretty bool) {
-	err := controller.RunSingleIeleTest(
+	err := controller.RunSingleJSONTest(
 		filepath.Join(elrondTestRoot, testFile),
 		newElrondIeleTestExecutor().SetTracePretty(tracePretty))
 
@@ -68,7 +69,7 @@ func debugElrondTest(testFile string, tracePretty bool) {
 }
 
 func debugOriginalTest(testFile string, tracePretty bool) {
-	err := controller.RunSingleIeleTest(
+	err := controller.RunSingleJSONTest(
 		filepath.Join(originalTestRoot, testFile),
 		newOriginalIeleTestExecutor(tracePretty))
 
@@ -80,7 +81,7 @@ func debugOriginalTest(testFile string, tracePretty bool) {
 }
 
 func debugElrondTestnetTest(testFile string, tracePretty bool) {
-	err := controller.RunSingleIeleTest(
+	err := controller.RunSingleJSONTest(
 		filepath.Join(elrondTestRoot, testFile),
 		newElrondTestnetIeleTestExecutor(tracePretty))
 

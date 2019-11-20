@@ -11,11 +11,11 @@ import (
 var emptyWordStack = m.NewKApplyConstant(m.ParseKLabel(".WordStack_IELE-DATA"))
 var wordStackElemLabel = m.ParseKLabel("_:__IELE-DATA")
 
-func (vm *ElrondIeleVM) convertArguments(args []*big.Int) m.KReference {
+func (vm *ElrondIeleVM) convertArguments(args [][]byte) m.KReference {
 	kargList := vm.kinterpreter.Model.NewKApply(m.LblXdotListXlbracketXquoteoperandListXquoteXrbracket)
 	for i := len(args) - 1; i >= 0; i-- {
 		newKargList := vm.kinterpreter.Model.NewKApply(m.LblOperandList,
-			vm.kinterpreter.Model.FromBigInt(args[i]),
+			vm.kinterpreter.Model.FromBigInt(big.NewInt(0).SetBytes(args[i])),
 			kargList,
 		)
 		kargList = newKargList

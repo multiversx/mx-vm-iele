@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 
+	twos "github.com/ElrondNetwork/big-int-util/twos-complement"
 	interpreter "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestinginterpreter"
 	m "github.com/ElrondNetwork/elrond-vm/iele/elrond/node/iele-testing-kompiled/ieletestingmodel"
 
@@ -14,9 +15,6 @@ import (
 // RunSmartContractCreate computes how a smart contract creation should be performed
 func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (*vmi.VMOutput, error) {
 	// validate input
-	if input.Header == nil {
-		return nil, errors.New("block header required")
-	}
 	if len(input.CallerAddr) != AddressLength {
 		return nil, fmt.Errorf("caller address is not %d bytes in length", AddressLength)
 	}
@@ -33,7 +31,7 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 	if g0Err != nil {
 		return nil, g0Err
 	}
-	gasProvided := big.NewInt(0).Sub(input.GasProvided, g0)
+	gasProvided := big.NewInt(0).Sub(big.NewInt(0).SetUint64(input.GasProvided), g0)
 
 	// convert input
 	kapp := vm.kinterpreter.Model.NewKApply(m.LblRunVM,
@@ -43,13 +41,13 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 		vm.kinterpreter.Model.NewString(string(input.ContractCode)),
 		vm.convertArgs(input.Arguments),
 		vm.kinterpreter.Model.FromBigInt(input.CallValue),
-		vm.kinterpreter.Model.FromBigInt(input.GasPrice),
+		vm.kinterpreter.Model.FromUint64(input.GasPrice),
 		vm.kinterpreter.Model.FromBigInt(gasProvided),
-		vm.kinterpreter.Model.FromBigInt(input.Header.Beneficiary),
+		m.IntZero, // beneficiary
 		m.IntZero, // difficulty
-		vm.kinterpreter.Model.FromBigInt(input.Header.Number),
-		vm.kinterpreter.Model.FromBigInt(input.Header.GasLimit),
-		vm.kinterpreter.Model.FromBigInt(input.Header.Timestamp),
+		m.IntZero, // number
+		m.IntZero, // block gas limit
+		vm.kinterpreter.Model.FromUint64(vm.blockchainAdapter.Upstream.CurrentTimeStamp()),
 		m.StringEmpty,
 	)
 
@@ -59,9 +57,6 @@ func (vm *ElrondIeleVM) RunSmartContractCreate(input *vmi.ContractCreateInput) (
 // RunSmartContractCall computes the result of a smart contract call and how the system must change after the execution
 func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi.VMOutput, error) {
 	// validate input
-	if input.Header == nil {
-		return nil, errors.New("block header required")
-	}
 	if len(input.CallerAddr) != AddressLength {
 		return nil, fmt.Errorf("caller address is not %d bytes in length", AddressLength)
 	}
@@ -81,7 +76,7 @@ func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi
 	if g0Err != nil {
 		return nil, g0Err
 	}
-	gasProvided := big.NewInt(0).Sub(input.GasProvided, g0)
+	gasProvided := big.NewInt(0).Sub(big.NewInt(0).SetUint64(input.GasProvided), g0)
 
 	kapp := vm.kinterpreter.Model.NewKApply(m.LblRunVM,
 		m.BoolFalse,
@@ -90,23 +85,24 @@ func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi
 		m.StringEmpty,
 		vm.convertArgs(input.Arguments),
 		vm.kinterpreter.Model.FromBigInt(input.CallValue),
-		vm.kinterpreter.Model.FromBigInt(input.GasPrice),
+		vm.kinterpreter.Model.FromUint64(input.GasPrice),
 		vm.kinterpreter.Model.FromBigInt(gasProvided),
-		vm.kinterpreter.Model.FromBigInt(input.Header.Beneficiary),
+		m.IntZero, // beneficiary
 		m.IntZero, // difficulty
-		vm.kinterpreter.Model.FromBigInt(input.Header.Number),
-		vm.kinterpreter.Model.FromBigInt(input.Header.GasLimit),
-		vm.kinterpreter.Model.FromBigInt(input.Header.Timestamp),
+		m.IntZero, // number
+		m.IntZero, // block gas limit
+		vm.kinterpreter.Model.FromUint64(vm.blockchainAdapter.Upstream.CurrentTimeStamp()),
 		vm.kinterpreter.Model.NewString(input.Function),
 	)
 
 	return vm.runTransaction(kapp)
 }
 
-func (vm *ElrondIeleVM) convertArgs(args []*big.Int) m.KReference {
+func (vm *ElrondIeleVM) convertArgs(args [][]byte) m.KReference {
 	kargs := make([]m.KReference, len(args))
 	for i, arg := range args {
-		kargs[i] = vm.kinterpreter.Model.FromBigInt(arg)
+		bi := twos.FromBytes(arg)
+		kargs[i] = vm.kinterpreter.Model.FromBigInt(bi)
 	}
 	kargList := vm.kinterpreter.Model.NewList(m.SortList, m.LblXuListXu, kargs)
 	return kargList
@@ -165,13 +161,13 @@ func (vm *ElrondIeleVM) runTransaction(kinput m.KReference) (*vmi.VMOutput, erro
 	if !retsOk {
 		return nil, errors.New("invalid vmResult return list")
 	}
-	var returnData []*big.Int
+	var returnData [][]byte
 	for _, kret := range kresRets {
 		kiRet, kiRetOk := vm.kinterpreter.Model.GetBigInt(kret)
 		if !kiRetOk {
 			return nil, errors.New("return value not of type Int")
 		}
-		returnData = append(returnData, kiRet)
+		returnData = append(returnData, twos.ToBytes(kiRet))
 	}
 
 	// gas

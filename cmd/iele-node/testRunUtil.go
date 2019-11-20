@@ -2,7 +2,7 @@ package main
 
 import (
 	"bytes"
-	"fmt"
+
 	"io/ioutil"
 	"math/big"
 	"os"
@@ -11,20 +11,8 @@ import (
 	worldhook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-blockchain"
 
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
-	ij "github.com/ElrondNetwork/elrond-vm-util/test-util/ielejson"
+	ij "github.com/ElrondNetwork/elrond-vm-util/test-util/vmtestjson"
 )
-
-// for nicer error messages
-func resultAsString(result []*big.Int) string {
-	str := "["
-	for i, res := range result {
-		str += fmt.Sprintf("0x%x", res)
-		if i < len(result)-1 {
-			str += ", "
-		}
-	}
-	return str + "]"
-}
 
 func convertAccount(testAcct *ij.Account) *worldhook.Account {
 	storage := make(map[string][]byte)
@@ -53,21 +41,6 @@ func convertLogToTestFormat(outputLog *vmi.LogEntry) *ij.LogEntry {
 		Data:    outputLog.Data,
 	}
 	return &testLog
-}
-
-func convertBlockHeader(testBlh *ij.BlockHeader) *vmi.SCCallHeader {
-	return &vmi.SCCallHeader{
-		Beneficiary: testBlh.Beneficiary,
-		Number:      testBlh.Number,
-		GasLimit:    testBlh.GasLimit,
-		Timestamp:   testBlh.UnixTimestamp,
-	}
-	// return &vmi.SCCallHeader{
-	// 	Beneficiary: big.NewInt(0),
-	// 	Number:      big.NewInt(0),
-	// 	GasLimit:    big.NewInt(0),
-	// 	Timestamp:   big.NewInt(0),
-	// }
 }
 
 var zero = big.NewInt(0)

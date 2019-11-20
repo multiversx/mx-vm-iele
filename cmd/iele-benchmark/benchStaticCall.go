@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	twos "github.com/ElrondNetwork/big-int-util/twos-complement"
 	vmi "github.com/ElrondNetwork/elrond-vm-common"
 	worldhook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-blockchain"
 	cryptohook "github.com/ElrondNetwork/elrond-vm-util/mock-hook-crypto"
@@ -50,6 +51,11 @@ func benchmarkStaticCall(b *testing.B, contract string, functionName string, arg
 		Code:    []byte{},
 	})
 
+	convertedArgs := make([][]byte, len(args))
+	for i, arg := range args {
+		convertedArgs[i] = twos.ToBytes(arg)
+	}
+
 	// create the VM and allocate some memory
 	vm := eiele.NewElrondIeleVM(
 		eiele.TestVMType, eiele.ElrondDefault,
@@ -62,23 +68,15 @@ func benchmarkStaticCall(b *testing.B, contract string, functionName string, arg
 	}
 
 	for benchMarkRepeat := 0; benchMarkRepeat < repeats; benchMarkRepeat++ {
-		blHeader := &vmi.SCCallHeader{
-			Beneficiary: big.NewInt(0),
-			Number:      big.NewInt(int64(benchMarkRepeat)),
-			GasLimit:    hexToBigInt("174876e800"),
-			Timestamp:   big.NewInt(0),
-		}
-
 		input := &vmi.ContractCallInput{
 			RecipientAddr: contractAddr,
 			Function:      functionName,
 			VMInput: vmi.VMInput{
 				CallerAddr:  account1Addr,
-				Arguments:   args,
+				Arguments:   convertedArgs,
 				CallValue:   big.NewInt(0),
-				GasPrice:    big.NewInt(1),
-				GasProvided: hexToBigInt("100000000"),
-				Header:      blHeader,
+				GasPrice:    1,
+				GasProvided: 100000000,
 			},
 		}
 

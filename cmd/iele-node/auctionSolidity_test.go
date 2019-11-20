@@ -7,9 +7,10 @@ import (
 )
 
 func TestAuctionSolidity(t *testing.T) {
-	err := controller.RunAllIeleTestsInDirectory(
+	err := controller.RunAllJSONTestsInDirectory(
 		elrondTestRoot,
 		"auction-solidity",
+		".iele.json",
 		nil,
 		newElrondIeleTestExecutor())
 
