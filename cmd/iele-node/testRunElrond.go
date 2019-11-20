@@ -33,6 +33,10 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 				return beforeErr
 			}
 
+			arguments := make([][]byte, len(tx.Arguments))
+			for i, arg := range tx.Arguments {
+				arguments[i] = append(arguments[i], arg.ToBytesAlwaysForceSign()...)
+			}
 			var output *vmi.VMOutput
 
 			if tx.IsCreate {
@@ -40,7 +44,7 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 					ContractCode: []byte(tx.AssembledCode),
 					VMInput: vmi.VMInput{
 						CallerAddr:  tx.From,
-						Arguments:   tx.Arguments,
+						Arguments:   arguments,
 						CallValue:   tx.Value,
 						GasPrice:    tx.GasPrice,
 						GasProvided: tx.GasLimit,
@@ -58,7 +62,7 @@ func runTestElrond(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.Bl
 					Function:      tx.Function,
 					VMInput: vmi.VMInput{
 						CallerAddr:  tx.From,
-						Arguments:   tx.Arguments,
+						Arguments:   arguments,
 						CallValue:   tx.Value,
 						GasPrice:    tx.GasPrice,
 						GasProvided: tx.GasLimit,
