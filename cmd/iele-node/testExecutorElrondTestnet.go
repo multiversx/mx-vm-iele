@@ -33,6 +33,7 @@ func (te *elrondTestnetIeleTestExecutor) Run(test *ij.Test) error {
 		te.vm = eiele.NewElrondIeleVM(
 			eiele.TestVMType, eiele.ElrondDefault,
 			te.world, cryptohook.KryptoHookMockInstance)
+		te.vm.SetSignedArguments() // these tests assume signed arguments
 		if te.tracePretty {
 			te.vm.SetTracePretty()
 		}

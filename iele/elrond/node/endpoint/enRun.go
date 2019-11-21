@@ -101,7 +101,13 @@ func (vm *ElrondIeleVM) RunSmartContractCall(input *vmi.ContractCallInput) (*vmi
 func (vm *ElrondIeleVM) convertArgs(args [][]byte) m.KReference {
 	kargs := make([]m.KReference, len(args))
 	for i, arg := range args {
-		bi := twos.FromBytes(arg)
+		var bi *big.Int
+		if vm.signedArguments {
+			bi = twos.FromBytes(arg)
+		} else {
+			bi = big.NewInt(0).SetBytes(arg)
+		}
+
 		kargs[i] = vm.kinterpreter.Model.FromBigInt(bi)
 	}
 	kargList := vm.kinterpreter.Model.NewList(m.SortList, m.LblXuListXu, kargs)

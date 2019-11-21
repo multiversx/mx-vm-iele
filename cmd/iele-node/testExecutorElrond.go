@@ -54,6 +54,7 @@ func (te *elrondIeleTestExecutor) Run(test *ij.Test) error {
 		elrondIeleVM := eiele.NewElrondIeleVM(
 			eiele.TestVMType, schedule,
 			te.world, cryptohook.KryptoHookMockInstance)
+		elrondIeleVM.SetSignedArguments() // these tests assume signed arguments
 		if te.tracePretty {
 			elrondIeleVM.SetTracePretty()
 		}

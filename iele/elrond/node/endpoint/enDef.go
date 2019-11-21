@@ -20,6 +20,7 @@ type ElrondIeleVM struct {
 	blockchainAdapter *blockchain.Blockchain
 	kryptoAdapter     *krypto.Krypto
 	kinterpreter      *interpreter.Interpreter
+	signedArguments   bool
 	logIO             bool
 }
 
@@ -44,12 +45,19 @@ func NewElrondIeleVM(
 		blockchainAdapter: blockchainAdapter,
 		kryptoAdapter:     kryptoAdapter,
 		kinterpreter:      kinterpreter,
+		signedArguments:   false,
+		logIO:             false,
 	}
 }
 
 // SetTracePretty turns on pretty trace creation, use for debugging only
 func (vm *ElrondIeleVM) SetTracePretty() {
 	vm.kinterpreter.SetTracePretty()
+}
+
+// SetSignedArguments causes the VM to interpret call arguments as signed instead of unsigned (default) big ints.
+func (vm *ElrondIeleVM) SetSignedArguments() {
+	vm.signedArguments = true
 }
 
 // SetLogIO causes the VM to print to console all inputs, data from hooks and output
