@@ -113,8 +113,8 @@ func runTestOriginal(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.
 			}
 
 			// check gas
-			if test.CheckGas && blResult.Gas != nil {
-				if blResult.Gas.Cmp(output.GasRemaining) != 0 {
+			if test.CheckGas && blResult.CheckGas {
+				if blResult.Gas != output.GasRemaining {
 					return fmt.Errorf("result gas mismatch. Want: %d (0x%x). Got: %d (0x%x)",
 						blResult.Gas, blResult.Gas, output.GasRemaining, output.GasRemaining)
 				}
@@ -164,7 +164,8 @@ func runTestOriginal(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.
 							ij.LogToString(testLog), ij.LogToString(convertLogToTestFormat(outLog)))
 					}
 					for ti := range outLog.Topics {
-						if outLog.Topics[ti].Cmp(testLog.Topics[ti]) != 0 {
+						if big.NewInt(0).SetBytes(outLog.Topics[ti]).Cmp(
+							big.NewInt(0).SetBytes(testLog.Topics[ti])) != 0 {
 							return fmt.Errorf("bad log topic. Want:\n%s\nGot:\n%s",
 								ij.LogToString(testLog), ij.LogToString(convertLogToTestFormat(outLog)))
 						}

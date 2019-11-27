@@ -156,7 +156,7 @@ func (vm *OriginalIeleVM) runTransaction(kinput m.KReference) (*vmi.VMOutput, er
 	}
 
 	// gas
-	kresGas, gasOk := vm.kinterpreter.Model.GetBigInt(resultKappArgs[1])
+	kresGas, gasOk := vm.kinterpreter.Model.GetUint64(resultKappArgs[1])
 	if !gasOk {
 		return nil, errors.New("invalid vmResult gas")
 	}
@@ -371,13 +371,13 @@ func (vm *OriginalIeleVM) convertKToLog(klog m.KReference) (*vmi.LogEntry, error
 	if !ktopicsOk {
 		return nil, errors.New("invalid log topics")
 	}
-	topics := make([]*big.Int, len(ktopics))
+	topics := make([][]byte, len(ktopics))
 	for i, ktopic := range ktopics {
 		itopic, itopicOk := vm.kinterpreter.Model.GetBigInt(ktopic)
 		if !itopicOk {
 			return nil, errors.New("invalid log topic")
 		}
-		topics[i] = itopic
+		topics[i] = itopic.Bytes()
 	}
 
 	data := logArgs[2]

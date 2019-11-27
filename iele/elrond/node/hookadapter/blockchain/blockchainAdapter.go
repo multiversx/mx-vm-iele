@@ -202,11 +202,11 @@ func (b *Blockchain) GetCode(c m.KReference, lbl m.KLabel, sort m.Sort, config m
 
 // GetBlockhash adapts between K model and elrond function
 func (b *Blockchain) GetBlockhash(c m.KReference, lbl m.KLabel, sort m.Sort, config m.KReference, ms *m.ModelState) (m.KReference, error) {
-	offset, isInt := ms.GetBigInt(c)
+	nonce, isInt := ms.GetUint64(c)
 	if !isInt {
 		return m.NoResult, errors.New("invalid argument(s) provided to blockchain hook")
 	}
-	result, err := b.Upstream.GetBlockhash(offset)
+	result, err := b.Upstream.GetBlockhash(nonce)
 	if err != nil {
 		return m.NoResult, err
 	}
