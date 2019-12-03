@@ -27,7 +27,7 @@ func main() {
 	//debugElrondTest("agar_v1/addPlayerToGame.iele.json", false)
 	//debugElrondTest("tests/iele-v3/danse/ERC20/allowance_CallerCaller.iele.json", false) // trace_good
 
-	debugElrondTest("tests/iele-v3/danse/unit/shift.iele.json", true)
+	debugElrondTest("tests/iele-v3/danse/auction/create.iele.json", false)
 
 	//debugAgarMin()
 
