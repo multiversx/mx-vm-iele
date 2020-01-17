@@ -261,6 +261,11 @@ func (vm *ElrondIeleVM) runTransaction(kinput m.KReference) (*vmi.VMOutput, erro
 		touchedAddr = append(touchedAddr, it)
 	}
 
+	modAccountsMap := make(map[string]*vmi.OutputAccount, len(modAccounts))
+	for _, account := range modAccounts {
+		modAccountsMap[string(account.Address)] = account
+	}
+
 	result := &vmi.VMOutput{
 		ReturnData:      returnData,
 		GasRemaining:    kresGas,
@@ -268,7 +273,7 @@ func (vm *ElrondIeleVM) runTransaction(kinput m.KReference) (*vmi.VMOutput, erro
 		ReturnCode:      vmi.ReturnCode(int(kresStatus.Int64())),
 		DeletedAccounts: deletedAddr,
 		TouchedAccounts: touchedAddr,
-		OutputAccounts:  modAccounts,
+		OutputAccounts:  modAccountsMap,
 		Logs:            logs,
 	}
 
@@ -373,12 +378,17 @@ func (vm *ElrondIeleVM) convertKToModifiedAccount(kacc m.KReference) (*vmi.Outpu
 		return nil, errors.New("VM should only output existing accounts")
 	}
 
+	storageUpdatesMap := make(map[string]*vmi.StorageUpdate, len(storageUpdates))
+	for _, update := range storageUpdates {
+		storageUpdatesMap[string(update.Offset)] = update
+	}
+
 	return &vmi.OutputAccount{
 		Address:        iaddr,
 		Balance:        ibalance,
 		BalanceDelta:   balanceDelta,
 		Nonce:          inonce,
-		StorageUpdates: storageUpdates,
+		StorageUpdates: storageUpdatesMap,
 		Code:           []byte(codeStr),
 	}, nil
 }

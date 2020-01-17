@@ -72,8 +72,8 @@ func (b *Blockchain) logStorage(address []byte, index []byte, data []byte) {
 		acc = &vmi.OutputAccount{Address: address}
 		b.inputAccounts[string(address)] = acc
 	}
-	acc.StorageUpdates = append(acc.StorageUpdates, &vmi.StorageUpdate{
+	acc.StorageUpdates[string(index)] =  &vmi.StorageUpdate{
 		Offset: index,
 		Data:   data,
-	})
+	}
 }

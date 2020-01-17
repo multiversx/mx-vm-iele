@@ -91,7 +91,15 @@ func (vm *ElrondIeleVM) logOutput(output *vmi.VMOutput) {
 	fmt.Printf("\nTransaction output:")
 	fmt.Printf("\n  Return code: %d (%s)", int(output.ReturnCode), output.ReturnCode.String())
 	fmt.Printf("\n  Output accounts:")
-	vm.printAccountData(output.OutputAccounts)
+
+	accounts := make([]*vmi.OutputAccount, len(output.OutputAccounts))
+	i := 0
+	for _, account := range output.OutputAccounts {
+		accounts[i] = account
+		i++
+	}
+
+	vm.printAccountData(accounts)
 	fmt.Println()
 }
 
