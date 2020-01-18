@@ -76,7 +76,15 @@ func runTestOriginal(test *ij.Test, vm vmi.VMExecutionHandler, world *worldhook.
 				}
 			}
 
-			updErr := world.UpdateAccounts(output.OutputAccounts, output.DeletedAccounts)
+			accountsSlice := make([]*vmi.OutputAccount, len(output.OutputAccounts))
+			i := 0
+			for _, account := range output.OutputAccounts {
+				accountsSlice[i] = account
+				i++
+			}
+
+			// update accounts based on deltas
+			updErr := world.UpdateAccounts(accountsSlice, output.DeletedAccounts)
 			if updErr != nil {
 				return updErr
 			}
